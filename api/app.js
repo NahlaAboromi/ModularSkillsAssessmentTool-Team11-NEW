@@ -6,9 +6,9 @@ require('dotenv').config();
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 if (!apiKey) {
-  console.error('❌ ANTHROPIC_API_KEY not found');
-  process.exit(1);
+  console.warn('⚠️ ANTHROPIC_API_KEY not found. Some routes may fail.');
 }
+
 
 const app = express();
 
