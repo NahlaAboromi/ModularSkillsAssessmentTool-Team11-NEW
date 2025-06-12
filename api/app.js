@@ -37,7 +37,7 @@ const studentNotificationsRouter = require('./routers/studentNotifications.route
 const summaryRouter = require('./routers/summary.route');
 const classesRouter = require('./routers/classes.route');
 const claudeRoutes = require('./routers/claude.route');
-
+const teacherStudentProgressRouter = require('./routers/teacherStudentProgress.route');
 // 🧭 Route setup
 app.use('/api/teachers', teachersRouter);
 app.use('/api/students', studentsRouter);
@@ -46,7 +46,7 @@ app.use('/api/studentNotifications', studentNotificationsRouter);
 app.use('/api', summaryRouter);
 app.use('/api/classes', classesRouter);
 app.use('/api/claude', claudeRoutes);
-
+app.use('/api', teacherStudentProgressRouter);
 // ✅ Export the app for Vercel
 module.exports = app;
 

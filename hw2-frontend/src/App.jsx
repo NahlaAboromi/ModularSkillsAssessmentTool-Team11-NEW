@@ -28,6 +28,7 @@ import VerifyCode from "./components/teacherLoginRegister/VerifyCode";
 import ResetPassword from "./components/teacherLoginRegister/ResetPassword";
 
 import Homepage from './layoutForEducatorsAndStudents/Homepage';
+import ProgressOfChosenStudent from './components/StudentProgressForTeacher/ProgressOfChosenStudent.jsx';
 
 function App() {
   return (
@@ -50,7 +51,7 @@ function App() {
                 <Route path="/class-card" element={<ClassCard />} />
                 <Route path="/view-classes" element={<ViewClasses />} />
                 <Route path="/login" element={<LoginPage />} />
-
+                <Route path="/progress-of-chosen-student/:studentId" element={<ProgressOfChosenStudent />} />
                 {/* ✅ חדשים לכפתורים */}
                 <Route path="/teacher/class/:classCode" element={<ClassDetails />} />
                 <Route path="/teacher/class/:classCode/reports" element={<ClassStudentReports />} />
