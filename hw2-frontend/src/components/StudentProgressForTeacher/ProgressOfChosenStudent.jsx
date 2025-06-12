@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
+
+import { exportElementAsPDF } from './pdfExporter';
 
 import TeacherHeader from '../../layout/TeacherHeader';
 import Footer from '../../layout/Footer';
@@ -23,10 +25,14 @@ const ProgressOfChosenStudentContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const exportRef = useRef(); // 🔵 רפרנס לייצוא PDF
+const handleExportPDF = () => {
+  exportElementAsPDF(exportRef.current, `student-${studentId}-progress.pdf`);
+};
   useEffect(() => {
     async function fetchStudentData() {
       try {
-        const res = await fetch(`/api/student/${studentId}/progress`);
+        const res = await fetch(`http://localhost:5000/api/student/${studentId}/progress`);
         if (!res.ok) throw new Error('Failed to fetch student progress data');
         const data = await res.json();
         setStudentData(data);
@@ -77,20 +83,33 @@ const ProgressOfChosenStudentContent = () => {
       <div className="px-4 mt-4"><TeacherHeader /></div>
 
       <main className="flex-1 w-full px-4 py-6">
-        <StudentOverviewHeader
-          student={{
-            id: studentId,
-            username: passedStudent?.username || studentData.username,
-            profilePic: passedStudent?.profilePic || studentData.profilePic,
-            classes: studentData.classes,
-            totalAttempts: passedStudent?.totalAttempts || studentData.totalAttempts,
-            uniqueSimulations: passedStudent?.uniqueSimulations || studentData.uniqueSimulations,
-            averageScore: passedStudent?.averageScore || studentData.averageScore
-          }}
-          isDark={isDark}
-        />
 
-        <div className="space-y-6">
+<div className="w-full flex justify-end mb-4 pr-4">
+  <button
+    onClick={handleExportPDF}
+    className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-all"
+  >
+    Export PDF
+  </button>
+</div>
+
+
+
+        {/* 🔵 תוכן לייצוא */}
+        <div ref={exportRef} className="space-y-6">
+          <StudentOverviewHeader
+            student={{
+              id: studentId,
+              username: passedStudent?.username || studentData.username,
+              profilePic: passedStudent?.profilePic || studentData.profilePic,
+              classes: studentData.classes,
+              totalAttempts: passedStudent?.totalAttempts || studentData.totalAttempts,
+              uniqueSimulations: passedStudent?.uniqueSimulations || studentData.uniqueSimulations,
+              averageScore: passedStudent?.averageScore || studentData.averageScore
+            }}
+            isDark={isDark}
+          />
+
           {studentData.classes.map((classData, index) => (
             <ClassProgressCard
               key={index}

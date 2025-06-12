@@ -6,18 +6,20 @@ import { UserContext } from '../../context/UserContext';
 import AIChat from '../../AI/AIChat';
 import StudentCard from '../../components/StudentProgressForTeacher/StudentCard';
 
+
+
 const AllReportsContent = () => {
-  const { theme } = useContext(ThemeContext);
-  const { user } = useContext(UserContext);
-  const isDark = theme === 'dark';
+  const { theme } = useContext(ThemeContext); // Get current theme
+  const { user } = useContext(UserContext);   // Get current user (teacher)
+  const isDark = theme === 'dark';            // Boolean for dark mode
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
     if (!user?.id) return;
     const fetchStudents = async () => {
       try {
-        const response = await fetch(`/api/student-progress/${user.id}`);
-        const data = await response.json();
+        const response = await fetch(`http://localhost:5000/api/student-progress/${user.id}`);
+        const data = await response.json(); 
         console.log("Fetched students data:", data);
         setStudents(data);
       } catch (error) {
@@ -43,18 +45,10 @@ const AllReportsContent = () => {
             View progress of all students who participated in your classes
           </p>
 
-          <div className={`rounded-lg shadow-md p-6 ${isDark ? 'bg-slate-600' : 'bg-white'}`}>
-            {students.length === 0 ? (
-              <p className={`text-center text-lg ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>
-                😕 No students found in your classes yet.
-              </p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {students.map((student) => (
-                  <StudentCard key={student.id} student={student} />
-                ))}
-              </div>
-            )}
+          <div className={`rounded-lg shadow-md p-6 ${isDark ? 'bg-slate-600' : 'bg-white'} grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4`}>
+            {students.map((student) => (
+              <StudentCard key={student.id} student={student} />
+            ))}
           </div>
         </div>
       </main>
