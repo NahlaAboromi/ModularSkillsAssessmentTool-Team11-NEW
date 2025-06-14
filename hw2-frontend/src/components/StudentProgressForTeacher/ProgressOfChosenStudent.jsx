@@ -32,7 +32,7 @@ const handleExportPDF = () => {
   useEffect(() => {
     async function fetchStudentData() {
       try {
-        const res = await fetch(`/api/student/${studentId}/progress`);
+        const res = await fetch(`/api/teacher/${user.id}/student/${studentId}/progress`);
         if (!res.ok) throw new Error('Failed to fetch student progress data');
         const data = await res.json();
         setStudentData(data);
