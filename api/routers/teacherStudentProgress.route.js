@@ -68,15 +68,20 @@ router.get('/student-progress/:teacherId', async (req, res) => {
   }
 });
 
-// Route לקבלת כל נתוני התקדמות לסטודנט מסוים
-router.get('/student/:studentId/progress', async (req, res) => {
-  const { studentId } = req.params;
-  
+router.get('/teacher/:teacherId/student/:studentId/progress', async (req, res) => {
+  const { teacherId, studentId } = req.params;
+
   try {
-    // מוצאים את כל הכיתות שבהן יש לסטודנט נסיונות
-    const classes = await Class.find({ "students.studentId": studentId });
-    
-    // עבור כל כיתה, מסננים רק את התשובות של הסטודנט
+    // שלוף רק כיתות של המורה שבהן הסטודנט הזה קיים
+    const classes = await Class.find({
+      createdBy: teacherId,
+      "students.studentId": studentId
+    });
+
+    if (classes.length === 0) {
+      return res.status(404).json({ message: 'Student not found for this teacher' });
+    }
+
     const studentClasses = classes.map(cls => {
       const studentAttempts = cls.students.filter(s => s.studentId === studentId);
       return {
@@ -88,7 +93,7 @@ router.get('/student/:studentId/progress', async (req, res) => {
         attempts: studentAttempts
       };
     });
-    
+
     res.json({
       studentId,
       classes: studentClasses
@@ -98,5 +103,4 @@ router.get('/student/:studentId/progress', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 module.exports = router;
