@@ -35,10 +35,10 @@ const StudentCard = ({ student }) => {
               e.target.onerror = null;
             }}
           />
-          <div>
-            <h3 className="text-lg font-semibold">{username}</h3>
-            <p className="text-sm text-gray-500">Student ID: {id}</p>
-          </div>
+        <div className="min-w-0">
+          <h3 className="text-sm font-semibold truncate max-w-[160px]">{username}</h3>
+          <p className="text-xs text-gray-500">Student ID: {id}</p>
+        </div>
         </div>
         <div className="text-lg font-bold text-yellow-600 whitespace-nowrap">
           {averageScore}/5
