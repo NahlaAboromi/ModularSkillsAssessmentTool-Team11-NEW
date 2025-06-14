@@ -23,25 +23,28 @@ const StudentCard = ({ student }) => {
       ${isDark ? 'bg-slate-700 text-white' : 'bg-white text-gray-800'}`}>
 
       {/* תמונת סטודנט וכותרת */}
-      <div className="flex items-center gap-4 mb-4">
-        <img
-          src={profilePic && profilePic !== 'default_empty_profile_pic' ? profilePic : defaultAvatar}
-          alt="Profile"
-          className={`w-12 h-12 rounded-full object-cover border
-            ${isDark ? 'border-gray-600' : 'border-gray-300'}`}
-          onError={(e) => {
-            e.target.src = defaultAvatar;
-            e.target.onerror = null;
-          }}
-        />
-        <div>
-          <h3 className="text-lg font-semibold">{username}</h3>
-          <p className="text-sm text-gray-500">Student ID: {id}</p>
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-4">
+          <img
+            src={profilePic && profilePic !== 'default_empty_profile_pic' ? profilePic : defaultAvatar}
+            alt="Profile"
+            className={`w-12 h-12 rounded-full object-cover border
+              ${isDark ? 'border-gray-600' : 'border-gray-300'}`}
+            onError={(e) => {
+              e.target.src = defaultAvatar;
+              e.target.onerror = null;
+            }}
+          />
+          <div>
+            <h3 className="text-lg font-semibold">{username}</h3>
+            <p className="text-sm text-gray-500">Student ID: {id}</p>
+          </div>
         </div>
-        <div className="ml-auto text-lg font-bold text-yellow-600">
+        <div className="text-lg font-bold text-yellow-600 whitespace-nowrap">
           {averageScore}/5
         </div>
       </div>
+
 
       {/* סטטיסטיקות */}
       <div className={`text-sm mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
