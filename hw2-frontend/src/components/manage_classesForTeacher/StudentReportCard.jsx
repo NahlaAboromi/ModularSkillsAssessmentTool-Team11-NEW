@@ -82,39 +82,50 @@ const StudentReportCard = ({ studentGroup }) => {
    * Uses html2canvas to capture the report DOM and jsPDF to generate and download the PDF.
    */
 const exportToPDF = async () => {
-    if (!reportRef.current) return;
+  if (!reportRef.current) return;
 
-    setIsExporting(true);
-    try {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: isDark ? '#334155' : '#ffffff',
-        width: reportRef.current.offsetWidth,
-        height: reportRef.current.offsetHeight
-      });
+  setIsExporting(true);
+  try {
+    const canvas = await html2canvas(reportRef.current, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: false,
+      backgroundColor: isDark ? '#334155' : '#ffffff'
+    });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const imgWidth = 190;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgProps = pdf.getImageProperties(imgData);
 
-      pdf.setFontSize(16);
-      pdf.text(`Student Report - ${(fullStudent && fullStudent.username) || username || studentId || 'Unknown Student'}`, 10, 10);
-      pdf.addImage(imgData, 'PNG', 10, 25, imgWidth, imgHeight);
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      const fileName = `student_report_${(fullStudent && fullStudent.username) || username || studentId}_${new Date().toISOString().split('T')[0]}.pdf`;
-      pdf.save(fileName);
+    const imgWidth = pdfWidth - 20; // leave margins
+    const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
 
-    } catch (error) {
-      console.error('❌ Error exporting PDF:', error);
-      alert("Error exporting PDF. Please try again.");
-    } finally {
-      setIsExporting(false);
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, 'PNG', 10, position + 10, imgWidth, imgHeight);
+    heightLeft -= pdfHeight - 20;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 10, position + 10, imgWidth, imgHeight);
+      heightLeft -= pdfHeight - 20;
     }
-  };
+
+    const fileName = `student_report_${(fullStudent && fullStudent.username) || username || studentId}_${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fileName);
+
+  } catch (error) {
+    console.error('❌ Error exporting PDF:', error);
+    alert("Error exporting PDF. Please try again.");
+  } finally {
+    setIsExporting(false);
+  }
+};
   return (
     <div className="relative">
       {/* Export PDF Button */}
