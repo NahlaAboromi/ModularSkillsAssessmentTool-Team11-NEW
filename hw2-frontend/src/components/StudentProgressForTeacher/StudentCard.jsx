@@ -36,7 +36,13 @@ const StudentCard = ({ student }) => {
             }}
           />
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold truncate max-w-[160px]">{username}</h3>
+          <h3
+          className="text-sm font-semibold truncate max-w-[160px]"
+          title={username}
+        >
+          {username}
+        </h3>
+
           <p className="text-xs text-gray-500">Student ID: {id}</p>
         </div>
         </div>
