@@ -161,9 +161,13 @@ const RegisterPage = () => {
             <h2 className="mt-6 text-center text-3xl font-extrabold">Create your account</h2>
             <p className="mt-2 text-center text-sm">
               Already have an account?{' '}
-              <Link to="/student-login" className="font-medium text-blue-500 hover:text-blue-600">
+              <Link 
+                to={role === "teacher" ? "/login" : "/student-login"} 
+                className="font-medium text-blue-500 hover:text-blue-600"
+              >
                 Sign in
               </Link>
+
             </p>
           </div>
              {/* Error Alert */}
