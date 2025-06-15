@@ -15,10 +15,12 @@
     {
       "src": "/api/(.*)",
       "dest": "/api/app.js"
-    },
+    }
+  ],
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "/hw2-frontend/$1"
+      "source": "/(.*)",
+      "destination": "/hw2-frontend/dist/index.html"
     }
   ],
   "env": {
