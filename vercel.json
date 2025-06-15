@@ -10,8 +10,5 @@
       "src": "api/app.js",
       "use": "@vercel/node"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
