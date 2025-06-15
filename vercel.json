@@ -17,6 +17,9 @@
       "dest": "/api/app.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "/hw2-frontend/dist/index.html"
     }
