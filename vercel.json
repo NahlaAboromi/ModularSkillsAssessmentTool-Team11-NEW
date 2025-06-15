@@ -11,16 +11,6 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/app.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/hw2-frontend/dist/index.html"
-    }
-  ],
   "env": {
     "NODE_ENV": "production"
   }
