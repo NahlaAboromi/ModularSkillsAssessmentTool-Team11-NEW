@@ -1,5 +1,5 @@
 import React from 'react'; 
-import { useNotifications } from '../hooks/NotificationsContext'; 
+import { useNotifications } from '../context/NotificationsContext'; 
 
 // Main component to display recent unread activities
 const RecentActivity = () => {
