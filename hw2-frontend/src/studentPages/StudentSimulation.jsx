@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ThemeProvider, ThemeContext } from '../DarkLightMood/ThemeContext';
 import StudentHeader from "../studentPages/StudentHeader";
 import { UserContext } from '../context/UserContext';
-import {useStudentNotification} from '../studentPages/StudentNotifications';
+import {useStudentNotification} from '../context/StudentNotificationsContext';
 import Footer from "../layout/Footer";
 
 const StudentSimulation = () => {
