@@ -11,15 +11,9 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/app.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/hw2-frontend/$1"
-    }
+   "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/app.js" },
+    { "source": "/(.*)", "destination": "/hw2-frontend/index.html" }
   ],
   "env": {
     "NODE_ENV": "production"
