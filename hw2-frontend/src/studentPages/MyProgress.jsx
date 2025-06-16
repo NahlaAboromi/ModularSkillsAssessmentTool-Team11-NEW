@@ -6,7 +6,7 @@ import { ThemeProvider, ThemeContext } from '../DarkLightMood/ThemeContext';
 import {
     LineChart,Line,BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,Legend
 } from 'recharts';
-import {useStudentNotification} from './StudentNotifications';
+import {useStudentNotification} from '../context/StudentNotificationsContext';
 import StudentAIChat from '../AI/StudentAIChat'; 
 
 //Renders a line chart that visualizes student progress over time by attempt number and score.
