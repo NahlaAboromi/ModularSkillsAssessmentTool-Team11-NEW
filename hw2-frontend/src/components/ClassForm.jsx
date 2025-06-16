@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { UserContext } from '../context/UserContext';
-import { useNotifications } from '../hooks/NotificationsContext';
+import { useNotifications } from '../context/NotificationsContext'; 
 
 /**
  * ClassForm Component
