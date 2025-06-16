@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useStudentNotification } from './StudentNotifications';
+import { useStudentNotification } from '../context/StudentNotifications';
 import { useLocation } from 'react-router-dom';
 
 const RecentActivity = () => {
