@@ -327,15 +327,18 @@ const ClassForm = () => {
               Choose from our topic list or create your own custom topic
             </div>
             
+            
             {/* Topic selection tabs */}
             <div className="flex mb-4 border-b">
               {/* Tab for topic list */}
               <button
                 type="button"
                 onClick={() => setFormData({...formData, useCustomTopic: false})}
-                className={`py-2 px-4 ${!formData.useCustomTopic 
-                  ? 'border-b-2 border-blue-500 font-medium text-blue-600' 
-                  : 'text-gray-500 hover:text-gray-700'}`}
+               className={`py-2 px-4 
+                ${!formData.useCustomTopic 
+                  ? 'border-b-2 font-medium text-blue-600 dark:bg-gray-600  dark:text-blue-500' 
+                  : 'text-gray-500 hover:text-gray-700 dark:bg-gray-600 dark:text-gray-400 dark:hover:text-gray-200'
+                }`}
                 disabled={isLoading}
               >
                 Select from List
@@ -344,14 +347,17 @@ const ClassForm = () => {
               <button
                 type="button"
                 onClick={() => setFormData({...formData, useCustomTopic: true})}
-                className={`py-2 px-4 ${formData.useCustomTopic 
-                  ? 'border-b-2 border-blue-500 font-medium text-blue-600' 
-                  : 'text-gray-500 hover:text-gray-700'}`}
+                className={`py-2 px-4 
+                ${!formData.useCustomTopic 
+                  ? 'text-gray-500 dark:bg-gray-600 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                  : 'border-b-2  font-medium text-blue-600  dark:bg-gray-600  dark:text-blue-500' 
+                }`}
                 disabled={isLoading}
               >
                 Enter Custom Topic
               </button>
             </div>
+            
             
             {/* Topic dropdown or custom input */}
             {!formData.useCustomTopic ? (
@@ -396,21 +402,6 @@ const ClassForm = () => {
                 </p>
               </div>
             )}
-          </div>
-
-          {/* How it works explanation */}
-          <div className="mt-6 bg-blue-50 dark:bg-slate-600 p-4 rounded border border-blue-200 dark:border-slate-500">
-            <h3 className="font-medium text-blue-800 dark:text-blue-300">How it works:</h3>
-            <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
-              After entering class details, our AI will generate a short scenario with a question.
-              You'll be able to review and regenerate if needed before creating the class.
-            </p>
-            <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 mt-2 space-y-1">
-              <li>AI generates a short situational scenario (about 50 words)</li>
-              <li>It creates an open-ended question for students</li>
-              <li>Student responses will be analyzed using the CASEL 5 framework</li>
-              <li>You'll receive detailed reports on each student's social-emotional competencies</li>
-            </ul>
           </div>
 
           {/* Generate situation button */}
