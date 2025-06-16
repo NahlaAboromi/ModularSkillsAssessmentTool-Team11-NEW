@@ -9,7 +9,7 @@ const RecentActivity = () => {
   // Fetch notifications every time the pathname changes (page changes)
   useEffect(() => {
     fetchNotifications();
-  }, [location.pathname, fetchNotifications]); // הוספת fetchNotifications כתלות
+  }, [location.pathname, fetchNotifications]); 
 
   // Parse custom date string into a JavaScript Date object
   function parseCustomDate(dateStr) {
@@ -53,7 +53,7 @@ const RecentActivity = () => {
       <ul className="space-y-4">
         {recentNotifications.map((activity) => (
           <li
-            key={activity.id || activity.time} // השתמש במזהה ייחודי אם יש, אחרת ב־time
+            key={activity.id || activity.time} 
             className="border-b pb-2 border-gray-200 dark:border-gray-500 flex items-start gap-3"
           >
             <div
