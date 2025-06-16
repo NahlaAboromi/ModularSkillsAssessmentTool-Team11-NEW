@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ThemeContext } from '../DarkLightMood/ThemeContext';
 import ThemeToggle from '../DarkLightMood/ThemeToggle';
 import { UserContext } from '../context/UserContext';
-import {useStudentNotification} from './StudentNotifications';
+import {useStudentNotification} from '../context/StudentNotificationsContext';
 
 
 
