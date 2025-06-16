@@ -16,7 +16,7 @@ import ViewStudentSimulation from "./studentPages/StudentSimulation.jsx";
 import { UserProvider } from './context/UserContext';
 import { ThemeProvider } from './DarkLightMood/ThemeContext';
 import { NotificationsProvider } from "./context/NotificationsContext";
-import { StudentNotificationsProvider } from "./context/StudentNotificationsContext";
+import { StudentNotificationsProvider } from "./context/StudentNotificationContext";
 import StudentHome from './studentPages/StudentHome';
 import StudentRecentActivites from './studentPages/StudentRecentActivities';
 import MyReports from './studentPages/MyReports';
