@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { useNotifications } from '../hooks/NotificationsContext'; 
+import { useNotifications } from '../context/NotificationsContext'; 
 import { ThemeContext } from '../DarkLightMood/ThemeContext';
 import ThemeToggle from '../DarkLightMood/ThemeToggle';
 import { UserContext } from '../context/UserContext';
