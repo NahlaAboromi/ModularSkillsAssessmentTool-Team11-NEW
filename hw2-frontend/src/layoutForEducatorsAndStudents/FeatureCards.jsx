@@ -43,9 +43,7 @@ const FeatureCards = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-6 py-10">
       {features.map((feature, index) => {
-        const baseClasses = feature.bg
-          ? `${feature.bg} rounded-xl shadow-md p-6 text-center transition duration-300`
-          : `${isDark ? 'bg-slate-700 text-white' : 'bg-white text-slate-900'} rounded-xl shadow-md p-6 text-center transition duration-300`;
+        const baseClasses =  `${isDark ? 'bg-slate-700 text-white' : 'bg-white text-slate-900'} rounded-xl shadow-md p-6 text-center transition duration-300`;
 
         return (
           <div key={index} className={baseClasses}>
