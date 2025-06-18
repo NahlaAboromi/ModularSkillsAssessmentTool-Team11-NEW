@@ -82,7 +82,7 @@ const HomepageContent = () => {
     {/* Right Side - Image */}
     <div className="md:w-1/2 w-full px-6 md:px-12 py-10 bg-slate-50 dark:bg-slate-900 border-l border-slate-200 dark:border-slate-700 flex justify-center">
       <img
-        src="/analyze3.jpg"
+        src="/analyze2.jpg"
         alt="AI in education"
         className="rounded-xl shadow-2xl w-full object-cover h-80 md:h-[25rem] transform transition-all duration-500 hover:scale-105"
       />
