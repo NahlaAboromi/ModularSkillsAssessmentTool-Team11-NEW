@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNotifications } from '../context/NotificationsContext'; 
+import { useLocation } from 'react-router-dom';
 
+// Main component to display recent unread activities
 const RecentActivity = () => {
-  const { notifications } = useNotifications();
+  const { notifications, fetchNotifications } = useNotifications();
+  const location = useLocation();
+
+  // Fetch notifications every time the pathname changes (page changes)
+  useEffect(() => {
+    fetchNotifications();
+
+    const interval = setInterval(() => {
+      fetchNotifications(); // Polling every 5 seconds
+    }, 5000);
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, [location.pathname, fetchNotifications]); 
 
   // Parse custom date string into a JavaScript Date object
   function parseCustomDate(dateStr) {
@@ -40,10 +54,12 @@ const RecentActivity = () => {
     }
   };
 
-  if (!recentNotifications.length) {
+  // Show message if no notifications are available
+  if (!notifications.length) {
     return <div className="text-center text-gray-500 dark:text-gray-300">No activities found.</div>;
   }
 
+  // Render the list of unread notifications
   return (
     <div className="bg-white dark:bg-slate-600 dark:text-white p-6 rounded shadow-md">
       <h2 className="text-xl font-bold mb-4">Recent Activities</h2>
