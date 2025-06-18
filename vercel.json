@@ -3,7 +3,8 @@
   "builds": [
     {
       "src": "hw2-frontend/package.json",
-      "use": "@vercel/static-build"
+      "use": "@vercel/static-build",
+      "config": { "outputDirectory": "dist" }
     },
     {
       "src": "api/app.js",
@@ -17,7 +18,10 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/hw2-frontend/$1"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
