@@ -12,7 +12,16 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/app.js" },
-    { "src": "/(.*)", "dest": "/hw2-frontend/dist/index.html" }
-  ]
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/app.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/hw2-frontend/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
