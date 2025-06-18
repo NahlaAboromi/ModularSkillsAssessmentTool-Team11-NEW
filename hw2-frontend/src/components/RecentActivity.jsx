@@ -16,10 +16,6 @@ const RecentActivity = () => {
     return () => clearInterval(interval);
   }, [fetchNotifications, location.pathname]);
 
-  // הדפסת כל ה-notifications שהגיעו מה-context
-  console.log("🔍 Raw notifications from context:", notifications);
-
-  // ממיינים לפי createdAt מהחדש לישן
   const sortedNotifications = [...notifications].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
@@ -28,7 +24,7 @@ const RecentActivity = () => {
 
   const recentNotifications = sortedNotifications.slice(0, 3);
 
-  console.log("✅ Recent 3 activities:", recentNotifications);
+
 
   const getTypeStyle = (type) => {
     switch (type) {
