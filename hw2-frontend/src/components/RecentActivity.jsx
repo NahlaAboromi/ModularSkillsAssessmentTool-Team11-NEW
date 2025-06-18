@@ -6,7 +6,6 @@ const RecentActivity = () => {
   const { notifications, fetchNotifications } = useNotifications();
   const location = useLocation();
 
-  // Fetch notifications when pathname changes + set polling every 5 seconds
   useEffect(() => {
     fetchNotifications();
 
@@ -51,7 +50,11 @@ const RecentActivity = () => {
   };
 
   if (!notifications.length) {
-    return <div className="text-center text-gray-500 dark:text-gray-300">No activities found.</div>;
+    return (
+      <div className="text-center text-gray-500 dark:text-gray-300">
+        No activities found.
+      </div>
+    );
   }
 
   return (
@@ -63,12 +66,16 @@ const RecentActivity = () => {
             key={activity.id || activity.time}
             className="border-b pb-2 border-gray-200 dark:border-gray-500 flex items-start gap-3"
           >
-            <div className={`flex-shrink-0 mt-1 w-8 h-8 ${getTypeStyle(activity.type)} rounded-full flex items-center justify-center`}>
+            <div
+              className={`flex-shrink-0 mt-1 w-8 h-8 ${getTypeStyle(activity.type)} rounded-full flex items-center justify-center`}
+            >
               <span>{getTypeIcon(activity.type)}</span>
             </div>
             <div>
               <div className="font-medium">{activity.title}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-300">{activity.time}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-300">
+                {activity.time}
+              </div>
             </div>
           </li>
         ))}
