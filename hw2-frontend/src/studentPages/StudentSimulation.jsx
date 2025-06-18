@@ -110,11 +110,16 @@ const StudentSimulation = () => {
     }
   };
 
-  const LoadingSpinner = () => (
-    <svg className="animate-spin h-20 w-20 text-blue-500"  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
+  const LoadingOverlay = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center z-50">
+      <svg className={`animate-spin h-20 w-20 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p className={`mt-4 text-xl font-semibold animate-pulse ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
+        Loading simulation...
+      </p>
+    </div>
   );
 
   return (
@@ -124,61 +129,53 @@ const StudentSimulation = () => {
           <StudentHeader />
         </div>
 
+        {loading && <LoadingOverlay />}
+
         <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 w-full">
-          <div className="w-full max-w-2xl bg-slate-100 text-black dark:bg-slate-800 dark:text-white p-8 rounded-xl shadow-lg">
-            <h2 className="text-3xl font-extrabold mb-4 text-center text-blue-500 ">🎯 Welcome to the Simulation!</h2>
-            <p className={`mb-6 text-center ${isDark ? 'text-white' : 'text-gray-700'}`}>
-              Please read the situation carefully and submit your answer below.
-            </p>
+          {!loading && (
+            <div className="w-full max-w-2xl bg-slate-100 text-black dark:bg-slate-800 dark:text-white p-8 rounded-xl shadow-lg">
+              <h2 className="text-3xl font-extrabold mb-4 text-center text-blue-500 ">🎯 Welcome to the Simulation!</h2>
+              <p className={`mb-6 text-center ${isDark ? 'text-white' : 'text-gray-700'}`}>
+                Please read the situation carefully and submit your answer below.
+              </p>
 
-            <div className="bg-slate-100 text-black dark:bg-slate-800 dark:text-white rounded-lg shadow-md">
-              {loading ? (
-                  <div className="fixed inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center z-50">
-                    <svg className={`animate-spin h-20 w-20 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <p className={`mt-4 text-xl font-semibold animate-pulse ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>
-                      Loading simulation...
-                    </p>
-                  </div>
+              <div className="bg-slate-100 text-black dark:bg-slate-800 dark:text-white rounded-lg shadow-md">
+                <h3 className="text-xl font-semibold mb-4 text-blue-500 ">Simulation Situation</h3>
+                <p className="text-gray-700 dark:text-gray-200 mb-6">{situation}</p>
 
-              ) : (
-                <>
-                  <h3 className="text-xl font-semibold mb-4 text-blue-500 ">Simulation Situation</h3>
-                  <p className="text-gray-700 dark:text-gray-200 mb-6">{situation}</p>
+                <h4 className="text-lg font-semibold mb-2 text-blue-500 ">Question:</h4>
+                <p className="text-gray-700 dark:text-gray-200 mb-4">{question}</p>
 
-                  <h4 className="text-lg font-semibold mb-2 text-blue-500 ">Question:</h4>
-                  <p className="text-gray-700 dark:text-gray-200 mb-4">{question}</p>
-
-                  <form onSubmit={handleSubmit}>
-                    <textarea
-                      className="w-full p-3 rounded bg-slate-200 text-black dark:bg-slate-600 dark:text-white mb-4 resize-none"
-                      rows="5"
-                      placeholder="Write your answer here..."
-                      value={answer}
-                      onChange={(e) => setAnswer(e.target.value)}
-                      required
-                    />
-                    <button
-                      type="submit"
-                      className={`mt-6 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 w-full flex justify-center items-center ${isLoadingToSubmit ? 'opacity-70 cursor-not-allowed' : ''}`}
-                      disabled={isLoadingToSubmit}
-                    >
-                      {isLoadingToSubmit ? (
-                        <>
-                          <LoadingSpinner />
-                          <span>Submitting Simulation</span>
-                        </>
-                      ) : (
-                        'Submit Simulation'
-                      )}
-                    </button>
-                  </form>
-                </>
-              )}
+                <form onSubmit={handleSubmit}>
+                  <textarea
+                    className="w-full p-3 rounded bg-slate-200 text-black dark:bg-slate-600 dark:text-white mb-4 resize-none"
+                    rows="5"
+                    placeholder="Write your answer here..."
+                    value={answer}
+                    onChange={(e) => setAnswer(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className={`mt-6 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 w-full flex justify-center items-center ${isLoadingToSubmit ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    disabled={isLoadingToSubmit}
+                  >
+                    {isLoadingToSubmit ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Submitting Simulation</span>
+                      </>
+                    ) : (
+                      'Submit Simulation'
+                    )}
+                  </button>
+                </form>
+              </div>
             </div>
-          </div>
+          )}
         </main>
 
         <div className="px-4 pb-4">
@@ -189,12 +186,10 @@ const StudentSimulation = () => {
   );
 };
 
-const ViewStudentSimulation = () => {
-  return (
-    <ThemeProvider>
-      <StudentSimulation />
-    </ThemeProvider>
-  );
-};
+const ViewStudentSimulation = () => (
+  <ThemeProvider>
+    <StudentSimulation />
+  </ThemeProvider>
+);
 
 export default ViewStudentSimulation;
