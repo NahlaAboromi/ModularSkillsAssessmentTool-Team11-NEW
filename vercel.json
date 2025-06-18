@@ -4,7 +4,7 @@
     {
       "src": "hw2-frontend/package.json",
       "use": "@vercel/static-build",
-      "config": { "outputDirectory": "build" }
+      "config": { "outputDirectory": "dist" }
     },
     {
       "src": "api/app.js",
@@ -17,12 +17,8 @@
       "dest": "/api/app.js"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|svg|ico|woff2?|ttf|map))",
-      "dest": "/hw2-frontend/build/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/hw2-frontend/build/index.html"
+      "dest": "/hw2-frontend/dist/index.html"
     }
   ],
   "env": {
