@@ -4,17 +4,9 @@
     {
       "src": "hw2-frontend/package.json",
       "use": "@vercel/static-build"
-    },
-    {
-      "src": "api/app.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/app.js"
-    },
     {
       "src": "/(.*)",
       "dest": "/index.html"
