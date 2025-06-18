@@ -1,23 +1,11 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "hw2-frontend/package.json",
-      "use": "@vercel/static-build"
-    },
-    {
-      "src": "api/app.js",
-      "use": "@vercel/node"
-    }
+    { "src": "api/app.js", "use": "@vercel/node" },
+    { "src": "hw2-frontend/package.json", "use": "@vercel/static-build" }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/app.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/hw2-frontend/dist/index.html"
-    }
+    { "src": "/api/(.*)", "dest": "/api/app.js" },
+    { "src": "/(.*)", "dest": "/hw2-frontend/dist/$1" }
   ]
 }
