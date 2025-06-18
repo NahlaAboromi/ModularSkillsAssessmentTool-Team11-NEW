@@ -133,9 +133,11 @@ const StudentSimulation = () => {
 
             <div className="bg-slate-100 text-black dark:bg-slate-800 dark:text-white rounded-lg shadow-md">
               {loading ? (
-                <div className="text-center text-gray-500 dark:text-gray-300 py-6">
-                  Loading simulation...
+                <div className="flex flex-col items-center justify-center py-6">
+                  <LoadingSpinner />
+                  <p className="mt-2 text-gray-500 dark:text-gray-300">Loading simulation...</p>
                 </div>
+
               ) : (
                 <>
                   <h3 className="text-xl font-semibold mb-4 text-blue-500 ">Simulation Situation</h3>
