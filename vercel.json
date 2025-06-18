@@ -18,7 +18,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/hw2-frontend/$1"
+      "dest": "/hw2-frontend/index.html"
     }
   ],
   "env": {
