@@ -264,7 +264,7 @@ const getTypeIcon = (type) => {
                   No notifications
                 </div>
               ) : (
-                  notifications.slice().reverse().map((notification, index) => (
+                  notifications.map((notification, index) => (
                     <div 
                       key={index}
                       onClick={() => {
