@@ -1,36 +1,20 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNotifications } from '../context/NotificationsContext'; 
-import { useLocation } from 'react-router-dom';
 
-// Main component to display recent unread activities
 const RecentActivity = () => {
-  const { notifications, fetchNotifications } = useNotifications();
-  const location = useLocation();
+  const { notifications } = useNotifications();
 
-  // Fetch notifications every time the pathname changes (page changes)
-  useEffect(() => {
-    fetchNotifications();
-
-    const interval = setInterval(() => {
-      fetchNotifications(); // Polling every 5 seconds
-    }, 5000);
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, [location.pathname, fetchNotifications]); 
-
-  // Parse custom date string into a JavaScript Date object
   function parseCustomDate(dateStr) {
     const [datePart, timePart] = dateStr.split(',').map(s => s.trim());
     const [day, month, year] = datePart.split('.').map(Number);
     return new Date(year, month - 1, day, ...timePart.split(':').map(Number));
   }
 
-  // Sort notifications by date, newest first
-  const sortedNotifications = [...notifications].sort((a, b) => parseCustomDate(b.time) - parseCustomDate(a.time));
-  // Take the 3 most recent notifications
+  const sortedNotifications = [...notifications].sort(
+    (a, b) => parseCustomDate(b.time) - parseCustomDate(a.time)
+  );
   const recentNotifications = sortedNotifications.slice(0, 3);
 
-  // Helper function: get background and text color by notification type
   const getTypeStyle = (type) => {
     switch (type) {
       case 'success': return 'bg-green-500 text-white';
@@ -42,7 +26,6 @@ const RecentActivity = () => {
     }
   };
 
-  // Helper function: get icon by notification type
   const getTypeIcon = (type) => {
     switch (type) {
       case 'success': return '✔️';
@@ -54,12 +37,10 @@ const RecentActivity = () => {
     }
   };
 
-  // Show message if no notifications are available
   if (!notifications.length) {
     return <div className="text-center text-gray-500 dark:text-gray-300">No activities found.</div>;
   }
 
-  // Render the list of unread notifications
   return (
     <div className="bg-white dark:bg-slate-600 dark:text-white p-6 rounded shadow-md">
       <h2 className="text-xl font-bold mb-4">Recent Activities</h2>
