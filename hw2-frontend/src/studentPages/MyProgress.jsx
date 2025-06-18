@@ -259,8 +259,8 @@ const [openChartClassIndex, setOpenChartClassIndex] = useState(null);
     
     return (
       <img
-        src={student.profilePic}
-        alt={student?.username || "User"}
+        src={user.profilePic}
+        alt={user?.username || "User"}
         className="w-full h-full object-cover"
         onError={(e) => {
           e.target.onerror = null; 
