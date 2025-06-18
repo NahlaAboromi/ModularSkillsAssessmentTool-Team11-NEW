@@ -1,67 +1,48 @@
-import React from 'react';
-import { useNotifications } from '../context/NotificationsContext'; 
+import { createContext, useContext, useEffect, useState } from 'react';
+import { UserContext } from './UserContext';
 
-const RecentActivity = () => {
-  const { notifications } = useNotifications();
+const NotificationsContext = createContext();
 
-  function parseCustomDate(dateStr) {
-    const [datePart, timePart] = dateStr.split(',').map(s => s.trim());
-    const [day, month, year] = datePart.split('.').map(Number);
-    return new Date(year, month - 1, day, ...timePart.split(':').map(Number));
-  }
+export const NotificationsProvider = ({ children }) => {
+  const { user } = useContext(UserContext);
+  const userId = user?.id;
+  const [notifications, setNotifications] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
 
-  const sortedNotifications = [...notifications].sort(
-    (a, b) => parseCustomDate(b.time) - parseCustomDate(a.time)
-  );
-  const recentNotifications = sortedNotifications.slice(0, 3);
-
-  const getTypeStyle = (type) => {
-    switch (type) {
-      case 'success': return 'bg-green-500 text-white';
-      case 'exam': return 'bg-yellow-400 text-black';
-      case 'message': return 'bg-blue-400 text-white';
-      case 'schedule': return 'bg-purple-500 text-white';
-      case 'warning': return 'bg-red-500 text-white';
-      default: return 'bg-gray-300 text-black';
+  const fetchNotifications = async () => {
+    if (!userId) return;
+    try {
+      const response = await fetch(`/api/notifications/teacher/${userId}`);
+      if (!response.ok) {
+        console.error("❌ Fetch failed:", response.statusText);
+        return;
+      }
+      const data = await response.json();
+      setNotifications(data || []);
+      setNotificationCount(data.filter(n => !n.read).length);
+    } catch (err) {
+      console.error('❌ Error fetching notifications:', err);
     }
   };
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'success': return '✔️';
-      case 'exam': return '📝';
-      case 'message': return '💬';
-      case 'schedule': return '📅';
-      case 'warning': return '⚠️';
-      default: return '🔔';
-    }
-  };
-
-  if (!notifications.length) {
-    return <div className="text-center text-gray-500 dark:text-gray-300">No activities found.</div>;
-  }
+  useEffect(() => {
+    if (!userId) return;
+    fetchNotifications();
+    const interval = setInterval(() => {
+      fetchNotifications();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [userId]);
 
   return (
-    <div className="bg-white dark:bg-slate-600 dark:text-white p-6 rounded shadow-md">
-      <h2 className="text-xl font-bold mb-4">Recent Activities</h2>
-      <ul className="space-y-4">
-        {recentNotifications.map((activity) => (
-          <li
-            key={activity.id || activity.time} 
-            className="border-b pb-2 border-gray-200 dark:border-gray-500 flex items-start gap-3"
-          >
-            <div className={`flex-shrink-0 mt-1 w-8 h-8 ${getTypeStyle(activity.type)} rounded-full flex items-center justify-center`}>
-              <span>{getTypeIcon(activity.type)}</span>
-            </div>
-            <div>
-              <div className="font-medium">{activity.title}</div>
-              <div className="text-xs text-gray-500 dark:text-gray-300">{activity.time}</div>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <NotificationsContext.Provider value={{
+      notifications,
+      notificationCount,
+      fetchNotifications,
+    }}>
+      {children}
+    </NotificationsContext.Provider>
   );
 };
 
-export default RecentActivity;
+export const useNotifications = () => useContext(NotificationsContext);
