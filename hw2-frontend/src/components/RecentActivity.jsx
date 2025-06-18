@@ -22,10 +22,22 @@ const RecentActivity = () => {
     return new Date(year, month - 1, day, ...timePart.split(':').map(Number));
   }
 
+  // הדפסת כל ה-notifications שהגיעו מה-context
+  console.log("🔍 Raw notifications from context:", notifications);
+
+  // ממיינים לפי זמן מהחדש לישן
   const sortedNotifications = [...notifications].sort(
     (a, b) => parseCustomDate(b.time) - parseCustomDate(a.time)
   );
+
+  // הדפסת ה-notifications אחרי המיון
+  console.log("📌 Sorted notifications:", sortedNotifications);
+
+  // לוקחים את 3 האחרונים באמת
   const recentNotifications = sortedNotifications.slice(0, 3);
+
+  // הדפסת ה-3 האחרונים שנבחרו להציג
+  console.log("✅ Recent 3 activities:", recentNotifications);
 
   const getTypeStyle = (type) => {
     switch (type) {
