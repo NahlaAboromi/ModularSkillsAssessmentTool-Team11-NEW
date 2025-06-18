@@ -16,27 +16,18 @@ const RecentActivity = () => {
     return () => clearInterval(interval);
   }, [fetchNotifications, location.pathname]);
 
-  function parseCustomDate(dateStr) {
-    const [datePart, timePart] = dateStr.split(',').map(s => s.trim());
-    const [day, month, year] = datePart.split('.').map(Number);
-    return new Date(year, month - 1, day, ...timePart.split(':').map(Number));
-  }
-
   // הדפסת כל ה-notifications שהגיעו מה-context
   console.log("🔍 Raw notifications from context:", notifications);
 
-  // ממיינים לפי זמן מהחדש לישן
+  // ממיינים לפי createdAt מהחדש לישן
   const sortedNotifications = [...notifications].sort(
-    (a, b) => parseCustomDate(b.time) - parseCustomDate(a.time)
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  // הדפסת ה-notifications אחרי המיון
   console.log("📌 Sorted notifications:", sortedNotifications);
 
-  // לוקחים את 3 האחרונים באמת
   const recentNotifications = sortedNotifications.slice(0, 3);
 
-  // הדפסת ה-3 האחרונים שנבחרו להציג
   console.log("✅ Recent 3 activities:", recentNotifications);
 
   const getTypeStyle = (type) => {
@@ -75,7 +66,7 @@ const RecentActivity = () => {
       <ul className="space-y-4">
         {recentNotifications.map((activity) => (
           <li
-            key={activity.id || activity.time}
+            key={activity._id || activity.createdAt}
             className="border-b pb-2 border-gray-200 dark:border-gray-500 flex items-start gap-3"
           >
             <div
@@ -86,7 +77,7 @@ const RecentActivity = () => {
             <div>
               <div className="font-medium">{activity.title}</div>
               <div className="text-xs text-gray-500 dark:text-gray-300">
-                {activity.time}
+                {activity.createdAt ? new Date(activity.createdAt).toLocaleString() : 'No date'}
               </div>
             </div>
           </li>
