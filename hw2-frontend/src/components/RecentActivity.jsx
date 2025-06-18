@@ -20,7 +20,6 @@ const RecentActivity = () => {
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
-  console.log("📌 Sorted notifications:", sortedNotifications);
 
   const recentNotifications = sortedNotifications.slice(0, 3);
 
