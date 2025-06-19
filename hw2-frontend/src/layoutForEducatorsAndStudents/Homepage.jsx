@@ -11,9 +11,8 @@ const HomepageContent = () => {
   return (
     
     <>
-      <div className={`flex flex-col min-h-screen w-screen ${
-      isDark ? 'bg-slate-900 !important text-white !important' : 'bg-slate-100 text-slate-900'
-    }`}>
+      <div className={"flex flex-col min-h-screen w-screen dark:bg-slate-900 !important dark:text-white !important bg-slate-100 text-slate-900"}>
+
       {/* Header */}
       <div className="px-6 pt-6">
         <HomeHeader />
