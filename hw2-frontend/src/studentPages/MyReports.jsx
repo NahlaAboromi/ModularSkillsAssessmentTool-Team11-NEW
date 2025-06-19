@@ -149,6 +149,7 @@ const ClassDetailsContent = () => {
                       return submittedDate === searchDate;
                     })
                   : studentAnswers;
+                  console.log(filteredAnswers);
 
                 // Render answers or message if none found
                 return filteredAnswers.length > 0 ? (
