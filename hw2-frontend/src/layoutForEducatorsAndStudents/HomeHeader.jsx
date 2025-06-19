@@ -12,9 +12,8 @@ const SharedHeader = () => {
 
   return (
     <header
-      className={`w-full flex justify-between items-center px-6 py-3 shadow-sm
-        ${isDark ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-800 border-b border-slate-100'}
-      `}
+      className={"w-full flex justify-between items-center px-6 py-3 shadow-sm dark:bg-slate-900 dark:text-white bg-slate-100 text-slate-800 border-b border-slate-100"}
+
     >
       {/* Left side of header with logo and title */}
       <div className="flex items-center gap-3">
