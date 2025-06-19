@@ -18,9 +18,13 @@ Analyze across:
 4. Relationship skills
 5. Responsible decision-making
 
+
 Return a JSON object with:
-- Score (1-5) per competency
-- Brief feedback
+- selfAwareness: { score: 1-5, brief_feedback: string }
+- selfManagement: { score: 1-5, brief_feedback: string }
+- socialAwareness: { score: 1-5, brief_feedback: string }
+- relationshipSkills: { score: 1-5, brief_feedback: string }
+- responsibleDecisionMaking: { score: 1-5, brief_feedback: string }
 - Observed strengths (list of strings; if none, return an empty list [])
 - Areas for improvement (list of strings; if none, return an empty list [])
 - Overall score
