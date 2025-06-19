@@ -21,8 +21,8 @@ Analyze across:
 Return a JSON object with:
 - Score (1-5) per competency
 - Brief feedback
-- Observed strengths
-- Areas for improvement
+- Observed strengths (list of strings; if none, return an empty list [])
+- Areas for improvement (list of strings; if none, return an empty list [])
 - Overall score
 - suggestedIntervention (string)
 - redFlags (list)
