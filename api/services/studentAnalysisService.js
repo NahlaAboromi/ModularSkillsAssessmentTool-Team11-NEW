@@ -20,12 +20,11 @@ Analyze across:
 
 
 Return a JSON object with:
-- selfAwareness: { score: 1-5 }
-- selfManagement: { score: 1-5 }
-- socialAwareness: { score: 1-5 }
-- relationshipSkills: { score: 1-5 }
-- responsibleDecisionMaking: { score: 1-5 }
-- Brief feedback
+- selfAwareness: { score: 1-5, feedback: string }
+- selfManagement: { score: 1-5, feedback: string }
+- socialAwareness: { score: 1-5, feedback: string }
+- relationshipSkills: { score: 1-5, feedback: string }
+- responsibleDecisionMaking: { score: 1-5, feedback: string }
 - Observed strengths (list of strings; if none, return an empty list [])
 - Areas for improvement (list of strings; if none, return an empty list [])
 - Overall score
@@ -34,7 +33,6 @@ Return a JSON object with:
 - estimatedDepthLevel (string)`
     }
   ];
-  
   // Call Claude service to analyze the student response
   const result = await claudeService.chat(messages, {
     maxTokens: 1500,
