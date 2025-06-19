@@ -20,11 +20,12 @@ Analyze across:
 
 
 Return a JSON object with:
-- selfAwareness: { score: 1-5, brief_feedback: string }
-- selfManagement: { score: 1-5, brief_feedback: string }
-- socialAwareness: { score: 1-5, brief_feedback: string }
-- relationshipSkills: { score: 1-5, brief_feedback: string }
-- responsibleDecisionMaking: { score: 1-5, brief_feedback: string }
+- selfAwareness: { score: 1-5 }
+- selfManagement: { score: 1-5 }
+- socialAwareness: { score: 1-5 }
+- relationshipSkills: { score: 1-5 }
+- responsibleDecisionMaking: { score: 1-5 }
+- Brief feedback
 - Observed strengths (list of strings; if none, return an empty list [])
 - Areas for improvement (list of strings; if none, return an empty list [])
 - Overall score
