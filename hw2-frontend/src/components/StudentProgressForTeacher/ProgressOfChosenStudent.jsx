@@ -25,7 +25,7 @@ const ProgressOfChosenStudentContent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const exportRef = useRef(); // 🔵 רפרנס לייצוא PDF
+  const exportRef = useRef();
   const handleExportPDF = () => {
     exportElementAsPDF(exportRef.current, `student-${studentId}-progress.pdf`);
   };
@@ -108,7 +108,6 @@ const ProgressOfChosenStudentContent = () => {
           </button>
         </div>
 
-        {/* 🔵 תוכן לייצוא */}
         <div ref={exportRef} className="space-y-6">
           <StudentOverviewHeader
             student={{
@@ -129,6 +128,24 @@ const ProgressOfChosenStudentContent = () => {
               console.warn(`⚠️ Class at index ${index} is null or undefined, skipping.`);
               return null;
             }
+
+            if (!Array.isArray(classData.attempts)) {
+              console.warn(`⚠️ Class at index ${index} missing or invalid attempts array`, classData);
+              return null;
+            }
+
+            classData.attempts.forEach((attempt, aIndex) => {
+              console.log(`  🔹 Attempt ${aIndex}:`, attempt);
+              if (!attempt) {
+                console.warn(`  ⚠️ Attempt ${aIndex} is null or undefined!`);
+              } else if (!attempt.analysisResult) {
+                console.warn(`  ⚠️ Attempt ${aIndex} missing analysisResult!`);
+              } else {
+                console.log(`  ✅ Attempt ${aIndex} overallScore:`, attempt.analysisResult.overallScore);
+                console.log(`  ✅ Attempt ${aIndex} strengths:`, attempt.analysisResult.strengths);
+              }
+            });
+
             return (
               <ClassProgressCard
                 key={index}
