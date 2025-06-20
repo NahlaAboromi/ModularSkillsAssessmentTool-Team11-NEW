@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ThemeContext } from '../../DarkLightMood/ThemeContext';
 
@@ -15,8 +15,24 @@ const StudentCard = ({ student }) => {
     averageScore = 0,
     uniqueSimulations = 0,
     totalAttempts = 0,
-    latestActivity
+    latestActivity,
+    overallScore // במקרה שזה קיים
   } = student;
+
+  // 🔎 הדפסה מיידית של הנתונים שמגיעים ל-StudentCard
+  useEffect(() => {
+    console.log('📌 StudentCard received student:', student);
+  }, [student]);
+
+  const studentState = {
+    id,
+    username,
+    profilePic,
+    averageScore,
+    uniqueSimulations,
+    totalAttempts,
+    overallScore
+  };
 
   return (
     <div className={`rounded-lg shadow-md p-6 w-full sm:w-[300px] 
@@ -35,22 +51,20 @@ const StudentCard = ({ student }) => {
               e.target.onerror = null;
             }}
           />
-        <div className="min-w-0">
-          <h3
-          className="text-sm font-semibold truncate max-w-[160px]"
-          title={username}
-        >
-          {username}
-        </h3>
-
-          <p className="text-xs text-gray-500">Student ID: {id}</p>
-        </div>
+          <div className="min-w-0">
+            <h3
+              className="text-sm font-semibold truncate max-w-[160px]"
+              title={username}
+            >
+              {username}
+            </h3>
+            <p className="text-xs text-gray-500">Student ID: {id}</p>
+          </div>
         </div>
         <div className="text-lg font-bold text-yellow-600 whitespace-nowrap">
           {averageScore}/5
         </div>
       </div>
-
 
       {/* סטטיסטיקות */}
       <div className={`text-sm mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -69,15 +83,9 @@ const StudentCard = ({ student }) => {
       {/* מעבר לפרטי הסטודנט */}
       <Link
         to={`/progress-of-chosen-student/${id}`}
-        state={{
-          student: {
-            id,
-            username,
-            profilePic,
-            averageScore,
-            uniqueSimulations,
-            totalAttempts,
-          }
+        state={{ student: studentState }}
+        onClick={() => {
+          console.log('🚀 Navigating to student details with state:', studentState);
         }}
         className="block bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded mt-4 font-semibold"
       >
