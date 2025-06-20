@@ -50,8 +50,8 @@ app.use('/api/studentNotifications', studentNotificationsRouter);
 
 app.use('/api/classes', classesRouter);
 app.use('/api/claude', claudeRoutes);
-app.use('/api/summary', summaryRouter);
-app.use('/api/progress', teacherStudentProgressRouter);
+app.use('/api', summaryRouter);
+app.use('/api', teacherStudentProgressRouter);
 // ✅ Export the app for Vercel
 module.exports = app;
 
