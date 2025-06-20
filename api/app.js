@@ -14,7 +14,11 @@ const app = express();
 
 // CORS for Vercel + local
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://modular-skills-assessment-tool-team11.vercel.app'],
+  origin: [
+  'http://localhost:3000',
+  'https://modular-skills-assessment-tool-team11.vercel.app',
+  'https://modular-skills-assessment-tool-team-two.vercel.app'
+],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
