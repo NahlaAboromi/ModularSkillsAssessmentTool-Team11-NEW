@@ -47,10 +47,11 @@ app.use('/api/teachers', teachersRouter);
 app.use('/api/students', studentsRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/studentNotifications', studentNotificationsRouter);
-app.use('/api', summaryRouter);
+
 app.use('/api/classes', classesRouter);
 app.use('/api/claude', claudeRoutes);
-app.use('/api', teacherStudentProgressRouter);
+app.use('/api/summary', summaryRouter);
+app.use('/api/progress', teacherStudentProgressRouter);
 // ✅ Export the app for Vercel
 module.exports = app;
 
