@@ -7,22 +7,31 @@ const RecentActivity = () => {
   const location = useLocation();
 
   useEffect(() => {
+    console.log('🔄 useEffect triggered, location:', location.pathname);
     fetchNotifications();
+    console.log('📤 Called fetchNotifications (initial)');
 
     const interval = setInterval(() => {
+      console.log('⏰ Interval fetchNotifications called');
       fetchNotifications();
     }, 5000);
 
     return () => {
+      console.log('🛑 Cleaning up interval');
       clearInterval(interval);
     };
   }, [fetchNotifications, location.pathname]);
+
+  console.log('📦 Current notifications:', notifications);
 
   const sortedNotifications = [...notifications].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
 
+  console.log('📋 Sorted notifications:', sortedNotifications);
+
   const recentNotifications = sortedNotifications.slice(0, 3);
+  console.log('✨ Recent notifications (top 3):', recentNotifications);
 
   const getTypeStyle = (type) => {
     switch (type) {
@@ -47,6 +56,7 @@ const RecentActivity = () => {
   };
 
   if (!notifications.length) {
+    console.log('⚠️ No notifications to display');
     return (
       <div className="text-center text-gray-500 dark:text-gray-300">
         No activities found.
