@@ -51,14 +51,6 @@ const ProgressOfChosenStudentContent = () => {
     }
   }, [studentId, user?.id]);
 
-  useEffect(() => {
-    console.log('📌 passedStudent from location.state:', passedStudent);
-  }, [passedStudent]);
-
-  useEffect(() => {
-    console.log('📌 studentData updated:', studentData);
-  }, [studentData]);
-
   const baseClasses = `flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`;
 
   if (loading) {
@@ -81,9 +73,7 @@ const ProgressOfChosenStudentContent = () => {
       <div className={baseClasses}>
         <div className="px-4 mt-4"><TeacherHeader /></div>
         <main className="flex-1 w-full px-4 py-6">
-          <div className="p-6 text-center text-red-600">
-            Error: {error}
-          </div>
+          <div className="p-6 text-center text-red-600">Error: {error}</div>
         </main>
         <div className="px-4 pb-4"><Footer /></div>
       </div>
@@ -124,32 +114,26 @@ const ProgressOfChosenStudentContent = () => {
 
           {studentData.classes.map((classData, index) => {
             console.log(`🔍 Class at index ${index}:`, classData);
-            if (!classData) {
-              console.warn(`⚠️ Class at index ${index} is null or undefined, skipping.`);
+
+            if (!classData || !Array.isArray(classData.attempts)) {
+              console.warn(`⚠️ Invalid class or attempts at index ${index}, skipping.`);
               return null;
             }
 
-            if (!Array.isArray(classData.attempts)) {
-              console.warn(`⚠️ Class at index ${index} missing or invalid attempts array`, classData);
-              return null;
-            }
-
-            classData.attempts.forEach((attempt, aIndex) => {
-              console.log(`  🔹 Attempt ${aIndex}:`, attempt);
-              if (!attempt) {
-                console.warn(`  ⚠️ Attempt ${aIndex} is null or undefined!`);
-              } else if (!attempt.analysisResult) {
-                console.warn(`  ⚠️ Attempt ${aIndex} missing analysisResult!`);
-              } else {
-                console.log(`  ✅ Attempt ${aIndex} overallScore:`, attempt.analysisResult.overallScore);
-                console.log(`  ✅ Attempt ${aIndex} strengths:`, attempt.analysisResult.strengths);
+            // סנן ניסיונות חוקיים בלבד
+            const safeAttempts = classData.attempts.filter((attempt, aIndex) => {
+              if (!attempt || !attempt.analysisResult) {
+                console.warn(`  ⚠️ Skipping attempt ${aIndex} (missing or invalid analysisResult)`);
+                return false;
               }
+              console.log(`  ✅ Attempt ${aIndex} overallScore:`, attempt.analysisResult.overallScore);
+              return true;
             });
 
             return (
               <ClassProgressCard
                 key={index}
-                classData={classData}
+                classData={{ ...classData, attempts: safeAttempts }}
                 isDark={isDark}
               />
             );
@@ -158,7 +142,6 @@ const ProgressOfChosenStudentContent = () => {
       </main>
 
       {user?.id && <AIChat teacherId={user.id} />}
-
       <div className="px-4 pb-4"><Footer /></div>
     </div>
   );
