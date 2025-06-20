@@ -26,24 +26,38 @@ const ProgressOfChosenStudentContent = () => {
   const [error, setError] = useState('');
 
   const exportRef = useRef(); // 🔵 רפרנס לייצוא PDF
-const handleExportPDF = () => {
-  exportElementAsPDF(exportRef.current, `student-${studentId}-progress.pdf`);
-};
+  const handleExportPDF = () => {
+    exportElementAsPDF(exportRef.current, `student-${studentId}-progress.pdf`);
+  };
+
   useEffect(() => {
     async function fetchStudentData() {
       try {
+        console.log(`🚀 Fetching data for student ID: ${studentId}, teacher ID: ${user?.id}`);
         const res = await fetch(`/api/teacher/${user.id}/student/${studentId}/progress`);
         if (!res.ok) throw new Error('Failed to fetch student progress data');
         const data = await res.json();
+        console.log('📥 Fetched student data from API:', data);
         setStudentData(data);
       } catch (err) {
+        console.error('❌ Error fetching student data:', err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
-    fetchStudentData();
-  }, [studentId]);
+    if (user?.id) {
+      fetchStudentData();
+    }
+  }, [studentId, user?.id]);
+
+  useEffect(() => {
+    console.log('📌 passedStudent from location.state:', passedStudent);
+  }, [passedStudent]);
+
+  useEffect(() => {
+    console.log('📌 studentData updated:', studentData);
+  }, [studentData]);
 
   const baseClasses = `flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`;
 
@@ -78,22 +92,21 @@ const handleExportPDF = () => {
 
   if (!studentData) return null;
 
+  console.log('📝 Rendering with studentData.classes:', studentData.classes);
+
   return (
     <div className={baseClasses}>
       <div className="px-4 mt-4"><TeacherHeader /></div>
 
       <main className="flex-1 w-full px-4 py-6">
-
-<div className="w-full flex justify-end mb-4 pr-4">
-  <button
-    onClick={handleExportPDF}
-    className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-all"
-  >
-    Export PDF
-  </button>
-</div>
-
-
+        <div className="w-full flex justify-end mb-4 pr-4">
+          <button
+            onClick={handleExportPDF}
+            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-all"
+          >
+            Export PDF
+          </button>
+        </div>
 
         {/* 🔵 תוכן לייצוא */}
         <div ref={exportRef} className="space-y-6">
@@ -110,13 +123,20 @@ const handleExportPDF = () => {
             isDark={isDark}
           />
 
-          {studentData.classes.map((classData, index) => (
-            <ClassProgressCard
-              key={index}
-              classData={classData}
-              isDark={isDark}
-            />
-          ))}
+          {studentData.classes.map((classData, index) => {
+            console.log(`🔍 Class at index ${index}:`, classData);
+            if (!classData) {
+              console.warn(`⚠️ Class at index ${index} is null or undefined, skipping.`);
+              return null;
+            }
+            return (
+              <ClassProgressCard
+                key={index}
+                classData={classData}
+                isDark={isDark}
+              />
+            );
+          })}
         </div>
       </main>
 
