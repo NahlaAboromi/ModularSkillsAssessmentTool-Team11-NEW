@@ -1,9 +1,9 @@
 import React, { useEffect,useContext } from 'react';
-import { StudentNotificationsContext } from '../context/StudentNotificationsContext';
+import { useStudentNotification } from '../context/StudentNotificationsContext';
 import { useLocation } from 'react-router-dom';
 
 const RecentActivity = () => {
-  const { notifications, fetchNotifications } = useContext(StudentNotificationsContext);
+  const { notifications, fetchNotifications } = useStudentNotification();
   const location = useLocation();
 
   // Fetch notifications every time the pathname changes (page changes)
