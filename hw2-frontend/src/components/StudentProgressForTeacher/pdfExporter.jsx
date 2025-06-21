@@ -10,9 +10,10 @@ import jsPDF from 'jspdf';
  */
 export const exportElementAsPDF = async (elementRef, filename = 'report.pdf') => {
   try {
-    // השהיה קצרה להשלמת רינדור
+    // Wait 0.5s to allow any rendering/layout updates to complete before capturing
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+     // canvas holds screenshot of elementRef
     const canvas = await html2canvas(elementRef, {
       backgroundColor: '#ffffff',
       scale: 2,
@@ -22,6 +23,7 @@ export const exportElementAsPDF = async (elementRef, filename = 'report.pdf') =>
     const imgData = canvas.toDataURL('image/png');
     const imgProps = { width: canvas.width, height: canvas.height };
 
+    // Create a new A4-sized PDF document with millimeter units
     const pdf = new jsPDF({
       unit: 'mm',
       format: 'a4',
@@ -37,16 +39,15 @@ export const exportElementAsPDF = async (elementRef, filename = 'report.pdf') =>
     let heightLeft = pdfHeight;
     let position = 0;
 
-    // עמוד ראשון
+    // Add the first image page at the top of the PDF
     pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
     heightLeft -= pageHeight;
 
-    // עמודים נוספים
     while (heightLeft > 0) {
-      position -= pageHeight;
-      pdf.addPage();
+      position -= pageHeight;  // Move image position up to show next part
+      pdf.addPage();    // Add a new page to PDF
       pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-      heightLeft -= pageHeight;
+      heightLeft -= pageHeight; // Decrease remaining height by one page
     }
 
     pdf.save(filename);
