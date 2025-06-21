@@ -71,8 +71,7 @@ const ClassManagerContent = () => {
   const filteredClasses = classes.filter(classData => {
     const matchesSearch =
       searchTerm === '' ||
-      classData.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      classData.classCode.toLowerCase().includes(searchTerm.toLowerCase());
+      classData.className.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesClassCode =
       classCodeFilter === '' || classData.classCode.includes(classCodeFilter);
@@ -103,7 +102,7 @@ const ClassManagerContent = () => {
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="Search classes..."
+                  placeholder="Search classes by name..."
                   className="w-full py-2 px-4 pr-10 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
