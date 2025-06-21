@@ -223,7 +223,7 @@ const [openChartClassIndex, setOpenChartClassIndex] = useState(null);
   // Calculate number of unique simulations based on class name and subject combination
   const calculateUniqueSimulations = (data) => {
     const uniqueKeys = new Set();
-    data.forEach(cls => uniqueKeys.add(`${cls.className}-${cls.subject}`));
+    data.forEach(cls => uniqueKeys.add(cls.classCode));
     return uniqueKeys.size;
   };
 
