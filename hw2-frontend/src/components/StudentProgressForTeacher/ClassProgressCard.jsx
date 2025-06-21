@@ -64,9 +64,16 @@ const progressData = classData.attempts.map((attempt, index) => {
             Progress Over Time
           </h3>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={progressData}>
+            <LineChart 
+              data={progressData} 
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 12, fontWeight: 'bold', fill: isDark ? '#fff' : '#333' }} 
+                padding={{ left: 10, right: 10 }}
+              />
               <YAxis domain={[0, 5]} />
               <Tooltip />
               <Line
@@ -78,6 +85,7 @@ const progressData = classData.attempts.map((attempt, index) => {
               />
             </LineChart>
           </ResponsiveContainer>
+
         </div>
       ) : (
         <div className="mb-4 flex justify-center">
