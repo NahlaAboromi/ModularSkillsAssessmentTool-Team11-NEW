@@ -6,7 +6,7 @@ import ConfirmModal from './ConfirmModal';
  * ClassCard component displays a summary card for a class,
  * including statistics and actions such as view, reports, and delete.
  */
-const ClassCard = ({ classData }) => {
+const ClassCard = ({ classData, onDeleteSuccess }) => {
   // State for showing the delete confirmation modal
   const [showConfirm, setShowConfirm] = useState(false);
   // State for indicating if the delete operation is in progress
