@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ThemeContext } from '../DarkLightMood/ThemeContext';
 import ThemeToggle from '../DarkLightMood/ThemeToggle';
 import { UserContext } from '../context/UserContext';
-import {StudentNotificationsContext} from '../context/StudentNotificationsContext';
+import {useStudentNotification} from '../context/StudentNotificationsContext';
 
 
 
@@ -13,9 +13,11 @@ const StudentHeader = () => {
   const {
     notifications,
     notificationCount,
+    isLoading,
+    error,
     markNotificationAsRead,     
     markAllNotificationsAsRead                
-  } = useContext(StudentNotificationsContext);
+  } = useStudentNotification();
   
   const student = user;
 
@@ -231,7 +233,13 @@ const StudentHeader = () => {
             </div>
             <div className="max-h-80 overflow-y-auto">
             {/* Notifications list */}
-              { notifications.length === 0 ? (
+              {isLoading ? (
+                <div className={"p-4 text-center dark:text-gray-300 text-gray-500"}>
+                  Loading notifications...
+                </div>
+              ) : error ? (
+                <div className="p-4 text-center text-red-500">{error}</div>
+              ) : notifications.length === 0 ? (
                 <div className={"p-4 text-center  dark:text-gray-300 text-gray-500"}>
                   No notifications
                 </div>
