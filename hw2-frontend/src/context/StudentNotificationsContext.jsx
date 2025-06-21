@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { UserContext } from './UserContext';
 
-const StudentNotificationsContext = createContext();
+export const StudentNotificationsContext = createContext();
 
 export const StudentNotificationsProvider = ({ children }) => {
   const { user } = useContext(UserContext);
@@ -96,4 +96,3 @@ export const StudentNotificationsProvider = ({ children }) => {
   );
 };
 
-export const useStudentNotification = () => useContext(StudentNotificationsContext);
