@@ -161,7 +161,16 @@ const ClassManagerContent = () => {
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
                 .map((classData) => {
                   console.log("🎯 Rendering ClassCard with:", classData);
-                  return <ClassCard key={classData._id || classData.classCode} classData={classData} />;
+                  return (
+                       <ClassCard
+                         key={classData._id || classData.classCode}
+                         classData={classData}
+                         onDeleteSuccess={(deletedClassCode) => {
+                           setClasses(prev => prev.filter(c => c.classCode !== deletedClassCode));
+                         }}
+                       />
+                     );
+
                 })
             )}
           </div>
