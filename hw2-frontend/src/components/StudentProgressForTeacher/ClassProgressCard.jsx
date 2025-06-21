@@ -15,7 +15,8 @@ const ClassProgressCard = ({ classData, isDark }) => {
   const progressData = classData.attempts.map((attempt, index) => ({
     attempt: `Attempt ${index + 1}`,
     score: attempt.analysisResult.overallScore,
-    date: new Date(attempt.submittedAt).toLocaleDateString(),
+    const dt = new Date(attempt.submittedAt);
+    date: `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
   }));
 
   const latestAttempt = classData.attempts.at(-1);
