@@ -122,8 +122,9 @@ const progressData = classData.attempts.map((attempt, index) => {
           </span>
           <span className={`text-sm flex items-center ${mutedText}`}>
             <span className="mr-1">📅</span>
-            {new Date(latestAttempt.submittedAt).toLocaleDateString()}
+            {new Date(latestAttempt.submittedAt).toLocaleString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
+
         </div>
         <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-xs font-medium ml-4">
           {classData.attempts.length} attempt{classData.attempts.length > 1 ? 's' : ''}
