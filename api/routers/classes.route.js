@@ -52,7 +52,7 @@ router.get('/teacher/:teacherId', async (req, res) => {
       createdDate: classItem.createdAt,
       status: 'Active',
       active: true,
-      students: classItem.students || []  // <-- זה טוב
+      students: classItem.students || [] 
     }));
 
     res.status(200).json(mappedClasses);
