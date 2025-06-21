@@ -62,8 +62,7 @@ const ClassManagerContent = () => {
     const matchesSearch = searchTerm === '' ||
       classData.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
       classData.classCode.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesClassCode = classCodeFilter === '' || classData.classCode.includes(classCodeFilter);
-    return matchesSearch && matchesClassCode;
+    return matchesSearch;
   });
 
   return (
@@ -98,15 +97,6 @@ const ClassManagerContent = () => {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-            </div>
-            <div className="flex gap-4 flex-wrap md:flex-nowrap">
-              <input
-                type="text"
-                placeholder="Class Code..."
-                className="py-2 px-4 rounded border border-gray-300 dark:border-gray-500 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={classCodeFilter}
-                onChange={(e) => setClassCodeFilter(e.target.value)}
-              />
             </div>
           </div>
         </div>
