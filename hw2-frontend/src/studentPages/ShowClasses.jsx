@@ -60,7 +60,7 @@ const ClassManagerContent = () => {
   // Filter classes by search term and class code
   const filteredClasses = classes.filter(classData => {
     const matchesSearch = searchTerm === '' ||
-      classData.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      classData.className.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesClassCode = classCodeFilter === '' || classData.classCode.includes(classCodeFilter);
     return matchesSearch && matchesClassCode;
   });
