@@ -66,7 +66,7 @@ const progressData = classData.attempts.map((attempt, index) => {
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={progressData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="attempt" />
+              <XAxis dataKey="date" />
               <YAxis domain={[0, 5]} />
               <Tooltip />
               <Line
