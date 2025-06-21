@@ -97,9 +97,9 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        setShowConfirm(false);
-        setClasses(prevClasses => prevClasses.filter(c => c.classCode !== classData.classCode));
+        if (response.ok) {
+              setShowConfirm(false);
+              onDeleteSuccess(classData.classCode);
       } else {
         alert("Error deleting class: " + data.message);
       }
