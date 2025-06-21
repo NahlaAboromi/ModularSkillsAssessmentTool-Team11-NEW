@@ -17,12 +17,8 @@
       "dest": "/api/app.js"
     },
     {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map))",
-      "dest": "/hw2-frontend/dist/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/hw2-frontend/dist/index.html"
+      "dest": "/hw2-frontend/$1"
     }
   ],
   "env": {
