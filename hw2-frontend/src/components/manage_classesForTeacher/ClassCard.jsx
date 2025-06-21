@@ -99,7 +99,7 @@ const ClassCard = ({ classData }) => {
 
       if (response.ok) {
         setShowConfirm(false);
-        window.location.reload();
+        setClasses(prevClasses => prevClasses.filter(c => c.classCode !== classData.classCode));
       } else {
         alert("Error deleting class: " + data.message);
       }
