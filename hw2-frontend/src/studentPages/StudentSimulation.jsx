@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ThemeProvider, ThemeContext } from '../DarkLightMood/ThemeContext';
 import StudentHeader from "../studentPages/StudentHeader";
 import { UserContext } from '../context/UserContext';
-import { StudentNotificationsContext } from '../context/StudentNotificationsContext';
+import { useStudentNotification } from '../context/StudentNotificationsContext';
 import Footer from "../layout/Footer";
 
 const StudentSimulation = () => {
@@ -13,7 +13,7 @@ const StudentSimulation = () => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
   const { user } = useContext(UserContext);
-  const { fetchNotifications } = useContext(StudentNotificationsContext);
+  const { fetchNotifications } = useStudentNotification();
 
   const [situation, setSituation] = useState('');
   const [question, setQuestion] = useState('');
