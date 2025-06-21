@@ -110,7 +110,7 @@ const ClassProgressCard = ({ classData, isDark }) => {
       <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
         <div className="flex items-center space-x-4">
           <span className={`px-3 py-1 rounded-full text-sm ${
-            latestAttempt.analysisResult.estimatedDepthLevel === 'Advanced' ? 'bg-green-100 text-green-800' :
+            latestAttempt.analysisResult.estimatedDepthLevel.includes('Advanced') ? 'bg-green-100 text-green-800' :
             latestAttempt.analysisResult.estimatedDepthLevel.includes('Intermediate') ? 'bg-yellow-100 text-yellow-800' :
             'bg-red-100 text-red-800'
           }`}>
