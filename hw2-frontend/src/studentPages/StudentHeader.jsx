@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ThemeContext } from '../DarkLightMood/ThemeContext';
 import ThemeToggle from '../DarkLightMood/ThemeToggle';
 import { UserContext } from '../context/UserContext';
-import {useStudentNotification} from '../context/StudentNotificationsContext';
+import {StudentNotificationsContext} from '../context/StudentNotificationsContext';
 
 
 
@@ -17,7 +17,7 @@ const StudentHeader = () => {
     error,
     markNotificationAsRead,     
     markAllNotificationsAsRead                
-  } = useStudentNotification();
+  } = useContext(StudentNotificationsContext);
   
   const student = user;
 
