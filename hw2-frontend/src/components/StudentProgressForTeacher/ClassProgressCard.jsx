@@ -12,12 +12,15 @@ import {
 const ClassProgressCard = ({ classData, isDark }) => {
   const mutedText = isDark ? 'text-gray-300' : 'text-gray-600';
 
-  const progressData = classData.attempts.map((attempt, index) => ({
+const progressData = classData.attempts.map((attempt, index) => {
+  const dt = new Date(attempt.submittedAt);
+  return {
     attempt: `Attempt ${index + 1}`,
     score: attempt.analysisResult.overallScore,
-    const dt = new Date(attempt.submittedAt);
     date: `${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-  }));
+  };
+});
+
 
   const latestAttempt = classData.attempts.at(-1);
   const firstAttempt = classData.attempts[0];
