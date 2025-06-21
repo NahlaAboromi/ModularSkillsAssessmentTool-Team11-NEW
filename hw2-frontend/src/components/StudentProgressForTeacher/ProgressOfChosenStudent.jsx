@@ -112,7 +112,14 @@ const ProgressOfChosenStudentContent = () => {
             isDark={isDark}
           />
 
-          {studentData.classes.map((classData, index) => {
+          {[...studentData.classes]
+            .sort((a, b) => {
+              const latestA = a.attempts?.at(-1)?.submittedAt || 0;
+              const latestB = b.attempts?.at(-1)?.submittedAt || 0;
+              return new Date(latestB) - new Date(latestA);
+            })
+            .map((classData, index) => {
+
             console.log(`🔍 Class at index ${index}:`, classData);
 
             if (!classData || !Array.isArray(classData.attempts)) {
