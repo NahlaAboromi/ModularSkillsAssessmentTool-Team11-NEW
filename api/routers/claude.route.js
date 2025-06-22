@@ -475,7 +475,7 @@ Please answer the student’s questions clearly and kindly.
       result.data?.content?.[0]?.text || 'I could not generate a response.';
     res.json({ success: true, response: reply });
   } catch (err) {
-    console.error('🔥 Error in /student-chat-insight:', err);
+    console.error('Error in /student-chat-insight:', err);
     res
       .status(500)
       .json({ success: false, error: err.message || 'Internal server error' });
