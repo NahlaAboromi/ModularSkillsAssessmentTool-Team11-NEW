@@ -16,6 +16,8 @@ export const StudentNotificationsProvider = ({ children }) => {
   // Fetch notifications from server for current user
 
   const fetchNotifications = async () => {
+     setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch(`/api/studentNotifications/student/${userId}`);
       const data = await response.json();
@@ -26,9 +28,10 @@ export const StudentNotificationsProvider = ({ children }) => {
         setNotifications(data);
         setNotificationCount(data.filter(n => !n.read).length);  
     } catch (err) {
-    
-        console.error("❌ Failed to fetch notifications:", err);
-    }
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
   };
   
   // Fetch notifications once userId is available and whenever it changes
@@ -39,18 +42,24 @@ export const StudentNotificationsProvider = ({ children }) => {
 
   // Mark single notification as read and refresh list
   const markNotificationAsRead = async (notificationId) => {
+     setIsLoading(true);
+    setError(null);
     try {
       await fetch(`/api/studentNotifications/mark-as-read/${notificationId}`, {
         method: 'PATCH',
       });
       await fetchNotifications();
-    } catch (err) {
-      console.error("❌ Failed to mark notification as read:", err);
-    }
+    }catch (err) {
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
   };
 
   // Mark all notifications as read and refresh list
   const markAllNotificationsAsRead = async () => {
+     setIsLoading(true);
+    setError(null);
     if (!userId) return; // safety check
     try {
       await fetch(`/api/studentNotifications/mark-all-as-read/${userId}`, {
@@ -58,8 +67,10 @@ export const StudentNotificationsProvider = ({ children }) => {
       });
       await fetchNotifications();
     } catch (err) {
-      console.error("❌ Failed to mark all notifications as read:", err);
-    }
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
   };
 
   
@@ -69,7 +80,9 @@ export const StudentNotificationsProvider = ({ children }) => {
       notificationCount,
       fetchNotifications,
       markNotificationAsRead,
-      markAllNotificationsAsRead
+      markAllNotificationsAsRead,
+     isLoading,
+     error
     }}>
       {children}
     </StudentNotificationsContext.Provider>
