@@ -390,31 +390,35 @@ ${JSON.stringify(filteredStudents, null, 2)}
 
 router.post('/student-chat-insight', async (req, res) => {
   try {
+    // Extract parameters from the request body
     const { studentId, messages } = req.body;
 
-    // ✅ בדיקת קלט
+    // Validate input
     if (!studentId || !Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({ success: false, error: 'Missing studentId or messages array' });
+      return res
+        .status(400)
+        .json({ success: false, error: 'Missing studentId or messages array' });
     }
 
-    // ✅ שליפת מידע בסיסי
-    const student = await StudentModel.findOne({ studentId }).lean();  // שים לב ל"תיקון"
+    // Fetch the student record
+    const student = await StudentModel.findOne({ studentId }).lean();
     if (!student || !student.username) {
-      return res.status(404).json({ success: false, error: 'Student not found or missing name' });
+      return res
+        .status(404)
+        .json({ success: false, error: 'Student not found or missing name' });
     }
-
     const studentName = student.username;
 
-    // ✅ כל הכיתות שהסטודנט רשום אליהן
+    // Fetch all classes in which the student is enrolled
     const simulationClasses = await ClassModel.find({
       students: { $elemMatch: { studentId } }
     }).lean();
 
-    // ✅ כל המורים במערכת (סיכום קצר)
+    // Fetch all teachers (for a concise list of names)
     const allTeachers = await TeacherModel.find().lean();
-    const teachersInfo = allTeachers.map(t => t.username || 'Unknown');
+    const teacherNames = allTeachers.map(t => t.username || 'Unknown');
 
-    // ✅ תשובות הסימולציה של הסטודנט
+    // Collect the student’s simulation scores
     const studentAnswers = [];
     simulationClasses.forEach(cls => {
       (cls.students || [])
@@ -428,49 +432,56 @@ router.post('/student-chat-insight', async (req, res) => {
         });
     });
 
-    // ✅ סיכום כיתות
+    // Create concise class summaries
     const classSummaries = simulationClasses.map(cls => ({
       classCode: cls.classCode,
       className: cls.className,
       subject: cls.subject
     }));
 
-    // ✅ Prompt מקוצר ונקי
+    // Build a compact prompt for Claude
     const systemPrompt = `
-You are a helpful and supportive teaching assistant AI helping the student "${studentName}" understand their learning progress.
+You are a friendly teaching assistant AI helping the student "${studentName}" understand their progress.
 
 Classes:
-${classSummaries.map(c => `• ${c.classCode} - ${c.className} (${c.subject})`).join('\n')}
+${classSummaries
+  .map(c => `• ${c.classCode} – ${c.className} (${c.subject})`)
+  .join('\n')}
 
 Simulation Scores:
 ${studentAnswers.map(a => `• ${a.classCode}: ${a.score}`).join('\n')}
 
 Teachers:
-${teachersInfo.join(', ')}
+${teacherNames.join(', ')}
 
-Respond clearly and kindly to the student's questions.
-    `.trim();
+Please answer the student’s questions clearly and kindly.
+`.trim();
 
-    // ✅ קריאה ל־Claude עם הגנה ולוג
+    // Call Claude
     const result = await claudeService.chat(messages, {
       maxTokens: 1200,
       temperature: 0.5,
       system: systemPrompt
     });
 
+    // Handle possible Claude errors
     if (!result.success) {
       console.error('Claude error:', result.error);
       return res.status(500).json({ success: false, error: result.error });
     }
 
-    const reply = result.data?.content?.[0]?.text || 'I could not generate a response.';
+    // Send Claude’s reply back to the client
+    const reply =
+      result.data?.content?.[0]?.text || 'I could not generate a response.';
     res.json({ success: true, response: reply });
-
   } catch (err) {
     console.error('🔥 Error in /student-chat-insight:', err);
-    res.status(500).json({ success: false, error: err.message || 'Internal server error' });
+    res
+      .status(500)
+      .json({ success: false, error: err.message || 'Internal server error' });
   }
 });
+
 
 
 module.exports = router;
