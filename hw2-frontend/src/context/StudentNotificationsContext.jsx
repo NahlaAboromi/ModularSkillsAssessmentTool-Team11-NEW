@@ -22,9 +22,11 @@ export const StudentNotificationsProvider = ({ children }) => {
       const response = await fetch(`/api/studentNotifications/student/${userId}`);
       const data = await response.json();
       if (!response.ok) {
+           setError(`Request failed with status ${response.status}`);
         console.warn(`Request failed with status ${response.status}`);
         return;
       }
+        console.log("Fetching notifications");
         setNotifications(data);
         setNotificationCount(data.filter(n => !n.read).length);  
     } catch (err) {
