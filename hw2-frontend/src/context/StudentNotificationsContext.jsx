@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { UserContext } from './UserContext';
 
-const StudentNotificationsContext = createContext();
-
+export const StudentNotificationsContext = createContext();
+ // Fetch notifications
 export const StudentNotificationsProvider = ({ children }) => {
   const { user } = useContext(UserContext);
   const userId = user?.id;
@@ -10,24 +10,32 @@ export const StudentNotificationsProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   // Fetch notifications from server for current user
+
   const fetchNotifications = async () => {
-    if (!userId) return; // No user ID, skip
-
     try {
-      const response = await fetch(`/api/studentNotifications/student/${userId}`);
+      const response = await fetch(`http://localhost:5000/api/studentNotifications/student/${userId}`);
       const data = await response.json();
-
       if (!response.ok) {
         console.warn(`Request failed with status ${response.status}`);
         return;
       }
-      setNotifications(data);
-      setNotificationCount(data.filter(n => !n.read).length);
+        setNotifications(data);
+        setNotificationCount(data.filter(n => !n.read).length);  
     } catch (err) {
-      console.error("❌ Failed to fetch notifications:", err);
+    
+        console.error("❌ Failed to fetch notifications:", err);
     }
   };
+  
+  // Fetch notifications once userId is available and whenever it changes
+ useEffect(() => {
+  if (!userId) return;
+      fetchNotifications();
+}, [userId]);
 
   // Mark single notification as read and refresh list
   const markNotificationAsRead = async (notificationId) => {
@@ -54,16 +62,7 @@ export const StudentNotificationsProvider = ({ children }) => {
     }
   };
 
-  // Fetch notifications once userId is available and whenever it changes
-  useEffect(() => {
-    if (userId) {
-      console.log("✅ userId ready, fetching notifications:", userId);
-      fetchNotifications();
-    } else {
-      console.log("⏳ userId not ready yet");
-    }
-  }, [userId]);
-
+  
   return (
     <StudentNotificationsContext.Provider value={{
       notifications,
@@ -77,4 +76,3 @@ export const StudentNotificationsProvider = ({ children }) => {
   );
 };
 
-export const useStudentNotification = () => useContext(StudentNotificationsContext);
