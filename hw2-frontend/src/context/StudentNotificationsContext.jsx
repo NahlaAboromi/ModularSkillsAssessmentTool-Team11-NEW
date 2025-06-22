@@ -26,7 +26,6 @@ export const StudentNotificationsProvider = ({ children }) => {
         console.warn(`Request failed with status ${response.status}`);
         return;
       }
-        console.log("Fetching notifications");
         setNotifications(data);
         setNotificationCount(data.filter(n => !n.read).length);  
     } catch (err) {
