@@ -65,7 +65,7 @@ const SimulationResult = () => {
             <br />
             {/* Button to return to dashboard on error */}
             <button
-              onClick={() => navigate('/student/Student')}
+              onClick={() => navigate('/StudentHome')}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
             >
               Return to Dashboard
