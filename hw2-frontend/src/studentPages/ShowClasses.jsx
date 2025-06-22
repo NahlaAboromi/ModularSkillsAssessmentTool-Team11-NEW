@@ -38,7 +38,7 @@ const ClassManagerContent = () => {
             subject: item.subject || '',
             createdAt: item.createdAt || item.createdDate || '',
             createdBy: item.createdBy || '',
-            studentsTaken: item.students || [],
+            studentsTaken: item.students || []
           }));
 
           setClasses(formattedData);
