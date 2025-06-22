@@ -17,7 +17,7 @@ export const StudentNotificationsProvider = ({ children }) => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/studentNotifications/student/${userId}`);
+      const response = await fetch(`/api/studentNotifications/student/${userId}`);
       const data = await response.json();
       if (!response.ok) {
         console.warn(`Request failed with status ${response.status}`);
