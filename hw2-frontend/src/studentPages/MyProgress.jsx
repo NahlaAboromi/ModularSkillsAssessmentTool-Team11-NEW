@@ -6,7 +6,7 @@ import { ThemeProvider, ThemeContext } from '../DarkLightMood/ThemeContext';
 import {
     LineChart,Line,BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,Legend
 } from 'recharts';
-import {useStudentNotification} from '../context/StudentNotificationsContext';
+import {StudentNotificationsContext} from '../context/StudentNotificationsContext';
 import StudentAIChat from '../AI/StudentAIChat'; 
 
 //Renders a line chart that visualizes student progress over time by attempt number and score.
@@ -148,7 +148,7 @@ const MyProgress = () => {
   const [classesData, setClassesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isExporting,setIsExporting]=useState(false)
-  const { fetchNotifications } = useStudentNotification();
+  const { fetchNotifications } = useContext(StudentNotificationsContext);
 const [openChartClassIndex, setOpenChartClassIndex] = useState(null);
 
 
