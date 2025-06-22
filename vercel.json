@@ -17,9 +17,12 @@
       "dest": "/api/app.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "/hw2-frontend/$1"
-    }
+    "handle": "filesystem"
+  },
+  {
+    "src": "/(.*)",
+    "dest": "/hw2-frontend/index.html"
+  }
   ],
   "env": {
     "NODE_ENV": "production"
