@@ -6,11 +6,11 @@ const RecentActivity = () => {
   const { notifications, fetchNotifications } = useContext(StudentNotificationsContext);
   const location = useLocation();
 
-  // Fetch notifications every time the pathname changes (page changes)
+  // Fetch notifications
   useEffect(() => {
     fetchNotifications();
-  }, [location.pathname, fetchNotifications]); 
-
+  }, []);
+  
   // Parse custom date string into a JavaScript Date object
   function parseCustomDate(dateStr) {
     const [datePart, timePart] = dateStr.split(',').map(s => s.trim());
