@@ -303,6 +303,14 @@ const [openChartClassIndex, setOpenChartClassIndex] = useState(null);
   });
 
   return averages;
+ //     {
+//  selfAwareness: "4.5",
+ // selfManagement: "3.5",
+//  socialAwareness: "N/A",
+ // relationshipSkills: "N/A",
+//  responsibleDecisionMaking: "N/A"
+//}
+
 };
 const averageSkills = calculateAverageSkills(classesData);
 
