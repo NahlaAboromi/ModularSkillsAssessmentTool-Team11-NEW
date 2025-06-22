@@ -2,7 +2,87 @@ const express = require('express');
 const router = express.Router();
 const claudeService = require('../services/claudeService');
 const mongoose = require('mongoose');
+router.post('/ask', async (req, res) => {
+  try {
+     // Logging the body of the request for debugging purposes
+    console.log("Claude /ask endpoint called with body:", JSON.stringify(req.body, null, 2));
+    
+    const { prompt, maxTokens, temperature, model, system } = req.body;
+      // Validation: Checking if the prompt is provided in the request
+    if (!prompt) {
+      console.log("No prompt provided in request");
+      return res.status(400).json({ success: false, error: 'Prompt is required' });
+    }
 
+    console.log(`Processing prompt: "${prompt.substring(0, 30)}..."`);
+     // Calling the Claude service to generate a response based on the prompt and optional parameters
+    const result = await claudeService.generateResponse(prompt, {
+      maxTokens, // Limit the number of tokens in the response
+      temperature,// Adjust the model's creativity (higher values result in more randomness)
+      model,  // Specify the model to use (if needed)
+      system    // Define system-level parameters (if any)
+    });
+
+    console.log("Claude service returned result:", result.success ? "Success" : "Failure");
+    
+    if (!result.success) {
+      console.log("Error from Claude service:", result.error);
+      return res.status(500).json(result);
+    }
+
+    console.log("Sending successful response to client");
+    res.json(result);
+  } catch (error) {
+    console.error('Error in Claude ask endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
+    });
+  }
+});
+// Handles a multi-message chat session with Claude AI.
+router.post('/chat', async (req, res) => {
+  try {
+    console.log("Claude /chat endpoint called");
+        // Extract relevant parameters from the request body
+    const { messages, maxTokens, temperature, model, system } = req.body;
+        // Validate that messages is a non-empty array
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      console.log("Invalid messages array in request");
+      return res.status(400).json({
+        success: false,
+        error: 'Valid messages array is required'
+      });
+    }
+
+    console.log(`Processing chat with ${messages.length} messages`);
+        // Call the Claude service to get a chat response
+
+    const result = await claudeService.chat(messages, {
+      maxTokens,
+      temperature,
+      model,
+      system
+    });
+       // Log whether the Claude service call was successful
+    console.log("Claude chat service returned result:", result.success ? "Success" : "Failure");
+      // If Claude service failed, log and return error
+    if (!result.success) {
+      console.log("Error from Claude chat service:", result.error);
+      return res.status(500).json(result);
+    }
+       // Send the successful chat result back to the client
+    console.log("Sending successful chat response to client");
+    res.json(result);
+  } catch (error) {
+    // Log and handle unexpected errors
+    console.error('Error in Claude chat endpoint:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Internal server error'
+    });
+  }
+});
 // Generates a short educational scenario and open-ended question using Claude AI.
 router.post('/generate-situation', async (req, res) => {
   try {
