@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../models/NotificationSchema');
-
+const crypto = require('crypto'); 
 // Creates a new notification for a teacher.
 router.post('/create', async (req, res) => {
   try {
@@ -24,20 +24,31 @@ router.post('/create', async (req, res) => {
 });
 
 // Retrieves all notifications for a specific teacher, sorted by newest first.
+
 router.get('/teacher/:teacherId', async (req, res) => {
   try {
     const { teacherId } = req.params;
 
-    // Sort by createdAt descending to get newest first
+    // שליפת ההתראות
     const notifications = await Notification.find({ teacherId }).sort({ createdAt: -1 });
 
+    // צור hash (etag) מההתראות (אפשר גם מבוסס updatedAt בלבד אם יש)
+    const etag = crypto.createHash('md5').update(JSON.stringify(notifications)).digest('hex');
+
+    // בדוק אם הלקוח כבר קיבל את הגרסה הזו
+    if (req.headers['if-none-match'] === etag) {
+      return res.status(304).end(); // אין שינוי, אל תשלח כלום
+    }
+
+    // שלח את ה־etag בתגובה + ההתראות
+    res.set('ETag', etag);
     res.status(200).json(notifications);
+
   } catch (error) {
     console.error('❌ Error fetching notifications:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 // Marks a single notification as read.
 router.patch('/mark-as-read/:notificationId', async (req, res) => {
   try {
