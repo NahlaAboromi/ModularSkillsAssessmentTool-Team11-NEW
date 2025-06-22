@@ -19,7 +19,6 @@ const ClassDetailsContent = () => {
   const { user } = useContext(UserContext); 
 
   const [classInfo, setClassInfo] = useState(null);
-  const [classInsight, setClassInsight] = useState('');
   const [searchDate, setSearchDate] = useState('');
 
   
@@ -40,29 +39,6 @@ const ClassDetailsContent = () => {
     fetchClassInfo();
   }, [classCode]);
 
-  // Function to request AI-generated insight for this class
-  const getClassInsightFromAI = async () => {
-    try {
-      // POST request with classCode to get AI insight
-      const res = await fetch('/api/classes/ai-class-insight', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ classCode })
-      });
-
-      const data = await res.json();
-
-      // If successful, save insight; else show error message
-      if (res.ok) {
-        setClassInsight(data.insight);
-      } else {
-        setClassInsight(`⚠️ ${data.message}`);
-      }
-    } catch (error) {
-      console.error('❌ Error getting AI class insight:', error);
-      setClassInsight('❌ Server error while requesting class insight.');
-    }
-  };
 
   // Convert any date string to Israel local date in format YYYY-MM-DD
   const formatDateToIsraelTime = (dateString) => {
