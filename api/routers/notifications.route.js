@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../models/NotificationSchema');
-
+//nahla
 // Creates a new notification for a teacher.
 router.post('/create', async (req, res) => {
   try {
