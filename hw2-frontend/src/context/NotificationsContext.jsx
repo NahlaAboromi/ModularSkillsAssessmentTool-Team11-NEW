@@ -19,37 +19,50 @@ export const NotificationsProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
 const [isFetching, setIsFetching] = useState(false);
 const [etag, setEtag] = useState(null);
 const fetchNotifications = async () => {
+  
   if (!userId) return;
-
+  setIsLoading(true);
+    setError(null);
   try {
     const response = await fetch(`/api/notifications/teacher/${userId}`);
     const data = await response.json();
     setNotifications(data || []);
     setNotificationCount(data.filter(n => !n.read).length);
   } catch (err) {
-    console.error('❌ Error fetching notifications:', err);
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
   }
 };
 
 
   // Mark a single notification as read
   const markNotificationAsRead = async (notificationId) => {
+      setIsLoading(true);
+    setError(null);
     try {
       // Send request to mark notification as read
       await fetch(`/api/notifications/mark-as-read/${notificationId}`, {
         method: 'PATCH',
       });
       fetchNotifications(); // Refresh notifications
-    } catch (err) {
-      console.error("❌ Failed to mark notification as read:", err);
-    }
+    }catch (err) {
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
   };
 
   // Mark all notifications as read
   const markAllAsRead = async () => {
+    setIsLoading(true);
+    setError(null);
     try {
       // Send request to mark all notifications as read
       await fetch(`/api/notifications/mark-all-as-read/${userId}`, {
@@ -57,8 +70,10 @@ const fetchNotifications = async () => {
       });
       fetchNotifications(); // Refresh notifications
     } catch (err) {
-      console.error("❌ Failed to mark all notifications as read:", err);
-    }
+    setError(err.message);
+  } finally {
+    setIsLoading(false);
+  }
   };
 
   // Fetch notifications when user ID changes
@@ -73,7 +88,9 @@ const fetchNotifications = async () => {
       notificationCount,
       fetchNotifications,
       markNotificationAsRead,
-      markAllAsRead
+      markAllAsRead,
+      isLoading,
+      error
     }}>
       {children}
     </NotificationsContext.Provider>
