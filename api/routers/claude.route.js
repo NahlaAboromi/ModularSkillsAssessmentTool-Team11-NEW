@@ -388,100 +388,89 @@ ${JSON.stringify(filteredStudents, null, 2)}
   }
 });
 
-// Provides a student with insights about their classes, simulations, and teachers using Claude AI.
 router.post('/student-chat-insight', async (req, res) => {
   try {
-  // Extract studentId and messages from the request body
     const { studentId, messages } = req.body;
-  // Validate input parameters
+
+    // ✅ בדיקת קלט
     if (!studentId || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ success: false, error: 'Missing studentId or messages array' });
     }
-  // Fetch student information from the database
-    const student = await StudentModel.findOne({ id: studentId }).lean();
+
+    // ✅ שליפת מידע בסיסי
+    const student = await StudentModel.findOne({ studentId }).lean();  // שים לב ל"תיקון"
     if (!student || !student.username) {
       return res.status(404).json({ success: false, error: 'Student not found or missing name' });
     }
-        // Get the student's name
-    const studentName = student.username;
-     // Fetch all classes in which the student is enrolled
-    const simulationClasses = await ClassModel.find({
-      students: {
-        $elemMatch: {studentId: studentId }
-      }
-    }).lean();
-    // Fetch all classes and teachers for context
-    const allClasses=await ClassModel.find().lean();
-    const allTeachers = await TeacherModel.find().lean();
-   // Prepare a summary of all teachers
-    const teachersInfo = allTeachers.map(teacher => ({
-      username: teacher.username,
-      email: teacher.email
-    }));
-     // Collect all simulation answers for this student
-    const studentAnswers = [];
-    const studentIdsInClasses = new Set();
 
+    const studentName = student.username;
+
+    // ✅ כל הכיתות שהסטודנט רשום אליהן
+    const simulationClasses = await ClassModel.find({
+      students: { $elemMatch: { studentId } }
+    }).lean();
+
+    // ✅ כל המורים במערכת (סיכום קצר)
+    const allTeachers = await TeacherModel.find().lean();
+    const teachersInfo = allTeachers.map(t => t.username || 'Unknown');
+
+    // ✅ תשובות הסימולציה של הסטודנט
+    const studentAnswers = [];
     simulationClasses.forEach(cls => {
       (cls.students || [])
         .filter(ans => ans.studentId === studentId)
         .forEach(ans => {
-          studentIdsInClasses.add(ans.studentId);
           studentAnswers.push({
             classCode: cls.classCode,
             className: cls.className,
-            studentId: ans.studentId,
-            fullName: ans.username,
-            answerText: ans.answerText || "",
-            overallScore: ans.analysisResult?.overallScore,
-            submittedAt: ans.submittedAt
+            score: ans.analysisResult?.overallScore ?? 'N/A'
           });
         });
     });
 
+    // ✅ סיכום כיתות
+    const classSummaries = simulationClasses.map(cls => ({
+      classCode: cls.classCode,
+      className: cls.className,
+      subject: cls.subject
+    }));
 
-    // Build the system prompt for Claude's context
-   const systemPrompt = `
-      You are a helpful and friendly teaching assistant AI helping the student "${studentName}" understand their learning progress.
+    // ✅ Prompt מקוצר ונקי
+    const systemPrompt = `
+You are a helpful and supportive teaching assistant AI helping the student "${studentName}" understand their learning progress.
 
-      Use the data below to assist the student with any questions they might have about:
-      - The classes they are enrolled in
-      - The simulations they have submitted
-      - Their teachers
+Classes:
+${classSummaries.map(c => `• ${c.classCode} - ${c.className} (${c.subject})`).join('\n')}
 
-      📚 Classes:
-      This is a list of all available classes in the system.
-      ${JSON.stringify(allClasses, null, 2)}
+Simulation Scores:
+${studentAnswers.map(a => `• ${a.classCode}: ${a.score}`).join('\n')}
 
-      🧪 Simulation Answers:
-      These are the simulation submissions made by the student.
-      ${JSON.stringify(studentAnswers, null, 2)}
+Teachers:
+${teachersInfo.join(', ')}
 
-      👨‍🏫 Teachers:
-      This is a list of all teachers in the system.
-      ${JSON.stringify(teachersInfo, null, 2)}
+Respond clearly and kindly to the student's questions.
+    `.trim();
 
-      Please respond to the student's questions based on this data. Be clear, concise, and supportive. If any data is missing, mention it politely.
-      `.trim();
-    // Call Claude service with the student's messages and system prompt
+    // ✅ קריאה ל־Claude עם הגנה ולוג
     const result = await claudeService.chat(messages, {
-      maxTokens: 1800,
+      maxTokens: 1200,
       temperature: 0.5,
-      system: systemPrompt 
+      system: systemPrompt
     });
-     // Handle errors from Claude service
+
     if (!result.success) {
+      console.error('Claude error:', result.error);
       return res.status(500).json({ success: false, error: result.error });
     }
-     // Extract and send the AI's reply to the client
-    const reply = result.data.content[0].text;
+
+    const reply = result.data?.content?.[0]?.text || 'I could not generate a response.';
     res.json({ success: true, response: reply });
 
   } catch (err) {
-     // Log and handle unexpected errors
-    console.error("Error in /chat-insight:", err);
-    res.status(500).json({ success: false, error: err.message });
+    console.error('🔥 Error in /student-chat-insight:', err);
+    res.status(500).json({ success: false, error: err.message || 'Internal server error' });
   }
 });
+
 
 module.exports = router;
