@@ -20,22 +20,38 @@ export const NotificationsProvider = ({ children }) => {
   const [notificationCount, setNotificationCount] = useState(0);
 
 const [isFetching, setIsFetching] = useState(false);
+const [etag, setEtag] = useState(null);
 
 const fetchNotifications = async () => {
   if (!userId || isFetching) return;
   setIsFetching(true);
 
   try {
-    const response = await fetch(`/api/notifications/teacher/${userId}`);
+    const response = await fetch(`/api/notifications/teacher/${userId}`, {
+      headers: etag ? { 'If-None-Match': etag } : {}
+    });
+
+    if (response.status === 304) {
+      console.log("✅ No changes in notifications");
+      return; // אין עדכון, לא צריך לשנות state
+    }
+
     const data = await response.json();
     setNotifications(data || []);
     setNotificationCount(data.filter(n => !n.read).length);
+
+    const newEtag = response.headers.get('ETag');
+    if (newEtag) {
+      setEtag(newEtag);
+    }
+
   } catch (err) {
     console.error('❌ Error fetching notifications:', err);
   } finally {
     setIsFetching(false);
   }
 };
+
 
   // Mark a single notification as read
   const markNotificationAsRead = async (notificationId) => {
