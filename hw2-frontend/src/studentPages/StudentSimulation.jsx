@@ -41,12 +41,12 @@ const StudentSimulation = () => {
         } else {
           console.error('❌ Error fetching class data:', data.message);
           alert('Class not found. Please try again.');
-          navigate('/student-login');
+          navigate('/StudentHome');
         }
       } catch (error) {
         console.error('❌ Server error:', error);
         alert('Server error. Please try again later.');
-        navigate('/student-login');
+        navigate('/StudentHome');
       } finally {
         setLoading(false);
       }
@@ -55,7 +55,7 @@ const StudentSimulation = () => {
     if (classCode) {
       fetchClassData();
     } else {
-      navigate('/student-login');
+      navigate('/StudentHome');
     }
   }, [classCode, navigate]);
 
