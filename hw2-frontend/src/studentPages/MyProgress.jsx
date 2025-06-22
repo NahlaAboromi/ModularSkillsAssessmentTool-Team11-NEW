@@ -495,7 +495,7 @@ const skillTimeData = submissions.map(sub => {
               <button
                 className="absolute top-4 right-6 text-sm bg-slate-200 dark:bg-slate-600 rounded px-4 hover:bg-gray-400"
                 onClick={() => setOpenChartClassIndex(idx)}
-                aria-label={`Open progress chart for ${cls.className}`}
+                aria-label={`Open progress chart for ${cls.name}`}
               >
                 ...
               </button>
