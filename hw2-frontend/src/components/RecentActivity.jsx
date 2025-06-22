@@ -16,7 +16,7 @@ const RecentActivity = () => {
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [fetchNotifications, location.pathname]);
 
 
   const sortedNotifications = [...notifications].sort(
