@@ -401,7 +401,7 @@ router.post('/student-chat-insight', async (req, res) => {
     }
 
     // Fetch the student record
-    const student = await StudentModel.findOne({ studentId }).lean();
+    const student = await StudentModel.findOne({ id: studentId }).lean();
     if (!student || !student.username) {
       return res
         .status(404)
