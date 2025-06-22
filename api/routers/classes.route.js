@@ -149,7 +149,8 @@ router.get('/get-classes-done-simulation/:studentId', async (req, res) => {
       situation: classItem.situation,
       question: classItem.question,
       createdBy: classItem.createdBy,
-      students: classItem.students,
+      createdAt: classItem.createdAt,
+      students: classItem.students
     }));
     res.status(200).json(mappedClasses);  
   } catch (error) {
@@ -170,7 +171,8 @@ router.get('/get-all-classes', async (req, res) => {
       situation: classItem.situation,
       question: classItem.question,
       createdBy: classItem.createdBy,
-      students: classItem.students,
+      createdAt: classItem.createdAt,
+      students: classItem.students
     }));
 
     res.status(200).json(mappedClasses);  
