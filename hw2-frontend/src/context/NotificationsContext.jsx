@@ -19,21 +19,23 @@ export const NotificationsProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
 
-  // Fetch notifications for the current user
-  const fetchNotifications = async () => {
-    if (!userId) return; // Skip if no user ID
+const [isFetching, setIsFetching] = useState(false);
 
-    try {
-      // Get notifications from backend
-      const response = await fetch(`/api/notifications/teacher/${userId}`);
-      const data = await response.json();
-      setNotifications(data || []); // Update notifications state
-      // Update unread count
-      setNotificationCount(data.filter(n => !n.read).length);
-    } catch (err) {
-      console.error('❌ Error fetching notifications:', err);
-    }
-  };
+const fetchNotifications = async () => {
+  if (!userId || isFetching) return;
+  setIsFetching(true);
+
+  try {
+    const response = await fetch(`/api/notifications/teacher/${userId}`);
+    const data = await response.json();
+    setNotifications(data || []);
+    setNotificationCount(data.filter(n => !n.read).length);
+  } catch (err) {
+    console.error('❌ Error fetching notifications:', err);
+  } finally {
+    setIsFetching(false);
+  }
+};
 
   // Mark a single notification as read
   const markNotificationAsRead = async (notificationId) => {
