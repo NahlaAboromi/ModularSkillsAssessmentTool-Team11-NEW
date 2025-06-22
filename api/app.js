@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
+
 require('dotenv').config();
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -52,8 +54,19 @@ app.use('/api/classes', classesRouter);
 app.use('/api/claude', claudeRoutes);
 app.use('/api', summaryRouter);
 app.use('/api', teacherStudentProgressRouter);
+
+if (process.env.NODE_ENV === 'production') {
+  const distPath = path.join(__dirname, 'dist');
+  app.use(express.static(distPath));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 // ✅ Export the app for Vercel
 module.exports = app;
+
 
 // 🖥️ Local development only
 if (process.env.NODE_ENV !== 'production') {
