@@ -8,14 +8,6 @@ const RecentActivity = () => {
 
   useEffect(() => {
     fetchNotifications();
-
-    const interval = setInterval(() => {
-      fetchNotifications();
-    }, 5000);
-
-    return () => {
-      clearInterval(interval);
-    };
   }, []);
 
 
