@@ -52,7 +52,7 @@ function App() {
                 <Route path="/view-classes" element={<ViewClasses />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/progress-of-chosen-student/:studentId" element={<ProgressOfChosenStudent />} />
-                {/* ✅ חדשים לכפתורים */}
+                {/* ✅ חדשים לכפתורים */}                {/* ✅ חדשים לכפתורים */}
                 <Route path="/teacher/class/:classCode" element={<ClassDetails />} />
                 <Route path="/teacher/class/:classCode/reports" element={<ClassStudentReports />} />
               
