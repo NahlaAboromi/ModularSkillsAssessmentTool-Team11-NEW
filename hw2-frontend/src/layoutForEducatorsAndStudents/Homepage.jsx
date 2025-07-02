@@ -9,17 +9,15 @@ const HomepageContent = () => {
   const isDark = theme === "dark";
   const location = useLocation();
 
-  // הדפסות למעקב
-  console.log("🚀 HomepageContent loaded");
+  console.log("🟢 HomepageContent component loaded");
   console.log("🎨 Current theme:", theme);
-  console.log("🌓 isDark mode?", isDark);
+  console.log("🌙 Dark mode?", isDark);
   console.log("📍 Current URL:", location.pathname);
 
   useEffect(() => {
-    console.log("🧩 HomepageContent rendered or updated.");
+    console.log("🔄 HomepageContent rendered or updated");
   }, [theme]);
 
-  // אירועים בלחיצה
   const handleEducatorClick = () => {
     console.log("👨‍🏫 Educator Portal clicked → navigating to /teacher-login");
   };
@@ -30,15 +28,19 @@ const HomepageContent = () => {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen w-screen dark:bg-slate-900 !important dark:text-white !important bg-slate-100 text-slate-900">
+      {console.log("📦 Rendering HomepageContent return block")}
+      <div className={"flex flex-col min-h-screen w-screen dark:bg-slate-900 !important dark:text-white !important bg-slate-100 text-slate-900"}>
+        {console.log("🧩 Container div rendered")}
 
         {/* Header */}
         <div className="px-6 pt-6">
+          {console.log("📌 Rendering HomeHeader")}
           <HomeHeader />
         </div>
 
         {/* Hero Section */}
         <section className="relative w-screen overflow-hidden bg-gradient-to-br from-sky-500 via-blue-600 to-blue-800 dark:from-blue-800 dark:via-blue-900 dark:to-slate-900 text-white py-24 px-6">
+          {console.log("🌈 Hero Section rendered")}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40"></div>
 
           <div className="max-w-5xl mx-auto relative z-10 text-center space-y-6 pt-8 pb-16">
@@ -53,6 +55,7 @@ const HomepageContent = () => {
             </p>
 
             <div className="flex flex-wrap justify-center gap-4 mt-4">
+              {console.log("🔘 Rendering Educator and Student buttons")}
               <Link to="/teacher-login" onClick={handleEducatorClick}>
                 <button className="group relative inline-flex items-center justify-center h-12 px-6 rounded-full bg-white/10 backdrop-blur-sm text-white border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
                   Educator Portal
@@ -69,8 +72,29 @@ const HomepageContent = () => {
           </div>
         </section>
 
+        {/* Feature Sections */}
+        <section className="w-full bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 py-24 space-y-24">
+          {console.log("🧠 Feature Section loaded")}
+
+          {/* Header of features */}
+          <div className="max-w-3xl mx-auto text-center mb-12 px-6">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">How It Works</h2>
+            <p className="mt-4 text-base text-slate-600 dark:text-slate-400">
+              Discover how our platform empowers students and educators through AI-driven SEL tools.
+            </p>
+          </div>
+
+          {/* Step 1 */}
+          {console.log("📘 Step 1 rendered")}
+          {/* Step 2 */}
+          {console.log("📗 Step 2 rendered")}
+          {/* Step 3 */}
+          {console.log("📙 Step 3 rendered")}
+        </section>
+
         {/* Footer */}
         <div className="px-6 pb-6 mt-12">
+          {console.log("📄 Rendering Footer")}
           <Footer />
         </div>
       </div>
@@ -79,7 +103,7 @@ const HomepageContent = () => {
 };
 
 const Homepage = () => {
-  console.log("📦 Homepage wrapper component loaded");
+  console.log("🔵 Homepage wrapper component loaded");
   return <HomepageContent />;
 };
 
