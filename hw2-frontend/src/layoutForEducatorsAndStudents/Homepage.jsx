@@ -3,7 +3,7 @@ import { ThemeContext } from "../DarkLightMood/ThemeContext";
 import HomeHeader from "./HomeHeader";
 import Footer from "../layout/Footer";
 import { Link } from "react-router-dom";
-
+ {/*משילד*/}
 const HomepageContent = () => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
