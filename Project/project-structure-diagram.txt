@@ -1,0 +1,21 @@
+Modular Skills Assessment Tool – Project Structure Diagram
+
+This diagram presents the file and folder architecture of our fullstack web application project, implemented using React (frontend), Express.js (backend), and Tailwind CSS for styling.
+
+The structure includes:
+- Frontend components and pages
+- API (backend) folder with routes, models, and services
+- Configuration files such as vercel.json for deployment
+
+We created the following interactive diagram to illustrate the complete layout of the project:
+
+View the diagram here:
+https://www.mermaidchart.com/app/projects/e1513125-dfc3-4f4d-a300-d41db2764a7f/diagrams/14e82b5c-8f85-4ef7-a3c9-d732b88bd9ca/share/invite/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudElEIjoiMTRlODJiNWMtOGY4NS00ZWY3LWEzYzktZDczMmI4OGJkOWNhIiwiYWNjZXNzIjoiRWRpdCIsImlhdCI6MTc1MjQwMzQ4Mn0.lju95FNB0X6sJjLeWicFQ-Vwort2E5oVJUtu4nVH5js
+
+The diagram includes:
+- API folder (models, routes, services)
+- Frontend folder (components, pages, contexts)
+- Shared structure for deployment and environment setup
+
+Prepared by Team 11
+
