@@ -1,0 +1,19 @@
+{
+  "checkingStatus": "בודק מצב…",
+  "preAlready": "כבר מילאת את השאלון הראשוני (PRE). אין צורך למלא שוב.",
+  "postAlready": "כבר מילאת את השאלון הסופי (POST). תודה על השתתפותך!",
+  "preCompleteTitle": "השאלון הראשוני הושלם",
+  "postCompleteTitle": "השאלון הסופי הושלם",
+  "continueToSimulation": "המשך לסימולציה",
+  "backToHome": "חזרה לדף הבית",
+  "goToFinalReflection": "מעבר לרפלקציה הסופית",
+  "goToSummary": "מעבר לסיכום",
+  "savedSecurely": "התשובות נשמרו בצורה מאובטחת.",
+  "loadingQuestionnaire": "טוען שאלון…",
+  "couldntLoad": "לא ניתן היה לטעון את השאלון",
+  "noItemsFound": "לא נמצאו פריטים.",
+  "retry": "נסה שוב",
+  "previous": "הקודם",
+  "next": "הבא",
+  "tooFast": "אתה עונה מהר מדי — אנא האט 🙂"
+}

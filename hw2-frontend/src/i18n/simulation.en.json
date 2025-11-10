@@ -1,0 +1,18 @@
+{
+  "loading": "Loading…",
+  "loadFailTitle": "Couldn’t load the simulation",
+  "loadFailBack": "Back",
+  "headerTitle": "Simulation",
+  "groupLabel": "Group",
+  "control": "Control",
+  "experimental": "Experimental",
+  "scenarioFallback": "Scenario",
+  "reflectionsTitle": "Reflection Questions",
+  "writeCombined": "Write your combined reflection here",
+  "yourResponse": "Your response",
+  "placeholderCombined": "Answer all the questions above in one response...",
+  "placeholderSingle": "Write your response here...",
+  "back": "Back",
+  "continue": "Continue",
+  "processing": "Processing…"
+}

@@ -7,67 +7,21 @@ import Footer from '../layout/Footer';
 import { useAnonymousStudent as useStudent } from '../context/AnonymousStudentContext';
 
 // ✅ i18n
-import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
+import { useI18n } from '../utils/i18n';
 
 export default function SocraticReflectionEnd() {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
   const { student } = useStudent?.() || { student: null };
   const anonId = student?.anonId || null;
-
   const navigate = useNavigate();
+
+  // ---- i18n ----
+  const { t, dir, lang: langAttr, ready } = useI18n('socraticReflectionFeedback');
+
   const [answers, setAnswers] = useState({ insight: '', usefulness: '' });
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState('');
-
-  // ---- Language / RTL ----
-  const { lang } = useContext(LanguageContext) || { lang: 'he' };
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
-
-  // ---- i18n (בלי עברית בקוד) ----
-  const SOURCE = {
-    cardTitle: 'Final Reflection',
-    cardSub: 'Before we end, please share your experience with Casely, your Socratic coach',
-    q1: 'In what way did the Socratic conversation help you reflect on your thoughts or feelings?',
-    q2: 'Overall, do you feel that talking with Casely was useful or meaningful to you?',
-    ph1: 'Share your thoughts here...',
-    ph2: 'You can explain why or why not...',
-    chars: 'characters',
-    saving: 'Saving…',
-    finishContinue: 'Finish & Continue',
-    mustAnswer: 'Please answer both questions to continue',
-    thanksNote: 'Thank you for taking the time to reflect on your experience 🙏',
-    errMissing: 'Missing anonId — make sure the anonymous student context is available.',
-    errSave: 'Saving failed. Please try again.',
-  };
-
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadT() {
-      if (lang === 'he') {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({ sourceLang: 'EN', targetLang: 'HE', texts: vals });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = tr[i]));
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadT();
-    return () => { cancelled = true; };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (e) =>
     setAnswers({ ...answers, [e.target.name]: e.target.value });
@@ -106,12 +60,19 @@ export default function SocraticReflectionEnd() {
     }
   };
 
+  // מונע הבהוב לפני טעינת המילון
+  if (!ready) return null;
+
+  // helper קצר להזחה לוגית לפי כיוון
+  const offsetClass = dir === 'rtl' ? 'pr-11' : 'pl-11';
+
   return (
     <div
       className={`flex flex-col min-h-screen w-screen ${
         isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'
       }`}
       dir={dir}
+      lang={langAttr}
     >
       {/* HEADER */}
       <div className="px-4 mt-4">
@@ -129,7 +90,8 @@ export default function SocraticReflectionEnd() {
             } max-w-6xl mx-auto`}
           >
             {/* Card header */}
-<div className="mb-6 text-center">              <div className="inline-block mb-4">
+            <div className="mb-6 text-center">
+              <div className="inline-block mb-4">
                 <div
                   className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl ${
                     isDark ? 'bg-emerald-900/50' : 'bg-emerald-100'
@@ -154,7 +116,7 @@ export default function SocraticReflectionEnd() {
             <div className="space-y-8">
               {/* Question 1 */}
               <div className="space-y-3">
-              <div className="flex items-start gap-3 justify-between">
+                <div className="flex items-start gap-3 justify-between">
                   <div
                     className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       isDark
@@ -172,7 +134,8 @@ export default function SocraticReflectionEnd() {
                     {t('q1')}
                   </label>
                 </div>
-<div className={dir==='rtl' ? 'mr-11' : 'ml-11'}>                  <textarea
+                <div className={offsetClass}>
+                  <textarea
                     name="insight"
                     value={answers.insight}
                     onChange={handleChange}
@@ -198,7 +161,8 @@ export default function SocraticReflectionEnd() {
 
               {/* Question 2 */}
               <div className="space-y-3">
-<div className="flex items-start gap-3 justify-between">                  <div
+                <div className="flex items-start gap-3 justify-between">
+                  <div
                     className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       isDark
                         ? 'bg-teal-900/50 text-teal-300'
@@ -215,7 +179,7 @@ export default function SocraticReflectionEnd() {
                     {t('q2')}
                   </label>
                 </div>
-                <div className={dir==='rtl' ? 'pr-11' : 'pl-11'}>
+                <div className={offsetClass}>
                   <textarea
                     name="usefulness"
                     value={answers.usefulness}

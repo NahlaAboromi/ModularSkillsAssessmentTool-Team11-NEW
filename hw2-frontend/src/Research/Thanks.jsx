@@ -7,37 +7,7 @@ import { ThemeContext, ThemeProvider } from '../DarkLightMood/ThemeContext';
 import { useAnonymousStudent as useStudent } from '../context/AnonymousStudentContext';
 
 // ✅ i18n
-import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
-
-// ---- טקסטים באנגלית (מתורגמים דינמית לעברית) ----
-const SOURCE = {
-  heroTitle_has: 'Thank you for participating! 🎉',
-  heroTitle_no:  'Thank you for participating! 🙌',
-  heroSubtitle_has: 'You completed the simulation, the Socratic reflection chat, and the validated questionnaire.',
-  heroSubtitle_no:  'You completed the simulation and the validated questionnaire.',
-  ribbons_completed: 'All steps completed',
-  ribbons_control: 'Control group',
-  ribbons_experimental: 'Experimental group',
-  ribbons_reflective: 'Socratic reflection',
-  ribbons_anonymous: 'Anonymous & secure',
-  aboutTitle: 'A note of appreciation',
-  about_1: 'Thank you for dedicating your time and sharing your honest reflections.',
-  about_2: 'All responses are stored securely and remain fully anonymous — no personal information is ever collected.',
-  about_3: 'Your participation contributes meaningfully to our study on learning and self-reflection among students.',
-  about_4: "You're all set! You can safely close this page; no further action is required.",
-  metaTitle: 'Technical recap',
-  meta_anon: 'Anonymous ID',
-  meta_phase: 'Final phase',
-  meta_phase_post: 'POST',
-  meta_notes_exp: 'Timestamps recorded for simulation and Socratic chat (research only)',
-  meta_notes_ctrl:'Timestamps recorded for simulation (research only)',
-  meta_group: 'Assigned group',
-  meta_type: 'Condition',
-  ready: 'Ready',
-  notes: 'Notes',
-  exit: 'Exit',
-};
+import { useI18n } from '../utils/i18n';
 
 function ThanksInner() {
   const { theme } = useContext(ThemeContext);
@@ -46,38 +16,9 @@ function ThanksInner() {
   const location = useLocation();
   const { student } = useStudent?.() || { student: null };
 
-  // ✅ שפה וכיוון
-  const { lang } = useContext(LanguageContext) || { lang: 'he' };
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
+  // ✅ שפה/כיוון מ־useI18n (לא עושים return לפני שכל ה-hooks הוגדרו)
+  const { t, dir, lang: langAttr, ready } = useI18n('thanks');
   const isRTL = dir === 'rtl';
-
-  // ✅ טבלת תרגום
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadT() {
-      if (lang === 'he') {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({ sourceLang: 'EN', targetLang: 'HE', texts: vals });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = tr[i]));
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadT();
-    return () => { cancelled = true; };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const anonId = location.state?.anonId || student?.anonId || '—';
   const initialGroup = (location.state?.group || '').toString().toUpperCase();
@@ -108,13 +49,7 @@ function ThanksInner() {
   }, [anonId, group]);
 
   const hasSocratic = useMemo(() => !!group && group !== 'D', [group]);
-
-  const aboutList = [
-    t('about_1'),
-    t('about_2'),
-    t('about_3'),
-    t('about_4'),
-  ];
+  const aboutList = [t('about_1'), t('about_2'), t('about_3'), t('about_4')];
 
   const groupBadge = useMemo(() => {
     if (!group) return null;
@@ -125,7 +60,32 @@ function ThanksInner() {
         ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
         : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
     };
-  }, [group, groupType, T]);
+  }, [group, groupType, t]);
+
+  // ✅ עכשיו מותר להחזיר placeholder אם המילון עוד לא מוכן
+  if (!ready) {
+    return (
+      <div
+        className={`flex flex-col min-h-screen w-screen ${
+          isDark ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-800'
+        }`}
+        dir={dir}
+        lang={langAttr}
+      >
+        <div className="px-4 mt-4">
+          <AnonymousHeader />
+        </div>
+        <main className="flex-1 grid place-items-center p-8">
+          <div className="flex flex-col items-center gap-4 opacity-80">
+            <div className={`w-12 h-12 rounded-full border-4 animate-spin ${isDark ? 'border-slate-600 border-t-slate-300' : 'border-slate-200 border-t-slate-600'}`} />
+          </div>
+        </main>
+        <div className="px-4 pb-4">
+          <Footer />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -135,8 +95,8 @@ function ThanksInner() {
           : 'bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-800'
       }`}
       dir={dir}
-      lang={lang}
-      style={{ fontFamily: lang === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
+      lang={langAttr}
+      style={{ fontFamily: langAttr === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
     >
       <div className="px-4 mt-4">
         <AnonymousHeader />
@@ -154,9 +114,7 @@ function ThanksInner() {
             {/* Hero Section */}
             <div className={`flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
               <div className="flex-1">
-                <h1
-                  className={`text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-2 text-center md:text-start`}
-                >
+                <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-2 text-center md:text-start">
                   {hasSocratic ? t('heroTitle_has') : t('heroTitle_no')}
                 </h1>
                 <p className={`text-base md:text-lg leading-[1.9] ${isDark ? 'text-slate-300' : 'text-slate-600'} text-center md:text-start`}>
@@ -165,11 +123,7 @@ function ThanksInner() {
               </div>
 
               {/* Ribbons */}
-              <div
-                className={`flex flex-wrap items-center gap-2 ${
-                  isRTL ? 'flex-row-reverse md:justify-start' : 'md:justify-end'
-                }`}
-              >
+              <div className={`flex flex-wrap items-center gap-2 ${isRTL ? 'flex-row-reverse md:justify-start' : 'md:justify-end'}`}>
                 <span
                   className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${
                     isDark ? 'bg-slate-600 text-slate-100 border border-slate-500' : 'bg-slate-100 text-slate-700 border border-slate-200'
@@ -231,52 +185,35 @@ function ThanksInner() {
                       : 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
                   }`}
                 >
-                  <div className="p-6 md:p-7" dir="ltr">
+                  <div className="p-6 md:p-7">
+                    <div
+                      className={`flex items-center gap-3 mb-4 ${
+                        isRTL ? 'flex-row-reverse text-right' : 'flex-row text-left'
+                      }`}
+                    >
+                      {isRTL ? (
+                        <>
+                          <span className="text-3xl">🙏</span>
+                          <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
+                          <span className="text-3xl">🙏</span>
+                        </>
+                      )}
+                    </div>
 
-
-<div
-  className={`flex items-center gap-3 mb-4 ${
-    lang === 'he' ? 'flex-row-reverse text-right' : 'flex-row text-left'
-  }`}
-  dir={lang === 'he' ? 'ltr' : 'ltr'}
->
-  {lang === 'he' ? (
-    <>
-      <span className="text-3xl">🙏</span>
-      <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
-    </>
-  ) : (
-    <>
-      <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
-      <span className="text-3xl">🙏</span>
-    </>
-  )}
-</div>
-
-<ul className="space-y-3 text-left pl-6 md:pl-7" dir="ltr" role="list">
-
-
-
-{aboutList.map((b, i) => (
-<li
-  key={i}
-  className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
->
-
-
-      <span
-        className={`mt-2 flex-shrink-0 w-1.5 h-1.5 rounded-full ${isDark ? 'bg-blue-400' : 'bg-blue-600'}`}
-      ></span>
-<span
-  dir={isRTL ? 'rtl' : 'ltr'}
-  className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-700'}`}
->
-  {b}
-</span>
-
-    </li>
-  ))}
-</ul>
+                    <ul className={`space-y-3 ${isRTL ? 'text-right pr-6 md:pr-7' : 'text-left pl-6 md:pl-7'}`} role="list">
+                      {aboutList.map((b, i) => (
+                        <li key={i} className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                          <span className={`mt-2 flex-shrink-0 w-1.5 h-1.5 rounded-full ${isDark ? 'bg-blue-400' : 'bg-blue-600'}`} />
+                          <span className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+                            {b}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -290,7 +227,6 @@ function ThanksInner() {
                 }`}
               >
                 <div className="p-6 md:p-7" dir={isRTL ? 'rtl' : 'ltr'}>
-
                   <div className="flex items-center justify-between mb-6">
                     <h4 className="text-xl font-bold">{t('metaTitle')}</h4>
                     <span className="text-xs font-bold rounded-full px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-sm">

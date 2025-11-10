@@ -1,58 +1,14 @@
 // src/Research/assessment/ResultsView.jsx
-import React, { useContext, useEffect, useState } from 'react';
-import { Award, TrendingUp } from 'lucide-react';
-import { LanguageContext } from '../../context/LanguageContext';
-import { translateUI } from '../../utils/translateUI';
+import React, { useContext } from "react";
+import { Award, TrendingUp } from "lucide-react";
+import { LanguageContext } from "../../context/LanguageContext";
+import { useI18n } from "../../utils/i18n"; // ✅ טעינה מקומית מ־JSON
 
 export default function ResultsView({ results, completionTime, onFinish }) {
   const { lang } = useContext(LanguageContext);
-
-  // ---- i18n (מקור באנגלית בלבד) ----
-  const SOURCE = {
-    title: 'Questionnaire Complete',
-    completedIn: 'Completed in',
-    avg: 'Avg',
-    useResults:
-      'Use these results to identify growth opportunities and leverage your strengths.',
-    finish: 'Finish',
-  };
-
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadT() {
-      if (lang === 'he') {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({
-            sourceLang: 'EN',
-            targetLang: 'HE',
-            texts: vals,
-          });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = tr[i]));
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadT();
-    return () => {
-      cancelled = true;
-    };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ---- RTL helpers ----
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
-  const spaceDir = lang === 'he' ? 'space-x-reverse' : '';
+  const { t } = useI18n("resultsView"); // ✅ namespace חדש
+  const dir = lang === "he" ? "rtl" : "ltr";
+  const spaceDir = lang === "he" ? "space-x-reverse" : "";
 
   return (
     <div className="min-h-screen bg-transparent p-4 md:p-6 lg:p-8" dir={dir}>
@@ -61,12 +17,12 @@ export default function ResultsView({ results, completionTime, onFinish }) {
         <div className="text-center mb-10">
           <div
             className="inline-flex items-center justify-center w-20 h-20 rounded-xl mb-6 shadow"
-            style={{ background: '#059669' }}
+            style={{ background: "#059669" }}
           >
             <Award className="w-10 h-10 text-white" />
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-slate-800 dark:text-slate-100 mb-4">
-            {t('title')}
+            {t("title")}
           </h2>
 
           {completionTime && (
@@ -75,7 +31,7 @@ export default function ResultsView({ results, completionTime, onFinish }) {
             >
               <TrendingUp className="w-5 h-5 text-emerald-600" />
               <span className="text-emerald-700 dark:text-emerald-300 font-semibold">
-                {t('completedIn')} {completionTime}
+                {t("completedIn")} {completionTime}
               </span>
             </div>
           )}
@@ -90,9 +46,9 @@ export default function ResultsView({ results, completionTime, onFinish }) {
             >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">
-                  {category}{' '}
+                  {category}{" "}
                   <span className="text-sm text-slate-600 dark:text-slate-300">
-                    ({t('avg')} {average} / 4.0)
+                    ({t("avg")} {average} / 4.0)
                   </span>
                 </h3>
                 <div className="text-3xl font-bold text-slate-800 dark:text-slate-100">
@@ -111,20 +67,22 @@ export default function ResultsView({ results, completionTime, onFinish }) {
 
         {/* TIP BOX */}
         <div className="bg-blue-50 border border-blue-200 dark:bg-blue-900/30 dark:border-blue-700 rounded-xl p-6 mb-8">
-          <p className="text-blue-800 dark:text-blue-200">{t('useResults')}</p>
+          <p className="text-blue-800 dark:text-blue-200">{t("useResults")}</p>
         </div>
 
         {/* CTA */}
         <div className="grid gap-3 md:grid-cols-1">
- <button
-   onClick={() => {
-     try { localStorage.removeItem('langLock'); } catch {}
-     window.dispatchEvent(new Event('lang-lock-change'));
-     onFinish?.();
-   }}
+          <button
+            onClick={() => {
+              try {
+                localStorage.removeItem("langLock");
+              } catch {}
+              window.dispatchEvent(new Event("lang-lock-change"));
+              onFinish?.();
+            }}
             className="w-full bg-emerald-600 dark:bg-emerald-500 text-white py-4 rounded-xl font-semibold hover:shadow"
           >
-            {t('finish')}
+            {t("finish")}
           </button>
         </div>
       </div>

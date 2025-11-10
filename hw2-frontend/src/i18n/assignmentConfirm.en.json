@@ -1,0 +1,37 @@
+{
+  "noAssignmentTitle": "No assignment found",
+  "noAssignmentBody": "It looks like this page was refreshed or opened directly. Please go back and try again.",
+  "back": "Back",
+  "summaryTitle": "Assignment Summary",
+  "assignedTo": "You were assigned to",
+  "groupWord": "Group",
+  "control": "Control",
+  "experimental": "Experimental",
+  "journeyTitle": "Your Research Journey",
+
+  "step1_title_exp": "CASEL Questionnaire (2-3 minutes)",
+  "step1_body_exp": "A validated questionnaire to measure your current social-emotional learning level.",
+  "step2_title_exp": "Simulation (7-8 minutes)",
+  "step2_body_exp": "Work through a realistic scenario and respond authentically.",
+  "step3_title_exp": "CASELY Analysis & Conversation",
+  "step3_body_exp": "You'll receive AI analysis and engage in a guided Socratic dialogue with CASELY.",
+  "step4_title_exp": "Brief Summary",
+  "step4_body_exp": "A short paragraph summarizing your reflection.",
+  "step5_title_exp": "Post-Questionnaire",
+  "step5_body_exp": "Complete the same questionnaire again to measure progress.",
+  "step6_title_exp": "Final Reflection & Complete",
+  "step6_body_exp": "Share your experience, then you're done!",
+
+  "step1_title_ctrl": "CASEL Questionnaire (2-3 minutes)",
+  "step1_body_ctrl": "A validated questionnaire to measure your social-emotional learning level.",
+  "step2_title_ctrl": "Simulation (7-8 minutes)",
+  "step2_body_ctrl": "Work through a realistic scenario and answer authentically.",
+  "step3_title_ctrl": "AI Analysis",
+  "step3_body_ctrl": "You'll receive AI feedback, but no interactive dialogue.",
+  "step4_title_ctrl": "Post-Questionnaire & Complete",
+  "step4_body_ctrl": "Complete the same questionnaire again, then finish!",
+
+  "importantLead": "Important:",
+  "importantBody": "There are no right or wrong answers — be authentic and thoughtful.",
+  "confirmContinue": "Confirm & Continue"
+}

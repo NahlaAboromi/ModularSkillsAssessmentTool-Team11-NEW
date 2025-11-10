@@ -1,7 +1,6 @@
-// src/studentPages/LogoutThanksModal.jsx
 import React, { useEffect, useRef, useContext, useState } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
+import { useI18n } from '../utils/i18n'; // ✅ מילון מקומי ומהיר
 
 export default function LogoutThanksModal({
   open,
@@ -13,59 +12,14 @@ export default function LogoutThanksModal({
 }) {
   if (!open) return null;
 
+  // שפה וכיוון
   const { lang } = useContext(LanguageContext);
   const isHe = lang === 'he';
-  const dir = isHe ? 'rtl' : 'ltr';
-
-  // --- תרגום טקסטים ---
-  const SOURCE = {
-    title: 'Thank you for participating in our research! 💙',
-    desc: 'Your anonymous session data has been recorded and will be used for analysis only.',
-    startTime: 'Start Time:',
-    endTime: 'End Time:',
-    duration: 'Duration:',
-    closeAndContinue: 'Close and Continue',
-  };
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadT() {
-      if (isHe) {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({
-            sourceLang: 'EN',
-            targetLang: 'HE',
-            texts: vals,
-          });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = tr[i]));
-            // התאמות עברית
-            map.title = 'תודה על השתתפותך במחקר שלנו! 💙';
-            map.desc = 'נתוני ההפעלה האנונימיים שלך נרשמו וישמשו לצורכי ניתוח בלבד.';
-            map.startTime = 'שעת התחלה:';
-            map.endTime = 'זמן סיום:';
-            map.duration = 'משך:';
-            map.closeAndContinue = 'סגור והמשך';
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadT();
-    return () => { cancelled = true; };
-  }, [isHe]);
+  const { t, dir } = useI18n('logoutThanksModal');
 
   const dialogRef = useRef(null);
 
+  // ESC לסגור (אם הוגדר closeOnEsc)
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') {
@@ -79,6 +33,7 @@ export default function LogoutThanksModal({
     return () => document.removeEventListener('keydown', onKey, true);
   }, [closeOnEsc, onClose]);
 
+  // סיכום זמנים
   const { createdAt, lastSeenAt, createdAtLocal, lastSeenAtLocal, sessionDurationSec } = summary || {};
 
   const parseISO = (s) => { const d = new Date(s); return Number.isNaN(d.getTime()) ? null : d; };

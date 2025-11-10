@@ -1,94 +1,31 @@
-import React, { useContext, useEffect, useState } from 'react';
+// src/StudentAnswerCard.jsx
+import React, { useContext } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
+import { useI18n } from '../utils/i18n';
 
 const StudentAnswerCard = ({ answer, isDark }) => {
   const { answerText, analysisResult, submittedAt } = answer || {};
-  const { lang } = useContext(LanguageContext); // 'he' | 'en'
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
+  const { lang: ctxLang } = useContext(LanguageContext); // נשאר בשביל locale לתאריך בלבד
+  const { t, dir, lang, ready } = useI18n('studentAnswerCard');
+  if (!analysisResult || !ready) return null;
 
-  if (!analysisResult) return null;
-
-  // ========= NORMALIZATION (תיקון ריקון ברשימות) =========
-  // מפתחי camelCase לצד מפתחות שמגיעים מה-AI עם רווחים/אותיות גדולות
+  // ========= NORMALIZATION =========
   const AR = {
-    overallScore:
-      Number(analysisResult.overallScore ?? analysisResult['Overall score'] ?? 0),
-    observedStrengths:
-      analysisResult.observedStrengths ??
-      analysisResult['Observed strengths'] ??
-      [],
-    areasForImprovement:
-      analysisResult.areasForImprovement ??
-      analysisResult['Areas for improvement'] ??
-      [],
-    suggestedIntervention:
-      analysisResult.suggestedIntervention ??
-      analysisResult['Suggested intervention'] ??
-      '',
-    estimatedDepthLevel:
-      analysisResult.estimatedDepthLevel ??
-      analysisResult['Estimated depth level'] ??
-      '',
+    overallScore: Number(analysisResult.overallScore ?? analysisResult['Overall score'] ?? 0),
+    observedStrengths: analysisResult.observedStrengths ?? analysisResult['Observed strengths'] ?? [],
+    areasForImprovement: analysisResult.areasForImprovement ?? analysisResult['Areas for improvement'] ?? [],
+    suggestedIntervention: analysisResult.suggestedIntervention ?? analysisResult['Suggested intervention'] ?? '',
+    estimatedDepthLevel: analysisResult.estimatedDepthLevel ?? analysisResult['Estimated depth level'] ?? ''
   };
 
-  // קטגוריות CASEL – תמיכה גם ב-snake_case
   const CAT = {
     selfAwareness: analysisResult.selfAwareness ?? analysisResult.self_awareness,
     selfManagement: analysisResult.selfManagement ?? analysisResult.self_management,
     socialAwareness: analysisResult.socialAwareness ?? analysisResult.social_awareness,
-    relationshipSkills:
-      analysisResult.relationshipSkills ?? analysisResult.relationship_skills,
-    responsibleDecisionMaking:
-      analysisResult.responsibleDecisionMaking ??
-      analysisResult.responsible_decision_making,
+    relationshipSkills: analysisResult.relationshipSkills ?? analysisResult.relationship_skills,
+    responsibleDecisionMaking: analysisResult.responsibleDecisionMaking ?? analysisResult.responsible_decision_making
   };
-  // =======================================================
-
-  // ------- i18n -------
-  const SOURCE = {
-    overallScore: 'Overall Score',
-    submitted: 'Submitted',
-    answer: 'Answer',
-    caselAnalysis: 'CASEL Analysis',
-    strengths: 'Strengths',
-    areasForImprovement: 'Areas for Improvement',
-    suggestedIntervention: 'Suggested Intervention',
-    depthLevel: 'Depth Level',
-
-    selfAwareness: 'Self-Awareness',
-    selfManagement: 'Self-Management',
-    socialAwareness: 'Social Awareness',
-    relationshipSkills: 'Relationship Skills',
-    responsibleDecisionMaking: 'Responsible Decision-Making',
-  };
-
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function run() {
-      if (lang === 'he') {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({ sourceLang: 'EN', targetLang: 'HE', texts: vals });
-          if (!cancelled) {
-            const m = {};
-            keys.forEach((k, i) => (m[k] = tr[i]));
-            setT(m);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    run();
-    return () => { cancelled = true; };
-  }, [lang]);
+  // =================================
 
   // ------- UI helpers -------
   const getScoreColor = (score = 0) => {
@@ -106,32 +43,25 @@ const StudentAnswerCard = ({ answer, isDark }) => {
   };
 
   const barColor = (score = 0) =>
-    score >= 4.5 ? 'bg-green-600' : score >= 3.5 ? 'bg-blue-600' : score >= 2.5 ? 'bg-yellow-600' : 'bg-red-600';
+    score >= 4.5 ? 'bg-green-600' : score >= 3.5 ? 'bg-blue-600' :
+    score >= 2.5 ? 'bg-yellow-600' : 'bg-red-600';
 
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleString(lang === 'he' ? 'he-IL' : 'en-GB', {
-      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit',
+      year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
     });
-
-  const CATEGORIES = [
-    'selfAwareness',
-    'selfManagement',
-    'socialAwareness',
-    'relationshipSkills',
-    'responsibleDecisionMaking',
-  ];
 
   const categoryIcons = {
     selfAwareness: '🌟',
     selfManagement: '🧘',
     socialAwareness: '👥',
     relationshipSkills: '🤝',
-    responsibleDecisionMaking: '🧠',
+    responsibleDecisionMaking: '🧠'
   };
 
   return (
     <main className="flex-1 w-full px-4 py-6">
-      <div dir={dir} className="bg-slate-100 text-black dark:bg-slate-800 dark:text-white p-6 rounded">
+      <div dir={dir} lang={lang} className="bg-slate-100 text-black dark:bg-slate-800 dark:text-white p-6 rounded">
         <div className="bg-white dark:bg-slate-600 p-4 rounded shadow mb-6">
           <div className="flex justify-between items-center gap-3">
             <div
@@ -168,7 +98,7 @@ const StudentAnswerCard = ({ answer, isDark }) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Object.entries(CAT)
-                  .filter(([_, v]) => v) // מציג רק קטגוריות שקיימות
+                  .filter(([_, v]) => v)
                   .map(([key, val]) => {
                     const score = Number(val?.score ?? 0);
                     const feedback = val?.feedback ?? '';
@@ -205,9 +135,7 @@ const StudentAnswerCard = ({ answer, isDark }) => {
                 <h4 className="font-bold mb-2 flex items-center gap-2 text-green-800 dark:text-green-200">
                   <span role="img" aria-label="strength">💪</span> {t('strengths')}:
                 </h4>
-                <ul
-                  className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}
-                >
+                <ul className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}>
                   {AR.observedStrengths.map((s, i) => (
                     <li key={i} className="text-sm">{s}</li>
                   ))}
@@ -218,9 +146,7 @@ const StudentAnswerCard = ({ answer, isDark }) => {
                 <h4 className="font-bold mb-2 flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
                   <span role="img" aria-label="improvement">🔍</span> {t('areasForImprovement')}:
                 </h4>
-                <ul
-                  className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}
-                >
+                <ul className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}>
                   {AR.areasForImprovement.map((a, i) => (
                     <li key={i} className="text-sm">{a}</li>
                   ))}

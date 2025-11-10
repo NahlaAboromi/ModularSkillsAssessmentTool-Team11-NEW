@@ -1,17 +1,14 @@
-// src/Research/AssignmentConfirm.jsx
 import React, { useContext, useMemo, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import AnonymousHeader from './AnonymousHeader';
 import Footer from '../layout/Footer';
 import { ThemeContext } from '../DarkLightMood/ThemeContext';
-
-// קונטקסט אנונימי
 import { useAnonymousStudent as useStudent } from '../context/AnonymousStudentContext';
 
-// i18n
+// 🔹 i18n חדש (מקומי)
 import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
+import { useI18n } from '../utils/i18n'; // ⬅️ במקום translateUI
 
 function AssignmentConfirmContent() {
   const navigate = useNavigate();
@@ -19,6 +16,8 @@ function AssignmentConfirmContent() {
   const isDark = theme === 'dark';
 
   const { lang } = useContext(LanguageContext);
+  const isRTL = lang === 'he';
+  const { t } = useI18n('assignmentConfirm'); // ✅ שימוש בתרגום מקומי
 
   const locationAsg = useLocation().state?.assignment;
   const { student, setStudent } =
@@ -28,120 +27,31 @@ function AssignmentConfirmContent() {
     try { return JSON.parse(localStorage.getItem('assignment') || 'null'); } catch { return null; }
   })();
   const assignment = locationAsg || student?.assignment || lsAsg || null;
-// בוחרים את גרסת הסנריו לפי השפה (he/en)
-const selectedScenario = useMemo(() => {
-  const sc = assignment?.scenarios;
-  if (!sc) return null;
-  return lang === 'he' ? (sc.he || sc.en) : (sc.en || sc.he);
-}, [assignment, lang]);
+
+  // בוחרים את גרסת הסנריו לפי השפה (he/en)
+  const selectedScenario = useMemo(() => {
+    const sc = assignment?.scenarios;
+    if (!sc) return null;
+    return lang === 'he' ? (sc.he || sc.en) : (sc.en || sc.he);
+  }, [assignment, lang]);
 
   useEffect(() => {
-if (assignment) {
-  // מעשירים את ה-assignment עם השדה scenario שנבחר לפי השפה
-  const enriched = { ...assignment, scenario: selectedScenario };
-
-  // שמירה ב-LS
-  try { localStorage.setItem('assignment', JSON.stringify(enriched)); } catch {}
-
-  // שמירה בקונטקסט (גם אם רק הגרסה/השפה של הסנריו השתנתה)
-  const prev = student?.assignment;
-  const changed =
-    !prev ||
-    prev.scenarioId !== enriched.scenarioId ||
-    (prev.scenario?.version !== enriched.scenario?.version) ||
-    (prev.scenario?.title !== enriched.scenario?.title);
-
-  if (changed) {
-    setStudent?.((s) => ({ ...(s || {}), assignment: enriched }));
-  }
-}
-
-  }, [assignment, setStudent, student]);
-
-  // ===== i18n SOURCE (English only) =====
-  const SOURCE = {
-    noAssignmentTitle: 'No assignment found',
-    noAssignmentBody: 'It looks like this page was refreshed or opened directly. Please go back and try again.',
-    back: 'Back',
-
-    summaryTitle: 'Assignment Summary',
-    assignedTo: 'You were assigned to',
-    groupWord: 'Group',
-    control: 'Control',
-    experimental: 'Experimental',
-
-    journeyTitle: 'Your Research Journey',
-
-    // Experimental (A/B/C)
-    step1_title_exp: 'CASEL Questionnaire (2-3 minutes)',
-    step1_body_exp: 'A validated questionnaire to measure your current social-emotional learning level.',
-
-    step2_title_exp: 'Simulation (7-8 minutes)',
-    step2_body_exp: 'Work through a realistic scenario. Please take it seriously and answer authentically.',
-
-    step3_title_exp: 'CASELY Analysis & Conversation',
-    step3_body_exp: "You'll receive AI analysis of your simulation, followed by a guided Socratic dialogue with CASELY to deepen your reflection.",
-
-    step4_title_exp: 'Brief Summary',
-    step4_body_exp: 'A short paragraph summarizing your session with CASELY.',
-
-    step5_title_exp: 'Post-Questionnaire',
-    step5_body_exp: "You'll complete the same CASEL questionnaire again to measure your progress.",
-
-    step6_title_exp: 'Final Reflection & Complete',
-    step6_body_exp: "Share your experience with CASELY, then you're all done!",
-
-    // Control (D)
-    step1_title_ctrl: 'CASEL Questionnaire (2-3 minutes)',
-    step1_body_ctrl: 'A validated questionnaire to measure your current social-emotional learning level.',
-
-    step2_title_ctrl: 'Simulation (7-8 minutes)',
-    step2_body_ctrl: 'Work through a realistic scenario. Please take it seriously and answer authentically.',
-
-    step3_title_ctrl: 'AI Analysis',
-    step3_body_ctrl: "You'll receive AI analysis of your simulation responses. As part of the control group, you won't engage in conversation with CASELY.",
-
-    step4_title_ctrl: 'Post-Questionnaire & Complete',
-    step4_body_ctrl: "You'll complete the same CASEL questionnaire again, then you're done!",
-
-    importantLead: 'Important:',
-    importantBody: 'There are no right or wrong answers. Please be authentic and thoughtful throughout the process.',
-
-    confirmContinue: 'Confirm & Continue',
-  };
-
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  // load translations once per language (no Hebrew in code; server returns translated strings)
-  useEffect(() => {
-    let cancelled = false;
-    async function loadTranslations() {
-      if (lang === 'he') {
-        const keys = Object.keys(SOURCE);
-        const values = Object.values(SOURCE);
-        try {
-          const translated = await translateUI({
-            sourceLang: 'EN',
-            targetLang: 'HE',
-            texts: values,
-          });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = translated[i]));
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
+    if (assignment) {
+      const enriched = { ...assignment, scenario: selectedScenario };
+      try { localStorage.setItem('assignment', JSON.stringify(enriched)); } catch {}
+      const prev = student?.assignment;
+      const changed =
+        !prev ||
+        prev.scenarioId !== enriched.scenarioId ||
+        (prev.scenario?.version !== enriched.scenario?.version) ||
+        (prev.scenario?.title !== enriched.scenario?.title);
+      if (changed) {
+        setStudent?.((s) => ({ ...(s || {}), assignment: enriched }));
       }
     }
-    loadTranslations();
-    return () => { cancelled = true; };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [assignment, setStudent, student, selectedScenario]);
 
+  // ✅ שומרים על אותו מבנה עיצובי ולוגי
   const anonBadge = useMemo(
     () => (
       <div
@@ -157,7 +67,6 @@ if (assignment) {
     [student?.anonId, isDark]
   );
 
-  // helper for numbered bullet
   const Num = ({ n, accent = 'emerald' }) => (
     <div
       className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold
@@ -168,7 +77,11 @@ if (assignment) {
   );
 
   return (
-    <div className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}>
+    <div
+      dir={isRTL ? 'rtl' : 'ltr'}
+      lang={lang}
+      className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
+    >
       {/* HEADER */}
       <div className="px-4 mt-4">
         <AnonymousHeader />
@@ -203,18 +116,8 @@ if (assignment) {
               </>
             ) : (
               <>
-<h2 className="text-3xl font-bold mt-3 mb-3">{t('summaryTitle')}</h2>
+                <h2 className="text-3xl font-bold mt-3 mb-3">{t('summaryTitle')}</h2>
 
-<p
-  aria-hidden="true"
-  className="hidden mb-6 text-sm md:text-base"
->
-  {t('assignedTo')} <b>{t('groupWord')} {assignment.group}</b>{' '}
-  ({assignment.groupType === 'control' ? t('control') : t('experimental')}). 
-</p>
-
-
-                {/* What's next */}
                 <div
                   className={`rounded-xl border p-6 mb-8 text-sm md:text-base
                     ${
@@ -226,110 +129,32 @@ if (assignment) {
                   <div className="text-xl font-bold mb-4">{t('journeyTitle')}</div>
 
                   {assignment.groupType !== 'control' ? (
-                    // A/B/C — Experimental
                     <div className="space-y-4">
-                      <div className="flex gap-3">
-                        <Num n={1} accent="emerald" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step1_title_exp')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step1_body_exp')}
+                      {[1, 2, 3, 4, 5, 6].map((n) => (
+                        <div className="flex gap-3" key={n}>
+                          <Num n={n} accent="emerald" />
+                          <div>
+                            <div className="font-semibold mb-1">{t(`step${n}_title_exp`)}</div>
+                            <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
+                              {t(`step${n}_body_exp`)}
+                            </div>
                           </div>
                         </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={2} accent="emerald" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step2_title_exp')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step2_body_exp')}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={3} accent="emerald" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step3_title_exp')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step3_body_exp')}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={4} accent="emerald" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step4_title_exp')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step4_body_exp')}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={5} accent="emerald" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step5_title_exp')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step5_body_exp')}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={6} accent="emerald" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step6_title_exp')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step6_body_exp')}
-                          </div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   ) : (
-                    // D — Control
                     <div className="space-y-4">
-                      <div className="flex gap-3">
-                        <Num n={1} accent="slate" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step1_title_ctrl')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step1_body_ctrl')}
+                      {[1, 2, 3, 4].map((n) => (
+                        <div className="flex gap-3" key={n}>
+                          <Num n={n} accent="slate" />
+                          <div>
+                            <div className="font-semibold mb-1">{t(`step${n}_title_ctrl`)}</div>
+                            <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
+                              {t(`step${n}_body_ctrl`)}
+                            </div>
                           </div>
                         </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={2} accent="slate" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step2_title_ctrl')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step2_body_ctrl')}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={3} accent="slate" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step3_title_ctrl')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step3_body_ctrl')}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <Num n={4} accent="slate" />
-                        <div>
-                          <div className="font-semibold mb-1">{t('step4_title_ctrl')}</div>
-                          <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
-                            {t('step4_body_ctrl')}
-                          </div>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   )}
 
@@ -338,7 +163,6 @@ if (assignment) {
                   </div>
                 </div>
 
-                {/* actions */}
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={() => navigate(-1)}
@@ -350,13 +174,12 @@ if (assignment) {
                   </button>
 
                   <button
-onClick={() => {
-  const enriched = { ...assignment, scenario: selectedScenario };
-  setStudent?.((s) => ({ ...(s || {}), assignment: enriched }));
-  try { localStorage.setItem('assignment', JSON.stringify(enriched)); } catch {}
-  navigate('/validated-questionnaire', { state: { phase: 'pre', fromAssignment: true } });
-}}
-
+                    onClick={() => {
+                      const enriched = { ...assignment, scenario: selectedScenario };
+                      setStudent?.((s) => ({ ...(s || {}), assignment: enriched }));
+                      try { localStorage.setItem('assignment', JSON.stringify(enriched)); } catch {}
+                      navigate('/validated-questionnaire', { state: { phase: 'pre', fromAssignment: true } });
+                    }}
                     className="w-full sm:w-auto px-6 py-2 rounded-xl font-semibold text-white bg-emerald-600 hover:shadow text-sm"
                   >
                     {t('confirmContinue')}

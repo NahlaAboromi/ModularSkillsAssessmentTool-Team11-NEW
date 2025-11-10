@@ -8,8 +8,7 @@ import { ThemeContext, ThemeProvider } from '../DarkLightMood/ThemeContext';
 import { useAnonymousStudent as useStudent } from '../context/AnonymousStudentContext';
 
 // ✅ i18n
-import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
+import { useI18n } from '../utils/i18n';
 
 function FinalSummaryInner() {
   const { theme } = useContext(ThemeContext);
@@ -18,54 +17,8 @@ function FinalSummaryInner() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ---- Language / RTL ----
-  const { lang } = useContext(LanguageContext) || { lang: 'he' };
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
-
-  // ---- i18n (בלי עברית בקוד) ----
-  const SOURCE = {
-    thanksTitle: 'Thank you for participating in our study!',
-    thanksSub: 'Casely prepared a short summary of your experience.',
-    summaryTitle: 'Overall Summary',
-    back: 'Back',
-    loading: 'Loading your saved summary…',
-    noSummary: 'No summary available.',
-    continueCta: 'Continue to Validated Questionnaire →',
-    loadFailed: 'Failed to load saved summary.',
-    missingAnonId: 'Missing anonId.',
-    loadError: 'Load error',
-  };
-
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadT() {
-      if (lang === 'he') {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({
-            sourceLang: 'EN',
-            targetLang: 'HE',
-            texts: vals,
-          });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = tr[i]));
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadT();
-    return () => { cancelled = true; };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ---- i18n ----
+  const { t, dir, lang: langAttr, ready } = useI18n('finalSummary');
 
   const anonId = location.state?.anonId || student?.anonId || null;
 
@@ -97,12 +50,17 @@ function FinalSummaryInner() {
         setLoading(false);
       }
     })();
-  }, [anonId, summary]); // השארנו כמו בקוד המקורי
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [anonId, summary]); // שומרים על אותו דפוס ולא "שוברים" לוגיקה
+
+  // כדי למנוע הבהוב טקסטים לפני טעינת המילון
+  if (!ready) return null;
 
   return (
     <div
       className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
       dir={dir}
+      lang={langAttr}
     >
       {/* HEADER */}
       <div className="px-4 mt-4">
@@ -114,8 +72,8 @@ function FinalSummaryInner() {
         <section className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 md:p-7 rounded`}>
           <div className={`rounded-lg shadow-md p-6 md:p-8 ${isDark ? 'bg-slate-600' : 'bg-white'} max-w-6xl mx-auto`}>
             {/* Thank You header inside the card */}
-<div className="mb-6 text-center">   
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500 mb-4 mx-auto">
+            <div className="mb-6 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500 mb-4 mx-auto">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
@@ -165,7 +123,8 @@ function FinalSummaryInner() {
                 <div className="space-y-8">
                   {/* Summary Section */}
                   <div className={`rounded-xl p-6 md:p-8 ${isDark ? 'bg-slate-900/50 border border-slate-600' : 'bg-slate-50 border border-slate-200'}`}>
-<div className={`flex items-center gap-3 mb-4 ${dir==='rtl' ? 'flex-row-reverse justify-end text-right' : ''}`}>                      <div className={`w-1 h-8 rounded-full ${isDark ? 'bg-emerald-400' : 'bg-emerald-600'}`} />
+                    <div className={`flex items-center gap-3 mb-4 ${dir === 'rtl' ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                      <div className={`w-1 h-8 rounded-full ${isDark ? 'bg-emerald-400' : 'bg-emerald-600'}`} />
                       <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>
                         {t('summaryTitle')}
                       </h3>
@@ -176,7 +135,7 @@ function FinalSummaryInner() {
                   </div>
 
                   {/* Action Button */}
-                  <div className={`pt-2 text-center ${dir==='rtl' ? 'md:text-right' : 'md:text-left'}`}>
+                  <div className={`pt-2 text-center ${dir === 'rtl' ? 'md:text-right' : 'md:text-left'}`}>
                     <button
                       onClick={() =>
                         navigate('/validated-questionnaire', {

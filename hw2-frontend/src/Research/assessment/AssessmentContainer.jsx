@@ -10,7 +10,7 @@ import ResultsView from './ResultsView';
 import { useAnonymousStudent as useStudent } from '../../context/AnonymousStudentContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LanguageContext } from '../../context/LanguageContext';
-import { translateUI } from '../../utils/translateUI';
+import { useI18n } from '../../utils/i18n'; // ✅ i18n מקומי ומהיר
 
 export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   const navigate = useNavigate();
@@ -21,59 +21,10 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   const { lang } = useContext(LanguageContext); // 'he' | 'en'
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
+  const isRTL = lang === 'he';
 
-  // ---- i18n (מקור באנגלית בלבד) ----
-  const SOURCE = {
-    checkingStatus: 'Checking status…',
-    preAlready: 'You have already completed the PRE questionnaire. No need to fill it again.',
-    postAlready: 'You have already completed the POST questionnaire. Thank you for your participation!',
-    preCompleteTitle: 'PRE Assessment Complete',
-    postCompleteTitle: 'POST Assessment Complete',
-    continueToSimulation: 'Continue to Simulation',
-    backToHome: 'Back to Home',
-    goToFinalReflection: 'Go to Final Reflection',
-    goToSummary: 'Go to Summary',
-    savedSecurely: 'Your responses have been securely saved.',
-    loadingQuestionnaire: 'Loading questionnaire…',
-    couldntLoad: "Couldn't load the questionnaire",
-    noItemsFound: 'No items found.',
-    retry: 'Retry',
-    previous: 'Previous',
-    next: 'Next',
-    tooFast: 'You\'re going too fast — please slow down 🙂',     // NEW
-  };
-
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadT() {
-      if (lang === 'he') {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({
-            sourceLang: 'EN',
-            targetLang: 'HE',
-            texts: vals,
-          });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = tr[i]));
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadT();
-    return () => { cancelled = true; };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ✅ i18n – טוען מילון assessment לפי שפה + מספק dir
+  const { t, dir } = useI18n('assessment');
 
   // --- Context + Assignment ---
   const { student, setStudent, questionnaire: ctxQuestionnaire, loadQuestionnaire } = useStudent();
@@ -110,8 +61,7 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
       }
     })();
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [student?.anonId, phase, lang, T]);
+  }, [student?.anonId, phase, t]);
 
   // --- Questionnaire state ---
   const [loading, setLoading] = useState(!(ctxQuestionnaire?.items?.length));
@@ -325,8 +275,7 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
         console.error('Save assessment failed:', e);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isComplete, lang, T]);
+  }, [isComplete, questionnaire?._id, student?.anonId, questionnaire?.version, questionnaire?.lang, phase, startTime, endTime, t]);
 
   // ניקוי טיימרים ביציאה
   useEffect(() => {
@@ -557,21 +506,21 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
 
   // Main questionnaire view
   return (
-<div className="min-h-screen bg-transparent px-4 md:px-8 lg:px-12 py-6" dir={dir}>    {/* polite hint */}
-{showHint && (
-  <div
-    className={`pointer-events-none absolute bottom-6 ${lang === 'he' ? 'left-24' : 'right-24'}
-                rounded-lg px-4 py-2 shadow border z-40
-                ${isDark ? 'bg-slate-700 text-slate-100 border-slate-600'
-                         : 'bg-white text-slate-800 border-slate-200'}`}
-    dir={dir}
-    role="status"
-    aria-live="polite"
-  >
-    {t('tooFast')}
-  </div>
-)}
-
+    <div className="min-h-screen bg-transparent px-4 md:px-8 lg:px-12 py-6" dir={dir}>
+      {/* polite hint */}
+      {showHint && (
+        <div
+          className={`pointer-events-none absolute bottom-6 ${isRTL ? 'left-24' : 'right-24'}
+                      rounded-lg px-4 py-2 shadow border z-40
+                      ${isDark ? 'bg-slate-700 text-slate-100 border-slate-600'
+                               : 'bg-white text-slate-800 border-slate-200'}`}
+          dir={dir}
+          role="status"
+          aria-live="polite"
+        >
+          {t('tooFast')}
+        </div>
+      )}
 
       <div className="w-full max-w-[96vw] mx-auto">
         <ProgressBar
@@ -591,7 +540,7 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
           <ScaleButtons options={options} selected={answers[current]} onSelect={handleAnswer} />
         </div>
 
-        <div className={`flex justify-between items-center ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
           <button
             onClick={() => {
               if (inputLockRef.current) { nudge(); return; }

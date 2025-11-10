@@ -1,91 +1,72 @@
 // src/Research/assessment/QuestionnaireIntro.jsx
-import React, { useContext, useEffect, useState, useMemo } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Brain, Zap, Keyboard } from "lucide-react";
 import { LanguageContext } from "../../context/LanguageContext";
-import { translateUI } from "../../utils/translateUI";
+import { useI18n } from "../../utils/i18n"; // ✅ במקום translateUI
 
 export default function QuestionnaireIntro({ CATEGORIES = {}, onStart }) {
   const { lang } = useContext(LanguageContext);
   const isHeb = lang === "he";
+  const { t } = useI18n("questionnaireIntro"); // ✅ טעינה מקובץ JSON
+  const T = {
+    title: t("title"),
+    subtitle: t("subtitle"),
+    chip: t("chip"),
+    quickOn: t("quickOn"),
+    quickHelp1: t("quickHelp1"),
+    quickHelp2: t("quickHelp2"),
+    start: t("start"),
+  };
 
-  // ===== Static UI strings (EN only in code) =====
-  const SOURCE = useMemo(
-    () => ({
-      title: "SEL Skills Questionnaire",
-      subtitle: "Complete in 2–3 minutes",
-      chip: "Fast & lightweight",
-      quickOn: "Quick Mode is always ON",
-      quickHelp1: "Use your keyboard to answer faster:",
-      quickHelp2: "Press 1 / 2 / 3 / 4 to select an option instantly.",
-      start: "Begin Questionnaire",
-    }),
-    []
-  );
+  // ===== Dynamic category name translations =====
+  const [catLabels, setCatLabels] = useState({});
 
-  const [T, setT] = useState(SOURCE);
   useEffect(() => {
     let cancelled = false;
-    async function load() {
-      if (!isHeb) { setT(SOURCE); return; }
-      const keys = Object.keys(SOURCE);
-      const vals = Object.values(SOURCE);
+    const names = Object.keys(CATEGORIES);
+    if (!names.length) {
+      setCatLabels({});
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    // תרגום דו-כיווני: EN→HE כשעברית, HE→EN כשאנגלית
+    const sourceLang = lang === "he" ? "EN" : "HE";
+    const targetLang = lang === "he" ? "HE" : "EN";
+
+    (async () => {
       try {
-        const out = await translateUI({ sourceLang: "EN", targetLang: "HE", texts: vals });
+        // נשאר עם translateUI רק לקטגוריות הדינמיות
+        const { translateUI } = await import("../../utils/translateUI");
+        const out = await translateUI({ sourceLang, targetLang, texts: names });
         if (!cancelled) {
           const map = {};
-          keys.forEach((k, i) => (map[k] = out[i] ?? vals[i]));
-          setT(map);
+          names.forEach((n, i) => (map[n] = out[i] ?? n));
+          setCatLabels(map);
         }
       } catch {
-        if (!cancelled) setT(SOURCE);
+        if (!cancelled) setCatLabels({});
       }
-    }
-    load();
-    return () => { cancelled = true; };
-  }, [isHeb, SOURCE]);
+    })();
 
-// ===== Dynamic category name translations =====
-// ===== Dynamic category name translations =====
-const [catLabels, setCatLabels] = useState({});
+    return () => {
+      cancelled = true;
+      setCatLabels({});
+    };
+  }, [lang, CATEGORIES]);
 
-useEffect(() => {
-  let cancelled = false;
-
-  const names = Object.keys(CATEGORIES);
-  if (!names.length) { setCatLabels({}); return () => { cancelled = true; }; }
-
-  // תרגום דו-כיווני: EN→HE כשעברית, HE→EN כשאנגלית
-  const sourceLang = (lang === 'he') ? 'EN' : 'HE';
-  const targetLang = (lang === 'he') ? 'HE' : 'EN';
-
-  (async () => {
-    try {
-      const out = await translateUI({ sourceLang, targetLang, texts: names });
-      if (!cancelled) {
-        const map = {};
-        names.forEach((n, i) => (map[n] = out[i] ?? n));
-        setCatLabels(map);
-      }
-    } catch {
-      if (!cancelled) setCatLabels({});
-    }
-  })();
-
-  // ניקוי – לא להשאיר זיכרון מהשפה הקודמת
-  return () => { cancelled = true; setCatLabels({}); };
-}, [lang, CATEGORIES]);
-
-
-  // —— render quickHelp2 with LTR numbers inside RTL sentence ——
+  // —— render quickHelp2 with LTR numbers inside RTL sentence —— //
   const renderQuickHelp2 = () => {
     if (!isHeb) return T.quickHelp2;
-    // נזהה את הרצף "1 / 2 / 3 / 4" במשפט המתורגם ונעטוף אותו ב-LTR
     const parts = String(T.quickHelp2).split(/(1\s*\/\s*2\s*\/\s*3\s*\/\s*4)/);
-    if (parts.length < 3) return T.quickHelp2; // אם אין התאמה, נחזיר כמות שהוא
+    if (parts.length < 3) return T.quickHelp2;
     return (
       <>
         {parts[0]}
-        <bdi dir="ltr" className="inline-block">1 / 2 / 3 / 4</bdi>
+        <bdi dir="ltr" className="inline-block">
+          1 / 2 / 3 / 4
+        </bdi>
         {parts[2]}
       </>
     );
@@ -134,17 +115,16 @@ useEffect(() => {
                 "
                 dir={isHeb ? "rtl" : "ltr"}
               >
-                {/* Label (בצד ימין בעברית) */}
+                {/* Label */}
                 <span
                   className={`font-semibold text-slate-700 dark:text-slate-100 leading-snug break-words ${
                     isHeb ? "text-right" : "text-left"
                   }`}
                 >
-                  {isHeb ? (catLabels[name] || name) : name}
-
+                  {isHeb ? catLabels[name] || name : name}
                 </span>
 
-                {/* Icon (בצד שמאל בעברית) */}
+                {/* Icon */}
                 <div
                   className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-md bg-slate-600 dark:bg-slate-500 ${
                     isHeb ? "mr-3" : "ml-3"
@@ -157,15 +137,15 @@ useEffect(() => {
           </div>
 
           {/* Quick mode info */}
- <div
-   dir={isHeb ? "rtl" : "ltr"}
-   className={`
-     flex flex-row items-center gap-3 rounded-xl mb-8 border p-5
-    ${isHeb ? "text-right" : "text-left"}
-     bg-slate-50 dark:bg-slate-700
-     border-slate-200 dark:border-slate-600
-   `}
- >
+          <div
+            dir={isHeb ? "rtl" : "ltr"}
+            className={`
+              flex flex-row items-center gap-3 rounded-xl mb-8 border p-5
+              ${isHeb ? "text-right" : "text-left"}
+              bg-slate-50 dark:bg-slate-700
+              border-slate-200 dark:border-slate-600
+            `}
+          >
             <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-700 dark:bg-slate-600">
               <Keyboard className="w-6 h-6 text-white" />
             </div>
@@ -182,14 +162,14 @@ useEffect(() => {
           </div>
 
           {/* CTA */}
-  <button
-    onClick={() => {
-     // 🔒 נעלת מחליף השפה
-     try { localStorage.setItem('langLock', '1'); } catch {}
-     // לעדכן את ההדר בעמוד הנוכחי
-      window.dispatchEvent(new Event('lang-lock-change'));
-      onStart?.();
-  }}
+          <button
+            onClick={() => {
+              try {
+                localStorage.setItem("langLock", "1");
+              } catch {}
+              window.dispatchEvent(new Event("lang-lock-change"));
+              onStart?.();
+            }}
             className="w-full bg-slate-800 text-white py-4 rounded-xl font-semibold hover:shadow"
           >
             {T.start}

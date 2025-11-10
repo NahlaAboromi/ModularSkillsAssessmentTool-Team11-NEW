@@ -1,9 +1,7 @@
-// src/Research/assessment/ProgressBar.jsx
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { Zap } from 'lucide-react';
 import { ThemeContext } from '../../DarkLightMood/ThemeContext';
-import { LanguageContext } from '../../context/LanguageContext';
-import { translateUI } from '../../utils/translateUI';
+import { useI18n } from '../../utils/i18n'; // ✅ מילון מקומי ומהיר
 
 export default function ProgressBar({
   progress,
@@ -18,50 +16,9 @@ export default function ProgressBar({
   const isDarkCtx = theme === 'dark';
   const isDark = typeof isDarkProp === 'boolean' ? isDarkProp : isDarkCtx;
 
-  // language
-  const { lang } = useContext(LanguageContext);
-
-  // ---- i18n (בלי עברית בקוד) ----
-  const SOURCE = {
-    question: 'Question',
-    of: 'of',
-    quickMode: 'Quick Mode',
-    completeSuffix: 'Complete',
-    answered: 'answered',
-  };
-
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadT() {
-      if (lang === 'he') {
-        try {
-          const keys = Object.keys(SOURCE);
-          const vals = Object.values(SOURCE);
-          const tr = await translateUI({
-            sourceLang: 'EN',
-            targetLang: 'HE',
-            texts: vals,
-          });
-          if (!cancelled) {
-            const map = {};
-            keys.forEach((k, i) => (map[k] = tr[i]));
-            setT(map);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadT();
-    return () => {
-      cancelled = true;
-    };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  // i18n
+  const { t, dir } = useI18n('progressBar');
+  const isRTL = dir === 'rtl';
 
   // ---- classes ----
   const wrapperCls = isDark
@@ -74,25 +31,19 @@ export default function ProgressBar({
   const rightTextCls = isDark ? 'text-white' : 'text-slate-900';
 
   // RTL: הופך סדר אייקון/טקסט בצ׳יפ של Quick Mode
-  const chipDirCls = lang === 'he' ? 'flex-row-reverse' : 'flex-row';
+  const chipDirCls = isRTL ? 'flex-row-reverse' : 'flex-row';
 
   // פורמט “שאלה X מתוך Y” / “Question X of Y”
   const qLabel =
     typeof total === 'number' && typeof current === 'number'
-      ? lang === 'he'
-        ? // בעברית: "שאלה X מתוך Y" (התרגום של Question/of מגיע מהשרת)
-          `${t('question')} ${current} ${t('of')} ${total}`
-        : `${t('question')} ${current} ${t('of')} ${total}`
+      ? `${t('question')} ${current} ${t('of')} ${total}`
       : '';
 
-  // “NN% Complete” → התרגום של "Complete" מגיע מהשרת
+  // “NN% Complete”
   const pctLabel = `${Math.round(progress)}% ${t('completeSuffix')}`;
 
   return (
-    <div
-      className={`mb-8 rounded-2xl p-6 border backdrop-blur-md ${wrapperCls}`}
-      dir={lang === 'he' ? 'rtl' : 'ltr'}
-    >
+    <div className={`mb-8 rounded-2xl p-6 border backdrop-blur-md ${wrapperCls}`} dir={dir}>
       <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-3">
           {qLabel && (
@@ -101,14 +52,12 @@ export default function ProgressBar({
             </span>
           )}
 
-          {/* אם תרצי להחזיר את מונה התשובות, בטלי את ההערה וסיימי עם t('answered') */}
-          {/*
-          {typeof answered === 'number' && typeof total === 'number' && (
+          {/* רוצים את מונה התשובות? הסירו את ההערה: */}
+          {/* {typeof answered === 'number' && typeof total === 'number' && (
             <span className={isDark ? 'text-xs text-white/70' : 'text-xs text-slate-600'}>
               ({answered} {t('answered')})
             </span>
-          )}
-          */}
+          )} */}
 
           {quickMode && (
             <span

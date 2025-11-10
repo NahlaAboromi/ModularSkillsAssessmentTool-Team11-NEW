@@ -1,4 +1,3 @@
-// src/Research/AnonymousSimulationResult.jsx
 import React, { useContext, useEffect, useState, useMemo } from 'react';
 import AnonymousHeader from './AnonymousHeader';
 import Footer from '../layout/Footer';
@@ -8,34 +7,17 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import AnswerCard from '../studentPages/AnswerCard';
 import SocraticCoach from './SocraticCoach';
 import ValidatedQuestionnaireButton from './ValidatedQuestionnaireButton';
-import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
+import { useI18n } from '../utils/i18n'; // ✅ מילון מקומי ומהיר
 
 // Helper
 const isExperimental = (g = '') => ['A', 'B', 'C'].includes(String(g).toUpperCase());
 
-const SOURCE = {
-  title: 'Simulation Completed Successfully!',
-  preparing: 'Preparing your results…',
-  back: 'Back',
-  groupMetaControl: 'Control',
-  groupMetaExp: 'Experimental',
-  vqBtn: 'Continue to Validated Questionnaire',
-  chatTitle: 'Conversation with Casely 🤖',
-  chatLead:
-    "Now you’ll begin a short reflection chat with Casely — our Socratic AI coach. Casely will ask you a few gentle questions to help you think about your decisions and emotions during the simulation. There are no right or wrong answers — just be honest and reflective.\n\nWhen you finish your chat, Casely will give you a short personalized summary paragraph. After that, you’ll automatically continue to the validated questionnaire (Post stage).",
-  finishToContinue: 'Finish the conversation to continue.',
-  missingAnon: 'Missing anonId.',
-  failAnalysis: 'Failed to fetch analysis.',
-  failTrialMeta: 'Failed to fetch trial meta.',
-  couldntLoad: 'Couldn’t load the results',
-};
-
 function AnonymousSimulationResultInner() {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
-  const { lang } = useContext(LanguageContext); // 'he' | 'en'
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
+
+  // ✅ i18n
+  const { t, dir, lang } = useI18n('anonymousSimulationResult');
 
   const { student } = useStudent?.() || { student: null };
   const navigate = useNavigate();
@@ -51,33 +33,6 @@ function AnonymousSimulationResultInner() {
 
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
-
-  // i18n
-  const [T, setT] = useState(SOURCE);
-  const t = (k) => T[k] ?? SOURCE[k] ?? k;
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      if (lang !== 'he') {
-        if (!cancelled) setT(SOURCE);
-        return;
-      }
-      try {
-        const keys = Object.keys(SOURCE);
-        const vals = Object.values(SOURCE);
-        const tr = await translateUI({ sourceLang: 'EN', targetLang: 'HE', texts: vals });
-        if (!cancelled) {
-          const map = {};
-          keys.forEach((k, i) => (map[k] = tr[i]));
-          setT(map);
-        }
-      } catch {
-        if (!cancelled) setT(SOURCE);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [lang]);
 
   useEffect(() => {
     (async () => {
@@ -144,7 +99,7 @@ function AnonymousSimulationResultInner() {
 
             {/* קו מידע קבוצה (מוסתר לעת עתה) */}
             <p aria-hidden="true" className="hidden text-center text-sm opacity-80 mb-6">
-              Group <b>{group || '—'}</b> · {groupType === 'control' ? t('groupMetaControl') : t('groupMetaExp')}
+              {t('groupLabel', 'Group')} <b>{group || '—'}</b> · {groupType === 'control' ? t('groupMetaControl') : t('groupMetaExp')}
             </p>
 
             {loading && (

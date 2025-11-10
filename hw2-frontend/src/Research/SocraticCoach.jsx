@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { LanguageContext } from '../context/LanguageContext';
 import { translateUI } from '../utils/translateUI';
 import { ThemeContext } from '../DarkLightMood/ThemeContext';
+
 /**
  * SocraticCoach – real AI-backed Socratic chat (Claude/backend).
  */
@@ -19,13 +20,12 @@ export default function SocraticCoach({
   disabled = false,
   startImmediately = true,
 }) {
-  // ---- language / RTL ----
+  // ---- HOOKS: תמיד באותו סדר וללא תנאים ----
   const { lang } = useContext(LanguageContext) || { lang: 'he' };
-  const dir = lang === 'he' ? 'rtl' : 'ltr';
-const { theme } = useContext(ThemeContext) || { theme: 'light' };
- const isDark = theme === 'dark';
-  // ---- i18n (בלי עברית בקוד) ----
-  const SOURCE = {
+  const { theme } = useContext(ThemeContext) || { theme: 'light' };
+  const navigate = useNavigate();
+
+  const [T, setT] = useState({
     title: "Hi! I'm your Socratic Coach ✋",
     missingAnonId: 'Missing anonId',
     initFailed: 'Init failed',
@@ -40,16 +40,29 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
     processing: 'Processing…',
     hintBeforeFinish:
       'The "Continue to Validated Questionnaire" button will enable after you click "Finish".',
-  };
+  });
+  const [messages, setMessages] = useState([]); // [{ role:'assistant'|'user', text, ts }]
+  const [input, setInput] = useState('');
+  const [finished, setFinished] = useState(false);
+  const [chatLoading, setChatLoading] = useState(false); // init/send
+  const [finishing, setFinishing] = useState(false);     // finalize+navigate
+  const [error, setError] = useState('');
 
-  const [T, setT] = useState(SOURCE);
+  const listRef = useRef(null);
+  const startedRef = useRef({ ran: false, anonId: null });
+
+  // ---- DERIVEDS (ללא hooks חדשים) ----
+  const isDark = theme === 'dark';
+  const dir = lang === 'he' ? 'rtl' : 'ltr';
   const t = (k) => T[k] ?? k;
 
+  // ---- i18n (אותה לוגיקה, רק אחרי שהוגדרו כל ה-hooks) ----
   useEffect(() => {
     let cancelled = false;
     async function loadT() {
       if (lang === 'he') {
         try {
+          const SOURCE = T; // משתמשים בערכים העדכניים כמקור
           const keys = Object.keys(SOURCE);
           const vals = Object.values(SOURCE);
           const tr = await translateUI({
@@ -63,45 +76,53 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
             setT(map);
           }
         } catch {
-          if (!cancelled) setT(SOURCE);
+          if (!cancelled) {
+            // אם התרגום נכשל, נשאיר את האנגלית (לא זורקים)
+            setT((prev) => prev);
+          }
         }
       } else {
-        setT(SOURCE);
+        // חזרה לאנגלית אם שפת UI איננה עברית
+        setT({
+          title: "Hi! I'm your Socratic Coach ✋",
+          missingAnonId: 'Missing anonId',
+          initFailed: 'Init failed',
+          initError: 'Init error',
+          sendFailed: 'Send failed',
+          sendError: 'Send error',
+          finalizeError: 'Failed to finalize conversation',
+          aiSummaryFailed: 'AI summary failed',
+          inputPlaceholder: 'Type your reply…',
+          send: 'Send',
+          finish: 'Finish',
+          processing: 'Processing…',
+          hintBeforeFinish:
+            'The "Continue to Validated Questionnaire" button will enable after you click "Finish".',
+        });
       }
     }
     loadT();
     return () => { cancelled = true; };
-  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
-  // ---- state ----
-  // message shape: { role: 'assistant'|'user', text: string, ts: string(ISO) }
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [finished, setFinished] = useState(false);
-
-  // two separate loading states
-  const [chatLoading, setChatLoading] = useState(false); // init/send only
-  const [finishing, setFinishing] = useState(false);     // building summary + navigate
-
-  const [error, setError] = useState('');
-  const listRef = useRef(null);
-  const navigate = useNavigate();
-
-  // guard to prevent double init
-  const startedRef = useRef({ ran: false, anonId: null });
-
-  // auto scroll to bottom
+  // ---- auto scroll ----
   useEffect(() => {
     if (!listRef.current) return;
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, chatLoading]);
 
+  // ---- memos ----
   const canType = useMemo(
     () => !finished && !disabled && !chatLoading && !finishing,
     [finished, disabled, chatLoading, finishing]
   );
-  const canSend = useMemo(() => canType && input.trim().length > 0, [canType, input]);
+  const canSend = useMemo(
+    () => canType && input.trim().length > 0,
+    [canType, input]
+  );
 
+  // ---- helpers ----
   const fmtTime = (iso) => {
     try {
       const d = new Date(iso);
@@ -113,13 +134,12 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
 
   const TypingDots = ({ align = 'left' }) => (
     <div className={align === 'left' ? 'text-left' : 'text-right'}>
-<span className={`inline-flex items-center gap-1 px-4 py-3 rounded-2xl shadow-sm
-  ${isDark ? 'bg-slate-700' : 'bg-gradient-to-r from-slate-100 to-slate-50'}`}>
-  <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '0ms' }} />
-  <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '150ms' }} />
-  <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '300ms' }} />
-</span>
-
+      <span className={`inline-flex items-center gap-1 px-4 py-3 rounded-2xl shadow-sm
+        ${isDark ? 'bg-slate-700' : 'bg-gradient-to-r from-slate-100 to-slate-50'}`}>
+        <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '0ms' }} />
+        <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '150ms' }} />
+        <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '300ms' }} />
+      </span>
     </div>
   );
 
@@ -211,11 +231,10 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
     try {
       setError('');
       setFinished(true);
-      setFinishing(true); // shows spinner on button
+      setFinishing(true); // spinner
 
       if (!anonId) throw new Error(t('missingAnonId'));
 
-      // Build & save summary on server (AI) — server returns summaryText
       const resp = await fetch('/api/trial/summary/final', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -226,7 +245,6 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
 
       const summaryText = (data.summaryText || '').toString();
 
-      // Navigate only after ready — pass it via state
       navigate('/simulation/final-summary', {
         state: { anonId, summaryText, from: 'coach-finish' }
       });
@@ -237,28 +255,24 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
     }
   }
 
-  // כותרת: אם זה הטקסט הדיפולטי—נשתמש בתרגום; אחרת נשאיר כמו שהועבר בפרופס
+  // כותרת: אם זה הדיפולט – נתרגם; אם לא, נשאיר כ־prop
   const shownTitle = title === DEFAULT_TITLE ? t('title') : title;
 
   return (
-<div
-  className={`rounded-3xl p-6 md:p-7 shadow-lg border
-    ${isDark
-      ? 'border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 text-slate-100'
-      : 'border-slate-200 bg-gradient-to-br from-white to-slate-50 text-slate-800'}
-  `}
-  dir={dir}
->
-
-<div className={`flex items-center gap-3 mb-5 ${dir === 'rtl' ? 'flex-row-reverse justify-end' : ''}`}>        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
+    <div
+      className={`rounded-3xl p-6 md:p-7 shadow-lg border
+        ${isDark
+          ? 'border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 text-slate-100'
+          : 'border-slate-200 bg-gradient-to-br from-white to-slate-50 text-slate-800'}`}
+      dir={dir}
+    >
+      <div className={`flex items-center gap-3 mb-5 ${dir === 'rtl' ? 'flex-row-reverse justify-end' : ''}`}>
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
           ✋
         </div>
-        <h3
-  className={`text-xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
->
-  {shownTitle.replace(' ✋', '')}
-</h3>
-
+        <h3 className={`text-xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+          {shownTitle.replace(' ✋', '')}
+        </h3>
       </div>
 
       {error && (
@@ -274,11 +288,9 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
       <div
         ref={listRef}
         className={`h-80 overflow-y-auto space-y-3 mb-4 rounded-2xl p-4 shadow-inner border
-  ${isDark
-    ? 'border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 text-slate-100'
-    : 'border-slate-200 bg-gradient-to-b from-white to-slate-50/50 text-slate-800'
-  }`}
-
+          ${isDark
+            ? 'border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 text-slate-100'
+            : 'border-slate-200 bg-gradient-to-b from-white to-slate-50/50 text-slate-800'}`}
         style={{ scrollBehavior: 'smooth' }}
       >
         {messages.map((m, i) => {
@@ -288,20 +300,18 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
               <div className={`inline-flex flex-col max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
                 <span
                   className={`inline-block px-4 py-3 rounded-2xl leading-relaxed whitespace-pre-wrap break-words shadow-sm transition-all hover:shadow-md ${
-isUser
-  ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
-  : (isDark
-      ? 'bg-slate-700 text-slate-100 border border-slate-600'
-      : 'bg-gradient-to-br from-slate-100 to-slate-50 text-slate-800 border border-slate-200')
-
+                    isUser
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
+                      : (isDark
+                          ? 'bg-slate-700 text-slate-100 border border-slate-600'
+                          : 'bg-gradient-to-br from-slate-100 to-slate-50 text-slate-800 border border-slate-200')
                   }`}
                 >
                   {m.text}
                 </span>
                 <span className={`mt-1.5 text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
-  {fmtTime(m.ts)}
-</span>
-
+                  {fmtTime(m.ts)}
+                </span>
               </div>
             </div>
           );
@@ -314,11 +324,11 @@ isUser
       {/* input row */}
       <div className={`flex gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
         <input
-className={`flex-1 rounded-xl px-4 py-3 transition-all focus:outline-none
-  ${isDark
-    ? 'bg-slate-800 text-slate-100 placeholder-slate-400 border-2 border-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-900/40'
-    : 'bg-white text-slate-800 placeholder-slate-400 border-2 border-slate-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'}
-  ${finishing ? 'cursor-wait opacity-70' : 'shadow-sm'}`}
+          className={`flex-1 rounded-xl px-4 py-3 transition-all focus:outline-none
+            ${isDark
+              ? 'bg-slate-800 text-slate-100 placeholder-slate-400 border-2 border-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-900/40'
+              : 'bg-white text-slate-800 placeholder-slate-400 border-2 border-slate-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'}
+            ${finishing ? 'cursor-wait opacity-70' : 'shadow-sm'}`}
           placeholder={t('inputPlaceholder')}
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -347,23 +357,9 @@ className={`flex-1 rounded-xl px-4 py-3 transition-all focus:outline-none
         >
           {finishing ? (
             <>
-              {/* circular spinner */}
-              <svg
-                className="w-5 h-5 animate-spin"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12" cy="12" r="10"
-                  stroke="currentColor" strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a 8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"
-                />
+              <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a 8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
               </svg>
               <span>{t('processing')}</span>
             </>
@@ -375,10 +371,9 @@ className={`flex-1 rounded-xl px-4 py-3 transition-all focus:outline-none
 
       {!finished && (
         <div className={`mt-4 flex items-start gap-2 text-xs rounded-xl px-4 py-3 border
-  ${isDark
-    ? 'text-slate-300 bg-slate-800 border-slate-700'
-    : 'text-slate-600 bg-blue-50 border-blue-100'}`}>
-
+          ${isDark
+            ? 'text-slate-300 bg-slate-800 border-slate-700'
+            : 'text-slate-600 bg-blue-50 border-blue-100'}`}>
           <span className="text-sm">💡</span>
           <p>{t('hintBeforeFinish')}</p>
         </div>
