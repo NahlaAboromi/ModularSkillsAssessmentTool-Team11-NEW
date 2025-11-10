@@ -1,0 +1,16 @@
+ Database Structure – ModularSkillsAssessmentTool
+
+המערכת עושה שימוש במסד נתונים חיצוני אמיתי – MongoDB Atlas, תחת בסיס הנתונים: modular_skills.
+
+ מבנה מסד הנתונים כולל את הקולקציות הבאות:
+1. classes
+2. students
+3. lecturers
+4. notifications
+5. studentnotifications
+
+ לצפייה בדיאגרמה הגרפית של מבנה מסד הנתונים (כולל קשרים בין האובייקטים והשדות החשובים):
+לחצו כאן:
+https://www.mermaidchart.com/app/projects/e1513125-dfc3-4f4d-a300-d41db2764a7f/diagrams/6816f307-f189-47cb-8a9e-28dded21414b/share/invite/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkb2N1bWVudElEIjoiNjgxNmYzMDctZjE4OS00N2NiLThhOWUtMjhkZGVkMjE0MTRiIiwiYWNjZXNzIjoiRWRpdCIsImlhdCI6MTc1MjQwNjQ5Nn0.EJNFnPJ9L16gWRa49XoKZ6uGKZ-pUvStv1BGg710h2M
+
+ הערה: כל הנתונים בתרשימים מקורם בשליפה מתוך מסד נתונים פעיל במערכת, בהתאם למימוש בפרויקט.
