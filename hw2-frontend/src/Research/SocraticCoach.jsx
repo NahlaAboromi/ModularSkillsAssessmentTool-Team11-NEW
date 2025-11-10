@@ -253,7 +253,12 @@ const { theme } = useContext(ThemeContext) || { theme: 'light' };
 <div className={`flex items-center gap-3 mb-5 ${dir === 'rtl' ? 'flex-row-reverse justify-end' : ''}`}>        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
           ✋
         </div>
-        <h3 className="text-xl font-bold text-slate-800">{shownTitle.replace(' ✋', '')}</h3>
+        <h3
+  className={`text-xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}
+>
+  {shownTitle.replace(' ✋', '')}
+</h3>
+
       </div>
 
       {error && (

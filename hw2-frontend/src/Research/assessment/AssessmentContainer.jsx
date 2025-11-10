@@ -41,6 +41,7 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
     retry: 'Retry',
     previous: 'Previous',
     next: 'Next',
+    tooFast: 'You\'re going too fast — please slow down 🙂',     // NEW
   };
 
   const [T, setT] = useState(SOURCE);
@@ -138,19 +139,41 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   const progress = useMemo(() => (answeredCount / Math.max(1, total)) * 100, [answeredCount, total]);
   const currentDisplay = Math.min(current + 1, Math.max(1, total));
 
+  // ---------- Anti-spam/lock refs ----------
+  const inputLockRef = React.useRef(false);
+  const lastKeyAtRef = React.useRef(0);
+  const advanceTmoRef = React.useRef(null);
+  const hintTmoRef = React.useRef(null);
+
+  // טווחים מומלצים (אפשר לכוון לפי UX)
+  const MIN_KEY_GAP_MS = 220;
+  const TRANSITION_LOCK_MS = 260;
+
+  // הודעת נימוס כשמתעלמים מקלט מהיר
+  const [showHint, setShowHint] = useState(false);
+  const nudge = () => {
+    setShowHint(true);
+    window.clearTimeout(hintTmoRef.current);
+    hintTmoRef.current = window.setTimeout(() => setShowHint(false), 1200);
+  };
+
   // --- Load questionnaire (prefer context) ---
   useEffect(() => {
     let canceled = false;
     (async () => {
       try {
         setLoadErr('');
-        if (ctxQuestionnaire?.items?.length) {
+        const hasCtx = !!(ctxQuestionnaire?.items?.length);
+        const sameLang = ctxQuestionnaire?.lang === lang;
+
+        if (hasCtx && sameLang) {
           if (!canceled) {
             setQuestionnaire(ctxQuestionnaire);
             setLoading(false);
           }
           return;
         }
+
         setLoading(true);
         const data = await loadQuestionnaire({ lang });
         if (!canceled) setQuestionnaire(data);
@@ -177,29 +200,70 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
     ? q.options
     : ((questionnaire?.lang === 'he' || lang === 'he') ? SCALE_HE : SCALE);
 
+  // Key handler with debouncing/locking
   useEffect(() => {
     const onKey = (e) => {
       if (showIntro || isComplete) return;
+
+      if (e.repeat) { nudge(); return; }                 // מתעלמים ממקש שמוחזק
+      if (inputLockRef.current) { nudge(); return; }     // בתקופת מעבר
+      const now = Date.now();
+      if (now - lastKeyAtRef.current < MIN_KEY_GAP_MS) { nudge(); return; }
+      lastKeyAtRef.current = now;
+
       const valid = (options || []).map(o => String(o.value));
-      if (valid.includes(e.key)) { handleAnswer(parseInt(e.key, 10)); return; }
-      if (e.key === 'ArrowLeft' && current > 0) { setCanNext(true); setCurrent(c => c - 1); }
+
+      if (valid.includes(e.key)) {
+        handleAnswer(parseInt(e.key, 10));
+        return;
+      }
+
+      if (e.key === 'ArrowLeft' && current > 0) {
+        inputLockRef.current = true;
+        setCanNext(true);
+        setCurrent(c => c - 1);
+        window.clearTimeout(advanceTmoRef.current);
+        advanceTmoRef.current = window.setTimeout(() => {
+          inputLockRef.current = false;
+        }, TRANSITION_LOCK_MS);
+      }
+
       if (e.key === 'ArrowRight' && canNext && current < QUESTIONS.length - 1) {
-        setCanNext(false); setCurrent(c => c + 1);
+        inputLockRef.current = true;
+        setCanNext(false);
+        setCurrent(c => c + 1);
+        window.clearTimeout(advanceTmoRef.current);
+        advanceTmoRef.current = window.setTimeout(() => {
+          inputLockRef.current = false;
+        }, TRANSITION_LOCK_MS);
       }
     };
+
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [showIntro, isComplete, current, QUESTIONS.length, options, canNext]);
 
   const handleAnswer = (val) => {
+    if (inputLockRef.current) { nudge(); return; }
+    inputLockRef.current = true;
+    window.clearTimeout(advanceTmoRef.current);
+
     setAnswers(prev => ({ ...prev, [current]: val }));
     setCanNext(false);
+
     const delay = quickMode ? 200 : 350;
+
     if (current < QUESTIONS.length - 1) {
-      setTimeout(() => setCurrent(c => c + 1), delay);
+      advanceTmoRef.current = window.setTimeout(() => {
+        setCurrent(c => c + 1);
+        window.setTimeout(() => { inputLockRef.current = false; }, TRANSITION_LOCK_MS);
+      }, delay);
     } else {
       setEnd(Date.now());
-      setTimeout(() => setIsComplete(true), delay);
+      advanceTmoRef.current = window.setTimeout(() => {
+        setIsComplete(true);
+        window.setTimeout(() => { inputLockRef.current = false; }, TRANSITION_LOCK_MS);
+      }, delay);
     }
   };
 
@@ -263,6 +327,15 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isComplete, lang, T]);
+
+  // ניקוי טיימרים ביציאה
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(advanceTmoRef.current);
+      window.clearTimeout(hintTmoRef.current);
+      inputLockRef.current = false;
+    };
+  }, []);
 
   // ----------------------------
   // Render guard based on status
@@ -484,7 +557,22 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
 
   // Main questionnaire view
   return (
-    <div className="min-h-screen bg-transparent px-4 md:px-8 lg:px-12 py-6" dir={dir}>
+<div className="min-h-screen bg-transparent px-4 md:px-8 lg:px-12 py-6" dir={dir}>    {/* polite hint */}
+{showHint && (
+  <div
+    className={`pointer-events-none absolute bottom-6 ${lang === 'he' ? 'left-24' : 'right-24'}
+                rounded-lg px-4 py-2 shadow border z-40
+                ${isDark ? 'bg-slate-700 text-slate-100 border-slate-600'
+                         : 'bg-white text-slate-800 border-slate-200'}`}
+    dir={dir}
+    role="status"
+    aria-live="polite"
+  >
+    {t('tooFast')}
+  </div>
+)}
+
+
       <div className="w-full max-w-[96vw] mx-auto">
         <ProgressBar
           progress={progress}
@@ -505,16 +593,35 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
 
         <div className={`flex justify-between items-center ${lang === 'he' ? 'flex-row-reverse' : ''}`}>
           <button
-            onClick={() => { setCanNext(true); setCurrent(c => Math.max(0, c - 1)); }}
+            onClick={() => {
+              if (inputLockRef.current) { nudge(); return; }
+              inputLockRef.current = true;
+              setCanNext(true);
+              setCurrent(c => Math.max(0, c - 1));
+              window.clearTimeout(advanceTmoRef.current);
+              advanceTmoRef.current = window.setTimeout(() => {
+                inputLockRef.current = false;
+              }, TRANSITION_LOCK_MS);
+            }}
             disabled={current === 0}
-            className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white border border-slate-300 text-slate-700 font-medium hover:shadow disabled:opacity-40"
+            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium hover:shadow disabled:opacity-40
+              ${isDark ? 'bg-slate-700 border border-slate-500 text-white' : 'bg-white border border-slate-300 text-slate-700'}`}
           >
             {t('previous')}
           </button>
 
           {canNext && current < QUESTIONS.length - 1 && (
             <button
-              onClick={() => { setCanNext(false); setCurrent(c => c + 1); }}
+              onClick={() => {
+                if (inputLockRef.current) { nudge(); return; }
+                inputLockRef.current = true;
+                setCanNext(false);
+                setCurrent(c => c + 1);
+                window.clearTimeout(advanceTmoRef.current);
+                advanceTmoRef.current = window.setTimeout(() => {
+                  inputLockRef.current = false;
+                }, TRANSITION_LOCK_MS);
+              }}
               className="flex items-center gap-2 px-6 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:shadow"
             >
               {t('next')}

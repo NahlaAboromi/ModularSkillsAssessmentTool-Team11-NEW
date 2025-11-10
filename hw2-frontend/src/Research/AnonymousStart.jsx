@@ -9,7 +9,7 @@ import Button from "../components/Button";
 import Alert from "../components/Alert";
 import { LanguageContext } from "../context/LanguageContext";
 import { translateUI } from "../utils/translateUI";
-
+import PageGate from "../components/PageGate";
 const AnonymousStartContent = () => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
@@ -29,7 +29,7 @@ const AnonymousStartContent = () => {
   const [error, setError] = useState("");
   const [okMsg, setOkMsg] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
-
+const [tLoading, setTLoading] = useState(lang === "he");
   const refs = {
     fieldOfStudy: useRef(null),
     customFieldOfStudy: useRef(null),
@@ -121,6 +121,7 @@ useEffect(() => {
   let cancelled = false;
   async function loadTranslations() {
     if (lang === "he") {
+      setTLoading(true);
       const keys = Object.keys(SOURCE);
       const values = Object.values(SOURCE);
       try {
@@ -162,21 +163,20 @@ useEffect(() => {
           map.s_6 = `${SEM} ${SIXTH}`;
           map.s_7 = `${SEM} ${SEVENTH}`;
           map.s_8 = `${SEM} ${EIGHTH} ${OR_HIGHER}`;
-
-          setT(map);
+   setT(map);
         }
       } catch {
         if (!cancelled) setT(SOURCE);
+      } finally {
+        if (!cancelled) setTLoading(false);   // ✅ חשוב: לכבות את הספינר בעברית
       }
     } else {
       setT(SOURCE);
+      setTLoading(false);
     }
   }
-
   loadTranslations();
-  return () => {
-    cancelled = true;
-  };
+  return () => { cancelled = true; };
 }, [lang]);
 
   const friendlyMissingMessage = useMemo(() => t("missing"), [T]);
@@ -304,6 +304,7 @@ useEffect(() => {
       console.error("❌ Anonymous start error:", err);
       setError(err.message || t("err_generic"));
     } finally {
+
       setIsLoading(false);
     }
   };
@@ -325,6 +326,7 @@ useEffect(() => {
       </div>
 
       {/* Main content */}
+      <PageGate loading={isLoading || tLoading} message={null}>
       <main className="flex-1 w-full px-4 py-6">
         <div className={`${isDark ? "bg-slate-700" : "bg-slate-200"} p-6 rounded`}>
           {/* Brand header with gradient */}
@@ -605,7 +607,7 @@ useEffect(() => {
           </div>
         </div>
       </main>
-
+</PageGate>
       {/* Footer */}
       <div className="px-4 pb-4">
         <Footer />

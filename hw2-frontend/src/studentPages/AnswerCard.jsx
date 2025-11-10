@@ -9,6 +9,42 @@ const StudentAnswerCard = ({ answer, isDark }) => {
 
   if (!analysisResult) return null;
 
+  // ========= NORMALIZATION (תיקון ריקון ברשימות) =========
+  // מפתחי camelCase לצד מפתחות שמגיעים מה-AI עם רווחים/אותיות גדולות
+  const AR = {
+    overallScore:
+      Number(analysisResult.overallScore ?? analysisResult['Overall score'] ?? 0),
+    observedStrengths:
+      analysisResult.observedStrengths ??
+      analysisResult['Observed strengths'] ??
+      [],
+    areasForImprovement:
+      analysisResult.areasForImprovement ??
+      analysisResult['Areas for improvement'] ??
+      [],
+    suggestedIntervention:
+      analysisResult.suggestedIntervention ??
+      analysisResult['Suggested intervention'] ??
+      '',
+    estimatedDepthLevel:
+      analysisResult.estimatedDepthLevel ??
+      analysisResult['Estimated depth level'] ??
+      '',
+  };
+
+  // קטגוריות CASEL – תמיכה גם ב-snake_case
+  const CAT = {
+    selfAwareness: analysisResult.selfAwareness ?? analysisResult.self_awareness,
+    selfManagement: analysisResult.selfManagement ?? analysisResult.self_management,
+    socialAwareness: analysisResult.socialAwareness ?? analysisResult.social_awareness,
+    relationshipSkills:
+      analysisResult.relationshipSkills ?? analysisResult.relationship_skills,
+    responsibleDecisionMaking:
+      analysisResult.responsibleDecisionMaking ??
+      analysisResult.responsible_decision_making,
+  };
+  // =======================================================
+
   // ------- i18n -------
   const SOURCE = {
     overallScore: 'Overall Score',
@@ -99,9 +135,9 @@ const StudentAnswerCard = ({ answer, isDark }) => {
         <div className="bg-white dark:bg-slate-600 p-4 rounded shadow mb-6">
           <div className="flex justify-between items-center gap-3">
             <div
-              className={`px-3 py-1.5 rounded-full ${getScoreBadgeColor(analysisResult.overallScore)} ${getScoreColor(analysisResult.overallScore)} font-bold text-sm`}
+              className={`px-3 py-1.5 rounded-full ${getScoreBadgeColor(AR.overallScore)} ${getScoreColor(AR.overallScore)} font-bold text-sm`}
             >
-              {t('overallScore')}: {analysisResult.overallScore}
+              {t('overallScore')}: {AR.overallScore}
             </div>
 
             {submittedAt && (
@@ -131,8 +167,8 @@ const StudentAnswerCard = ({ answer, isDark }) => {
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {Object.entries(analysisResult)
-                  .filter(([key]) => CATEGORIES.includes(key))
+                {Object.entries(CAT)
+                  .filter(([_, v]) => v) // מציג רק קטגוריות שקיימות
                   .map(([key, val]) => {
                     const score = Number(val?.score ?? 0);
                     const feedback = val?.feedback ?? '';
@@ -170,10 +206,9 @@ const StudentAnswerCard = ({ answer, isDark }) => {
                   <span role="img" aria-label="strength">💪</span> {t('strengths')}:
                 </h4>
                 <ul
-  className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}
->
-
-                  {analysisResult.observedStrengths?.map((s, i) => (
+                  className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}
+                >
+                  {AR.observedStrengths.map((s, i) => (
                     <li key={i} className="text-sm">{s}</li>
                   ))}
                 </ul>
@@ -184,10 +219,9 @@ const StudentAnswerCard = ({ answer, isDark }) => {
                   <span role="img" aria-label="improvement">🔍</span> {t('areasForImprovement')}:
                 </h4>
                 <ul
-  className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}
->
-
-                  {analysisResult.areasForImprovement?.map((a, i) => (
+                  className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}
+                >
+                  {AR.areasForImprovement.map((a, i) => (
                     <li key={i} className="text-sm">{a}</li>
                   ))}
                 </ul>
@@ -199,14 +233,14 @@ const StudentAnswerCard = ({ answer, isDark }) => {
               <h4 className="font-bold mb-2 flex items-center gap-2 text-blue-800 dark:text-blue-200">
                 <span role="img" aria-label="lightbulb">💡</span> {t('suggestedIntervention')}:
               </h4>
-              <p className="text-sm">{analysisResult.suggestedIntervention}</p>
+              <p className="text-sm">{AR.suggestedIntervention}</p>
             </div>
 
             {/* Depth Level */}
-            {analysisResult.estimatedDepthLevel && (
+            {AR.estimatedDepthLevel && (
               <div className={`${dir === 'rtl' ? 'text-left' : 'text-right'} text-sm mt-2`}>
                 <span className="opacity-75">{t('depthLevel')}:</span>{' '}
-                <span className="font-semibold">{analysisResult.estimatedDepthLevel}</span>
+                <span className="font-semibold">{AR.estimatedDepthLevel}</span>
               </div>
             )}
           </div>

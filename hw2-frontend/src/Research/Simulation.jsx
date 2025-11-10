@@ -23,6 +23,51 @@ async function startTrial(anonId) {
     localStorage.setItem('simStartAtISO', new Date().toISOString());
   }
 }
+// 🧩 helpers – למעלה בקובץ (או בקובץ utils)
+function readLS(key, fallback=null) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
+  catch { return fallback; }
+}
+
+// בוחר וריאנט לפי שפה מתוך אובייקט assignment ששמור בלוקאל
+function pickScenarioFromAssignment(asg, lang) {
+  if (!asg) return null;
+  const code = (lang === 'he') ? 'he' : 'en';
+  const v = asg?.scenarios?.[code];
+  if (!v) return null;
+  return {
+    scenarioId: asg.scenarioId || v.scenarioId,
+    assignedGroupType: v.assignedGroupType ?? asg.groupType,
+    selTags: Array.isArray(v.selTags) ? v.selTags : (asg.selTags || []),
+    title: v.title ?? asg.title,
+    text: v.text ?? asg.text,
+    reflection: Array.isArray(v.reflection) ? v.reflection : (asg.reflection || []),
+    version: v.version || asg.version || 'v1',
+  };
+}
+
+// בוחר גרסת תרחיש לפי שפה, עם נפילה חכמה למקור
+function pickScenarioByLang(scn, lang) {
+  if (!scn) return scn;
+  const code = (lang === 'he') ? 'he' : 'en';
+  const variant = scn?.scenarios?.[code];
+  // אם יש ווריאנט לשפה – נחזיר אותו, ונשמר מזהי/שדות שימושיים אם חסרים
+  if (variant) {
+    return {
+      scenarioId: scn.scenarioId || variant.scenarioId,
+      assignedGroupType: variant.assignedGroupType ?? scn.assignedGroupType,
+      selTags: variant.selTags ?? scn.selTags,
+      title: variant.title ?? scn.title,
+      text: variant.text ?? scn.text,
+      reflection: Array.isArray(variant.reflection) ? variant.reflection : scn.reflection || [],
+      version: scn.version || variant.version || 'v1',
+      // נשמור גם את המעטפת כדי לא לאבד מידע
+      scenarios: scn.scenarios
+    };
+  }
+  // אין ווריאנט? נחזור למקור
+  return scn;
+}
 
 function SimulationContent() {
   const navigate = useNavigate();
@@ -119,6 +164,19 @@ function SimulationContent() {
     localStorage.setItem(startedKey, '1');
     startTrial(student.anonId);
   }, [student?.anonId]);
+// אם השפה מתחלפת תוך כדי, נבחר מחדש את הווריאנט המקומי (ללא fetch נוסף)
+// ✅ על שינוי שפה – מחליף וריאנט מתוך localStorage.assignment (ללא fetch)
+useEffect(() => {
+  if (!trial) return;
+  const lsAsg = readLS('assignment', null);
+  if (!lsAsg) return;
+
+  const variant = pickScenarioFromAssignment(lsAsg, lang);
+  if (!variant) return;
+
+  setTrial(prev => (prev ? { ...prev, scenario: variant } : prev));
+}, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
+
 
   // 🔹 אתחול טיימר תצוגה (מתחיל מ-00:00 בכל כניסה)
   useEffect(() => {
@@ -135,14 +193,14 @@ function SimulationContent() {
         setLoading(true);
         setErr('');
 
-        if (navState?.group && navState?.scenario) {
-          const tTrial = {
-            group: navState.group,
-            groupType: navState.groupType,
-            scenarioId: navState.scenarioId || paramScenarioId,
-            scenario: navState.scenario,
-            startedAt: navState.startedAt,
-          };
+if (navState?.group && navState?.scenario) {
+  const tTrial = {
+    group: navState.group,
+    groupType: navState.groupType,
+    scenarioId: navState.scenarioId || paramScenarioId,
+    scenario: pickScenarioByLang(navState.scenario, lang),
+    startedAt: navState.startedAt,
+  };
           if (!cancelled) {
             setTrial(tTrial);
             setFreeAnswer('');
@@ -150,6 +208,26 @@ function SimulationContent() {
           }
           return;
         }
+// ✅ 2) ניסיון ראשון – לטעון מה-LocalStorage.assignment (יש לך שם he+en)
+const lsAsg = readLS('assignment', null);
+if (lsAsg) {
+  const variant = pickScenarioFromAssignment(lsAsg, lang);
+  if (variant) {
+    const tTrial = {
+      group: lsAsg.group,
+      groupType: lsAsg.groupType || lsAsg.assignedGroupType || 'control',
+      scenarioId: lsAsg.scenarioId,
+      scenario: variant,
+      startedAt: readLS('simStartAtISO', null) || null,  // אם שמור לך זמן התחלה
+    };
+    if (!cancelled) {
+      setTrial(tTrial);
+      setFreeAnswer('');
+      setLoading(false);
+    }
+    return; // 💡 לא צריך fetch אם מצאנו ב-LS
+  }
+}
 
         if (!student?.anonId) {
           throw new Error('Missing anonId. Please restart the study flow.');
@@ -161,13 +239,14 @@ function SimulationContent() {
         const data = await res.json();
 
         if (!cancelled) {
-          const tTrial = {
-            group: data.group,
-            groupType: data.groupType,
-            scenarioId: data.scenarioId,
-            scenario: data.scenario,
-            startedAt: data.startedAt,
-          };
+const tTrial = {
+  group: data.group,
+  groupType: data.groupType,
+  scenarioId: data.scenarioId,
+  scenario: pickScenarioByLang(data.scenario, lang),
+  startedAt: data.startedAt,
+};
+
           setTrial(tTrial);
           setFreeAnswer('');
           setLoading(false);
@@ -182,7 +261,7 @@ function SimulationContent() {
 
     init();
     return () => { cancelled = true; };
-  }, [student?.anonId, paramScenarioId, navState, lang]);
+}, [student?.anonId, paramScenarioId, navState]);
 
   // 🔹 fallback אם אין startedAt — נשתמש בזמן מלוקאל
   useEffect(() => {
@@ -222,9 +301,18 @@ function SimulationContent() {
           <div className={`max-w-3xl mx-auto rounded p-6 ${isDark?'bg-red-900/20':'bg-red-50'} border ${isDark?'border-red-800':'border-red-200'}`}>
             <div className="font-semibold mb-2">{t('loadFailTitle')}</div>
             <div className="text-sm opacity-80">{err || 'Unknown error'}</div>
-            <button onClick={() => navigate(-1)} className="mt-4 px-5 py-2 rounded border">
-              {t('loadFailBack')}
-            </button>
+<button
+  type="button"
+  onClick={() => navigate(-1)}
+  className={`mt-4 px-5 py-2 rounded border transition-colors
+    ${isDark
+      ? 'bg-slate-700 text-slate-100 border-slate-500 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-emerald-500'
+      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-emerald-500'}`}
+>
+  {t('loadFailBack')}
+</button>
+
+
           </div>
         </div>
         <div className="px-4 pb-4"><Footer /></div>
@@ -348,18 +436,19 @@ function SimulationContent() {
             </div>
 
             <div className={`mt-6 flex gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-              <button
-                onClick={() => navigate(-1)}
-                className={`px-5 py-2 rounded border ${
-  isDark
-    ? 'border-slate-400 text-slate-100 hover:bg-slate-700/60'
-    : 'border-slate-300 text-slate-700 hover:bg-slate-50'
-}`}
+<button
+  type="button"
+  onClick={() => navigate(-1)}
+  className={`px-5 py-2 rounded border transition-colors disabled:opacity-60 disabled:cursor-not-allowed
+    ${isDark
+      ? 'bg-slate-700 text-slate-100 border-slate-500 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-emerald-500'
+      : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-emerald-500'}`}
+  disabled={submitting}
+>
+  {t('back')}
+</button>
 
-                disabled={submitting}
-              >
-                {t('back')}
-              </button>
+
 
               <button
                 onClick={onSubmit}

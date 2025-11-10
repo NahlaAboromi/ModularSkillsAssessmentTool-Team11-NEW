@@ -1,6 +1,5 @@
 // src/context/LanguageContext.jsx
-import React, { createContext, useState, useEffect } from "react";
-
+import React, { createContext, useState, useLayoutEffect } from "react";
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
@@ -9,8 +8,7 @@ export const LanguageProvider = ({ children }) => {
   const [lang, setLang] = useState(storedLang);
 
   // 2️⃣ כל פעם שהשפה משתנה – נעדכן את ה-HTML direction
-  useEffect(() => {
-    document.documentElement.lang = lang;
+useLayoutEffect(() => {    document.documentElement.lang = lang;
     document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
     localStorage.setItem("lang", lang); // שומר גם באחסון המקומי
   }, [lang]);

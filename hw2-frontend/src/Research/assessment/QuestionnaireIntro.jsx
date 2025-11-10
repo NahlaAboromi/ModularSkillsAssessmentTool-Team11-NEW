@@ -45,23 +45,22 @@ export default function QuestionnaireIntro({ CATEGORIES = {}, onStart }) {
   }, [isHeb, SOURCE]);
 
 // ===== Dynamic category name translations =====
+// ===== Dynamic category name translations =====
 const [catLabels, setCatLabels] = useState({});
 
 useEffect(() => {
   let cancelled = false;
 
-  // אם לא עברית – מאפסים מיידית את המיפוי ומפסיקים
-  if (lang !== 'he') { 
-    setCatLabels({});
-    return () => { cancelled = true; };
-  }
-
   const names = Object.keys(CATEGORIES);
   if (!names.length) { setCatLabels({}); return () => { cancelled = true; }; }
 
+  // תרגום דו-כיווני: EN→HE כשעברית, HE→EN כשאנגלית
+  const sourceLang = (lang === 'he') ? 'EN' : 'HE';
+  const targetLang = (lang === 'he') ? 'HE' : 'EN';
+
   (async () => {
     try {
-      const out = await translateUI({ sourceLang: 'EN', targetLang: 'HE', texts: names });
+      const out = await translateUI({ sourceLang, targetLang, texts: names });
       if (!cancelled) {
         const map = {};
         names.forEach((n, i) => (map[n] = out[i] ?? n));
@@ -72,7 +71,7 @@ useEffect(() => {
     }
   })();
 
-  // גם בניקוי – לאפס כדי שלא יישאר זיכרון מהשפה הקודמת
+  // ניקוי – לא להשאיר זיכרון מהשפה הקודמת
   return () => { cancelled = true; setCatLabels({}); };
 }, [lang, CATEGORIES]);
 
