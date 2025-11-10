@@ -10,9 +10,6 @@ import { useAnonymousStudent as useStudent } from '../context/AnonymousStudentCo
 import { LanguageContext } from '../context/LanguageContext';
 import { translateUI } from '../utils/translateUI';
 
-// ✅ Gate לטעינה
-import PageGate from '../components/PageGate';
-
 // ---- טקסטים באנגלית (מתורגמים דינמית לעברית) ----
 const SOURCE = {
   heroTitle_has: 'Thank you for participating! 🎉',
@@ -54,17 +51,14 @@ function ThanksInner() {
   const dir = lang === 'he' ? 'rtl' : 'ltr';
   const isRTL = dir === 'rtl';
 
-  // ✅ טבלת תרגום + שער טעינה
+  // ✅ טבלת תרגום
   const [T, setT] = useState(SOURCE);
-  const [loading, setLoading] = useState(lang === 'he'); // בעברית נתחיל בטעון כדי למנוע הבהוב
   const t = (k) => T[k] ?? k;
 
   useEffect(() => {
     let cancelled = false;
-
     async function loadT() {
       if (lang === 'he') {
-        setLoading(true); // Gate: מציגים Spinner עד שהתרגום מוכן
         try {
           const keys = Object.keys(SOURCE);
           const vals = Object.values(SOURCE);
@@ -76,19 +70,14 @@ function ThanksInner() {
           }
         } catch {
           if (!cancelled) setT(SOURCE);
-        } finally {
-          if (!cancelled) setLoading(false);
         }
       } else {
-        // באנגלית אין תרגום א-סינכרוני → אין “מצמוץ”
         setT(SOURCE);
-        setLoading(false);
       }
     }
-
     loadT();
     return () => { cancelled = true; };
-  }, [lang]);
+  }, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const anonId = location.state?.anonId || student?.anonId || '—';
   const initialGroup = (location.state?.group || '').toString().toUpperCase();
@@ -153,235 +142,241 @@ function ThanksInner() {
         <AnonymousHeader />
       </div>
 
-      {/* ✅ כאן רק ה-main עטוף ב-PageGate כדי שהספינר יופיע באמצע אזור התוכן */}
-<PageGate loading={loading} message={null}>
-        <main className="flex-1 w-full px-4 md:px-8 lg:px-12 py-6">
-          <section className={`${isDark ? 'bg-slate-800/50' : 'bg-white/50'} backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-lg`}>
-            <div
-              className={`rounded-2xl shadow-xl p-8 md:p-10 border-2 max-w-6xl mx-auto transition-all duration-300 ${
-                isDark 
-                  ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600 text-white shadow-slate-900/50' 
-                  : 'bg-gradient-to-br from-white to-slate-50 border-slate-200 text-slate-800 shadow-slate-300/50'
-              }`}
-            >
-              {/* Hero Section */}
-              <div className={`flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
-                <div className="flex-1">
-                  <h1
-                    className={`text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-2 text-center md:text-start`}
-                  >
-                    {hasSocratic ? t('heroTitle_has') : t('heroTitle_no')}
-                  </h1>
-                  <p className={`text-base md:text-lg leading-[1.9] ${isDark ? 'text-slate-300' : 'text-slate-600'} text-center md:text-start`}>
-                    {hasSocratic ? t('heroSubtitle_has') : t('heroSubtitle_no')}
-                  </p>
-                </div>
-
-                {/* Ribbons */}
-                <div
-                  className={`flex flex-wrap items-center gap-2 ${
-                    isRTL ? 'flex-row-reverse md:justify-start' : 'md:justify-end'
-                  }`}
+      <main className="flex-1 w-full px-4 md:px-8 lg:px-12 py-6">
+        <section className={`${isDark ? 'bg-slate-800/50' : 'bg-white/50'} backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-lg`}>
+          <div
+            className={`rounded-2xl shadow-xl p-8 md:p-10 border-2 max-w-6xl mx-auto transition-all duration-300 ${
+              isDark 
+                ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600 text-white shadow-slate-900/50' 
+                : 'bg-gradient-to-br from-white to-slate-50 border-slate-200 text-slate-800 shadow-slate-300/50'
+            }`}
+          >
+            {/* Hero Section */}
+            <div className={`flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8 ${isRTL ? 'md:flex-row-reverse' : ''}`}>
+              <div className="flex-1">
+                <h1
+                  className={`text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent mb-2 text-center md:text-start`}
                 >
-                  <span
-                    className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${
-                      isDark ? 'bg-slate-600 text-slate-100 border border-slate-500' : 'bg-slate-100 text-slate-700 border border-slate-200'
-                    } ${isRTL ? '' : 'uppercase tracking-wider'}`}
-                  >
-                    ✓ {t('ribbons_completed')}
-                  </span>
-
-                  {groupBadge && (
-                    <span
-                      className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${groupBadge.tone} ${
-                        isRTL ? '' : 'uppercase tracking-wider'
-                      }`}
-                    >
-                      {groupBadge.text}
-                    </span>
-                  )}
-
-                  <span
-                    className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${
-                      isDark ? 'bg-slate-600 text-slate-100 border border-slate-500' : 'bg-slate-100 text-slate-700 border border-slate-200'
-                    } ${isRTL ? '' : 'uppercase tracking-wider'}`}
-                  >
-                    🔒 {t('ribbons_anonymous')}
-                  </span>
-
-                  {hasSocratic && (
-                    <span
-                      className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${
-                        isDark ? 'bg-blue-900/30 text-blue-300 border border-blue-800' : 'bg-blue-100 text-blue-800 border border-blue-200'
-                      } ${isRTL ? '' : 'uppercase tracking-wider'}`}
-                    >
-                      💭 {t('ribbons_reflective')}
-                    </span>
-                  )}
-                </div>
+                  {hasSocratic ? t('heroTitle_has') : t('heroTitle_no')}
+                </h1>
+                <p className={`text-base md:text-lg leading-[1.9] ${isDark ? 'text-slate-300' : 'text-slate-600'} text-center md:text-start`}>
+                  {hasSocratic ? t('heroSubtitle_has') : t('heroSubtitle_no')}
+                </p>
               </div>
 
-              {fetchErr && (
-                <div className={`mb-6 rounded-xl border-2 p-4 ${
-                  isDark ? 'bg-red-900/30 border-red-700 text-red-200' : 'bg-red-50 border-red-300 text-red-800'
-                }`}>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">⚠️</span>
-                    <span className="text-sm font-medium">{fetchErr}</span>
-                  </div>
-                </div>
-              )}
+              {/* Ribbons */}
+              <div
+                className={`flex flex-wrap items-center gap-2 ${
+                  isRTL ? 'flex-row-reverse md:justify-start' : 'md:justify-end'
+                }`}
+              >
+                <span
+                  className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${
+                    isDark ? 'bg-slate-600 text-slate-100 border border-slate-500' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                  } ${isRTL ? '' : 'uppercase tracking-wider'}`}
+                >
+                  ✓ {t('ribbons_completed')}
+                </span>
 
-              {/* Content Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Appreciation Card */}
-                  <div
-                    className={`rounded-xl border-2 shadow-md transition-all duration-300 hover:shadow-lg ${
-                      isDark 
-                        ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600' 
-                        : 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
+                {groupBadge && (
+                  <span
+                    className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${groupBadge.tone} ${
+                      isRTL ? '' : 'uppercase tracking-wider'
                     }`}
                   >
-                    <div className="p-6 md:p-7" dir="ltr">
-                      <div
-                        className={`flex items-center gap-3 mb-4 ${
-                          lang === 'he' ? 'flex-row-reverse text-right' : 'flex-row text-left'
-                        }`}
-                        dir={lang === 'he' ? 'ltr' : 'ltr'}
-                      >
-                        {lang === 'he' ? (
-                          <>
-                            <span className="text-3xl">🙏</span>
-                            <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
-                          </>
-                        ) : (
-                          <>
-                            <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
-                            <span className="text-3xl">🙏</span>
-                          </>
-                        )}
-                      </div>
+                    {groupBadge.text}
+                  </span>
+                )}
 
-                      <ul className="space-y-3 text-left pl-6 md:pl-7" dir="ltr" role="list">
-                        {aboutList.map((b, i) => (
-                          <li
-                            key={i}
-                            className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
-                          >
-                            <span
-                              className={`mt-2 flex-shrink-0 w-1.5 h-1.5 rounded-full ${isDark ? 'bg-blue-400' : 'bg-blue-600'}`}
-                            ></span>
-                            <span
-                              dir={isRTL ? 'rtl' : 'ltr'}
-                              className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-700'}`}
-                            >
-                              {b}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
+                <span
+                  className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${
+                    isDark ? 'bg-slate-600 text-slate-100 border border-slate-500' : 'bg-slate-100 text-slate-700 border border-slate-200'
+                  } ${isRTL ? '' : 'uppercase tracking-wider'}`}
+                >
+                  🔒 {t('ribbons_anonymous')}
+                </span>
+
+                {hasSocratic && (
+                  <span
+                    className={`text-xs font-bold rounded-full px-4 py-2 shadow-sm transition-all hover:scale-105 ${
+                      isDark ? 'bg-blue-900/30 text-blue-300 border border-blue-800' : 'bg-blue-100 text-blue-800 border border-blue-200'
+                    } ${isRTL ? '' : 'uppercase tracking-wider'}`}
+                  >
+                    💭 {t('ribbons_reflective')}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {fetchErr && (
+              <div className={`mb-6 rounded-xl border-2 p-4 ${
+                isDark ? 'bg-red-900/30 border-red-700 text-red-200' : 'bg-red-50 border-red-300 text-red-800'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">⚠️</span>
+                  <span className="text-sm font-medium">{fetchErr}</span>
                 </div>
+              </div>
+            )}
 
-                {/* Right Column - Meta Info */}
-                <aside
-                  className={`rounded-xl border-2 shadow-md h-fit transition-all duration-300 hover:shadow-lg ${
+            {/* Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Left Column */}
+              <div className="lg:col-span-2 space-y-6">
+                {/* Appreciation Card */}
+                <div
+                  className={`rounded-xl border-2 shadow-md transition-all duration-300 hover:shadow-lg ${
                     isDark 
                       ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600' 
                       : 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
                   }`}
                 >
-                  <div className="p-6 md:p-7" dir={isRTL ? 'rtl' : 'ltr'}>
-                    <div className="flex items-center justify-between mb-6">
-                      <h4 className="text-xl font-bold">{t('metaTitle')}</h4>
-                      <span className="text-xs font-bold rounded-full px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-sm">
-                        ✓ {t('ready')}
-                      </span>
+                  <div className="p-6 md:p-7" dir="ltr">
+
+
+<div
+  className={`flex items-center gap-3 mb-4 ${
+    lang === 'he' ? 'flex-row-reverse text-right' : 'flex-row text-left'
+  }`}
+  dir={lang === 'he' ? 'ltr' : 'ltr'}
+>
+  {lang === 'he' ? (
+    <>
+      <span className="text-3xl">🙏</span>
+      <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
+    </>
+  ) : (
+    <>
+      <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
+      <span className="text-3xl">🙏</span>
+    </>
+  )}
+</div>
+
+<ul className="space-y-3 text-left pl-6 md:pl-7" dir="ltr" role="list">
+
+
+
+{aboutList.map((b, i) => (
+<li
+  key={i}
+  className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse text-right' : 'text-left'}`}
+>
+
+
+      <span
+        className={`mt-2 flex-shrink-0 w-1.5 h-1.5 rounded-full ${isDark ? 'bg-blue-400' : 'bg-blue-600'}`}
+      ></span>
+<span
+  dir={isRTL ? 'rtl' : 'ltr'}
+  className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-700'}`}
+>
+  {b}
+</span>
+
+    </li>
+  ))}
+</ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column - Meta Info */}
+              <aside
+                className={`rounded-xl border-2 shadow-md h-fit transition-all duration-300 hover:shadow-lg ${
+                  isDark 
+                    ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600' 
+                    : 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
+                }`}
+              >
+                <div className="p-6 md:p-7" dir={isRTL ? 'rtl' : 'ltr'}>
+
+                  <div className="flex items-center justify-between mb-6">
+                    <h4 className="text-xl font-bold">{t('metaTitle')}</h4>
+                    <span className="text-xs font-bold rounded-full px-3 py-1.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 shadow-sm">
+                      ✓ {t('ready')}
+                    </span>
+                  </div>
+
+                  <div className="space-y-4 text-sm">
+                    <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className={`font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          {t('meta_anon')}
+                        </span>
+                        <code
+                          dir="ltr"
+                          className={`${isDark ? 'bg-slate-900 text-blue-300' : 'bg-white text-blue-600'} border rounded-lg px-3 py-1.5 text-xs font-mono font-semibold shadow-sm text-left`}
+                        >
+                          {anonId}
+                        </code>
+                      </div>
                     </div>
 
-                    <div className="space-y-4 text-sm">
-                      <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className={`font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                            {t('meta_anon')}
-                          </span>
-                          <code
-                            dir="ltr"
-                            className={`${isDark ? 'bg-slate-900 text-blue-300' : 'bg-white text-blue-600'} border rounded-lg px-3 py-1.5 text-xs font-mono font-semibold shadow-sm text-left`}
-                          >
-                            {anonId}
-                          </code>
-                        </div>
-                      </div>
-
-                      {/* מוסתר בכוונה – כמו אצלך */}
-                      {group && (
-                        <>
-                          <div aria-hidden="true" className={`hidden p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
-                            <div className="flex items-center justify-between gap-3">
-                              <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'} font-medium`}>
-                                {t('meta_group')}
-                              </span>
-                              <span className="font-bold text-lg">Group {group}</span>
-                            </div>
+                    {/* מוסתר בכוונה – כמו אצלך */}
+                    {group && (
+                      <>
+                        <div aria-hidden="true" className={`hidden p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'} font-medium`}>
+                              {t('meta_group')}
+                            </span>
+                            <span className="font-bold text-lg">Group {group}</span>
                           </div>
-                          <div aria-hidden="true" className={`hidden p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
-                            <div className="flex items-center justify-between gap-3">
-                              <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'} font-medium`}>
-                                {t('meta_type')}
-                              </span>
-                              <span className="font-bold">
-                                {group === 'D' ? 'Control' : 'Experimental'}
-                              </span>
-                            </div>
+                        </div>
+                        <div aria-hidden="true" className={`hidden p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
+                          <div className="flex items-center justify-between gap-3">
+                            <span className={`${isDark ? 'text-slate-400' : 'text-slate-600'} font-medium`}>
+                              {t('meta_type')}
+                            </span>
+                            <span className="font-bold">
+                              {group === 'D' ? 'Control' : 'Experimental'}
+                            </span>
                           </div>
-                        </>
-                      )}
-
-                      <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className={`font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                            {t('meta_phase')}
-                          </span>
-                          <span className="font-bold">{t('meta_phase_post')}</span>
                         </div>
-                      </div>
+                      </>
+                    )}
 
-                      <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
-                        <div className="flex flex-col gap-2">
-                          <span className={`font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                            {t('notes')}
-                          </span>
-                          <span className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
-                            {hasSocratic ? t('meta_notes_exp') : t('meta_notes_ctrl')}
-                          </span>
-                        </div>
+                    <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className={`font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          {t('meta_phase')}
+                        </span>
+                        <span className="font-bold">{t('meta_phase_post')}</span>
                       </div>
                     </div>
 
-                    {/* Exit Button */}
-                    <div className="mt-6">
-                      <button
-                        onClick={() => navigate('/')}
-                        className={`w-full px-6 py-3.5 rounded-xl font-bold text-base shadow-md transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] ${
-                          isDark
-                            ? 'bg-gradient-to-r from-slate-600 to-slate-700 text-white hover:from-slate-500 hover:to-slate-600 border border-slate-500'
-                            : 'bg-gradient-to-r from-white to-slate-50 text-slate-700 border-2 border-slate-300 hover:border-slate-400'
-                        }`}
-                      >
-                        {t('exit')}
-                      </button>
+                    <div className={`p-3 rounded-lg ${isDark ? 'bg-slate-800/50' : 'bg-slate-100/50'}`}>
+                      <div className="flex flex-col gap-2">
+                        <span className={`font-medium ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                          {t('notes')}
+                        </span>
+                        <span className={`text-xs leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                          {hasSocratic ? t('meta_notes_exp') : t('meta_notes_ctrl')}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </aside>
-              </div>
+
+                  {/* Exit Button */}
+                  <div className="mt-6">
+                    <button
+                      onClick={() => navigate('/')}
+                      className={`w-full px-6 py-3.5 rounded-xl font-bold text-base shadow-md transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] ${
+                        isDark
+                          ? 'bg-gradient-to-r from-slate-600 to-slate-700 text-white hover:from-slate-500 hover:to-slate-600 border border-slate-500'
+                          : 'bg-gradient-to-r from-white to-slate-50 text-slate-700 border-2 border-slate-300 hover:border-slate-400'
+                      }`}
+                    >
+                      {t('exit')}
+                    </button>
+                  </div>
+                </div>
+              </aside>
             </div>
-          </section>
-        </main>
-      </PageGate>
+          </div>
+        </section>
+      </main>
 
       <div className="px-4 pb-4">
         <Footer />

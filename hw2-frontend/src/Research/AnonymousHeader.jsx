@@ -1,4 +1,3 @@
-// src/studentPages/StudentHeader.jsx
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../DarkLightMood/ThemeContext';
@@ -8,7 +7,7 @@ import SessionTimer from './SessionTimer';
 import LogoutThanksModal from './LogoutThanksModal';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 import { LanguageContext } from '../context/LanguageContext';
-import { translateUI } from '../utils/translateUI';
+import { useI18n } from '../utils/i18n';
 
 const StudentHeader = () => {
   const navigate = useNavigate();
@@ -27,47 +26,11 @@ const StudentHeader = () => {
   const isDark = theme === 'dark';
   const isRTL = lang === 'he';
 
-  // 🔤 מקור באנגלית בלבד
-  const SOURCE = {
-    headerTitle: 'Anonymous Session',
-    registered: 'Registered',
-    guest: 'Guest',
-    logout: 'Logout',
-    working: 'Working...'
-  };
-
-  const [T, setT] = useState(SOURCE);
+  // ✅ i18n מקומי ומהיר
+  const { t, dir } = useI18n('anonymousHeader');
 
   useEffect(() => {
-    let cancelled = false;
-    async function loadTranslations() {
-      if (lang === 'he') {
-        const keys = Object.keys(SOURCE);
-        const values = Object.values(SOURCE);
-        try {
-          const translated = await translateUI({
-            sourceLang: 'EN',
-            targetLang: 'HE',
-            texts: values
-          });
-          if (!cancelled) {
-            const next = {};
-            keys.forEach((k, i) => { next[k] = translated[i]; });
-            setT(next);
-          }
-        } catch {
-          if (!cancelled) setT(SOURCE);
-        }
-      } else {
-        setT(SOURCE);
-      }
-    }
-    loadTranslations();
-    return () => { cancelled = true; };
-  }, [lang]);
-
-  useEffect(() => {
-    console.log('[Header DEBUG] render/update', {
+    console.log('[AnonymousHeader DEBUG] render/update', {
       theme,
       loggingOut,
       showModal,
@@ -79,20 +42,22 @@ const StudentHeader = () => {
       hasStopSessionTimerFn: typeof stopSessionTimer === 'function',
     });
   }, [theme, loggingOut, showModal, student, stopSessionTimer]);
+
   // 🔒 מעקב אחרי נעילת מחליף השפה (כשמתחיל שאלון)
   const readLangLock = () => {
-   try { return localStorage.getItem('langLock') === '1'; } catch { return false; }
+    try { return localStorage.getItem('langLock') === '1'; } catch { return false; }
   };
   const [isLangLocked, setIsLangLocked] = useState(readLangLock());
   useEffect(() => {
     const onChange = () => setIsLangLocked(readLangLock());
     window.addEventListener('lang-lock-change', onChange);
-    window.addEventListener('storage', onChange); // במקרה של טאבים/חלונות נוספים
+    window.addEventListener('storage', onChange); // טאבים נוספים
     return () => {
       window.removeEventListener('lang-lock-change', onChange);
       window.removeEventListener('storage', onChange);
     };
   }, []);
+
   // Logout flow
   const handleLogout = async () => {
     if (!student?.anonId || loggingOut) return;
@@ -137,7 +102,7 @@ const StudentHeader = () => {
     return (
       <img
         src={student.profilePic}
-        alt={student?.username || 'Anonymous Student'}
+        alt={student?.username || t('anonymousStudent')}
         className="w-full h-full object-cover"
         onError={(e) => {
           e.target.onerror = null;
@@ -150,16 +115,16 @@ const StudentHeader = () => {
   return (
     <>
       <header
-        dir={isRTL ? 'rtl' : 'ltr'}
+        dir={dir}                // ← נקי ומדויק
         lang={isRTL ? 'he' : 'en'}
         className={`p-4 ${isDark ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-800'}
                     flex justify-between items-center rounded shadow-md`}
       >
         {/* Left side: tiny title only (no nav links) */}
         <div className="flex items-center gap-3">
-          <span className="font-bold text-base">{T.headerTitle}</span>
+          <span className="font-bold text-base">{t('headerTitle')}</span>
 
-          {/* DEBUG badge קטן למסך - קבע רוחב קבוע למניעת קפיצות */}
+          {/* DEBUG badge – רוחב קבוע למניעת קפיצות */}
           <span className="text-xs px-2 py-0.5 rounded bg-slate-900/20 inline-flex items-center justify-center min-w-24">
             id:{student?.anonId ? String(student.anonId).slice(0, 8) : '—'}
           </span>
@@ -168,22 +133,22 @@ const StudentHeader = () => {
         {/* Right side: theme, language, timer, profile, logout */}
         <div className="flex items-center gap-6">
           <ThemeToggle />
-          {/* מומלץ לוודא ש- LanguageSwitcher שומר על w-12/h-9 כדי שלא יזיז את ההדר */}
-          <LanguageSwitcher disabled={isLangLocked} title={isLangLocked ? (lang==='he' ? 'מחליף השפה נעול במהלך השאלון' : 'Language switch is locked during the questionnaire') : undefined} />
+          <LanguageSwitcher
+            disabled={isLangLocked}
+            title={isLangLocked ? (isRTL ? t('langLockedHe') : t('langLockedEn')) : undefined}
+          />
           <SessionTimer />
 
           {/* Student profile - גבול/ריווח מתהפך לפי שפה */}
           <div
-            className={`flex items-center gap-3 ${
-              isRTL ? 'pl-4 border-l' : 'pr-4 border-r'
-            } border-slate-500`}
+            className={`flex items-center gap-3 ${isRTL ? 'pl-4 border-l' : 'pr-4 border-r'} border-slate-500`}
           >
             <div className={`flex flex-col ${isRTL ? 'items-start text-start' : 'items-end text-end'}`}>
               <span className="font-medium dark:text-gray-200">
-                {student?.username ? student.username : 'Anonymous Student'}
+                {student?.username ? student.username : t('anonymousStudent')}
               </span>
               <span className="text-xs dark:text-gray-300">
-                {student?.username ? T.registered : T.guest}
+                {student?.username ? t('registered') : t('guest')}
               </span>
             </div>
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-blue-400 flex items-center justify-center bg-white">
@@ -205,7 +170,7 @@ const StudentHeader = () => {
                 <polyline points="16 17 21 12 16 7"/>
                 <line x1="21" x2="9" y1="12" y2="12"/>
               </svg>
-              <span>{loggingOut ? T.working : T.logout}</span>
+              <span>{loggingOut ? t('working') : t('logout')}</span>
             </button>
           </div>
         </div>
