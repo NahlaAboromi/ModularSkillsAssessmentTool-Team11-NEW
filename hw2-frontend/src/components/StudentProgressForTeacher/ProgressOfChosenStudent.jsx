@@ -12,6 +12,9 @@ import AIChat from '../../AI/AIChat';
 import StudentOverviewHeader from '../../components/StudentProgressForTeacher/StudentOverviewHeader';
 import ClassProgressCard from '../../components/StudentProgressForTeacher/ClassProgressCard';
 
+// i18n
+import { useI18n } from '../../utils/i18n';
+
 const ProgressOfChosenStudentContent = () => {
   const { studentId } = useParams();
   const location = useLocation();
@@ -20,6 +23,8 @@ const ProgressOfChosenStudentContent = () => {
   const { theme } = useContext(ThemeContext);
   const { user } = useContext(UserContext);
   const isDark = theme === 'dark';
+
+  const { t, dir, lang } = useI18n('studentDetails'); // ⬅️ namespace: studentDetails
 
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -55,12 +60,12 @@ const ProgressOfChosenStudentContent = () => {
 
   if (loading) {
     return (
-      <div className={baseClasses}>
+      <div dir={dir} lang={lang} className={baseClasses}>
         <div className="px-4 mt-4"><TeacherHeader /></div>
         <main className="flex-1 w-full px-4 py-6">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3">Loading student data...</span>
+            <span className="ml-3">{t('loading')}</span>
           </div>
         </main>
         <div className="px-4 pb-4"><Footer /></div>
@@ -70,10 +75,12 @@ const ProgressOfChosenStudentContent = () => {
 
   if (error) {
     return (
-      <div className={baseClasses}>
+      <div dir={dir} lang={lang} className={baseClasses}>
         <div className="px-4 mt-4"><TeacherHeader /></div>
         <main className="flex-1 w-full px-4 py-6">
-          <div className="p-6 text-center text-red-600">Error: {error}</div>
+          <div className="p-6 text-center text-red-600">
+            {t('errorPrefix')} {error}
+          </div>
         </main>
         <div className="px-4 pb-4"><Footer /></div>
       </div>
@@ -85,7 +92,7 @@ const ProgressOfChosenStudentContent = () => {
   console.log('📝 Rendering with studentData.classes:', studentData.classes);
 
   return (
-    <div className={baseClasses}>
+    <div dir={dir} lang={lang} className={baseClasses}>
       <div className="px-4 mt-4"><TeacherHeader /></div>
 
       <main className="flex-1 w-full px-4 py-6">
@@ -93,8 +100,10 @@ const ProgressOfChosenStudentContent = () => {
           <button
             onClick={handleExportPDF}
             className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-all"
+            aria-label={t('exportPdf')}
+            title={t('exportPdf')}
           >
-            Export PDF
+            {t('exportPdf')}
           </button>
         </div>
 
@@ -120,31 +129,30 @@ const ProgressOfChosenStudentContent = () => {
             })
             .map((classData, index) => {
 
-            console.log(`🔍 Class at index ${index}:`, classData);
+              console.log(`🔍 Class at index ${index}:`, classData);
 
-            if (!classData || !Array.isArray(classData.attempts)) {
-              console.warn(`⚠️ Invalid class or attempts at index ${index}, skipping.`);
-              return null;
-            }
-
-            // סנן ניסיונות חוקיים בלבד
-            const safeAttempts = classData.attempts.filter((attempt, aIndex) => {
-              if (!attempt || !attempt.analysisResult) {
-                console.warn(`  ⚠️ Skipping attempt ${aIndex} (missing or invalid analysisResult)`);
-                return false;
+              if (!classData || !Array.isArray(classData.attempts)) {
+                console.warn(`⚠️ Invalid class or attempts at index ${index}, skipping.`);
+                return null;
               }
-              console.log(`  ✅ Attempt ${aIndex} overallScore:`, attempt.analysisResult.overallScore);
-              return true;
-            });
 
-            return (
-              <ClassProgressCard
-                key={index}
-                classData={{ ...classData, attempts: safeAttempts }}
-                isDark={isDark}
-              />
-            );
-          })}
+              const safeAttempts = classData.attempts.filter((attempt, aIndex) => {
+                if (!attempt || !attempt.analysisResult) {
+                  console.warn(`  ⚠️ Skipping attempt ${aIndex} (missing or invalid analysisResult)`);
+                  return false;
+                }
+                console.log(`  ✅ Attempt ${aIndex} overallScore:`, attempt.analysisResult.overallScore);
+                return true;
+              });
+
+              return (
+                <ClassProgressCard
+                  key={index}
+                  classData={{ ...classData, attempts: safeAttempts }}
+                  isDark={isDark}
+                />
+              );
+            })}
         </div>
       </main>
 

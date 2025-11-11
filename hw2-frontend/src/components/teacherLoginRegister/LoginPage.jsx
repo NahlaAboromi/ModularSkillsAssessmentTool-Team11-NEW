@@ -8,152 +8,167 @@ import FormInput from "../FormInput";
 import Button from "../Button";
 import Alert from "../Alert";
 
+import { useI18n } from "../../utils/i18n";
+import { LanguageContext } from "../../context/LanguageContext";
+
 /**
  * Teacher Login Page
- * 
- *login form for teachers, authenticates credentials,
+ * login form for teachers, authenticates credentials,
  * and navigates to the teacher dashboard upon successful login.
- * Supports dark/light theme and displays error messages.
  */
 
 const LoginContent = () => {
-  // Get login method from UserContext
+  // contexts
   const { login } = useContext(UserContext);
-   // Get current theme from ThemeContext
   const { theme } = useContext(ThemeContext);
-  const isDark = theme === 'dark';
-  // React Router navigation
+  const { lang } = useContext(LanguageContext) || { lang: "he" };
+
+  // i18n
+  const { t, dir, lang: langAttr, ready } = useI18n("teacherLogin");
+  const isDark = theme === "dark";
+
+  // router + state
   const navigate = useNavigate();
-    // Form state: teacher ID and password
   const [form, setForm] = useState({ id: "", password: "" });
-  // Loading and error state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-   // Handle input changes for both ID and password fields
+  if (!ready) return null; // טעינה מהירה של המילון כדי למנוע FOUC
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
   };
 
-   // Handle form submission for login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-      // Validate required fields
+
     if (!form.id || !form.password) {
-      setError("Please fill in both ID and Password.");
+      setError(t("errFillBoth"));
       setIsLoading(false);
       return;
     }
-     // Send login request to backend
+
     try {
-      const response = await fetch('/api/teachers/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/teachers/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+
       if (response.ok) {
-         // On success, update user context and navigate to teacher dashboard
         const data = await response.json();
         login(data.teacher);
         navigate("/teacher/Teacher");
       } else {
-          // On failure, show error message from backend
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
+        const errorData = await response.json().catch(() => ({}));
+        setError(errorData.message || t("errLoginFailed"));
       }
-    } catch (error) {
-      console.error("❌ Login error:", error);
-      setError("Login error. Please try again later.");
+    } catch (e2) {
+      console.error("❌ Login error:", e2);
+      setError(t("errLoginGeneric"));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={`min-h-screen w-screen flex flex-col ${isDark ? 'bg-slate-900 text-white' : 'bg-gray-50 text-slate-900'}`}>
-      
-      {/* Header section */}
+    <div
+      dir={dir}
+      lang={langAttr}
+      className={`min-h-screen w-screen flex flex-col ${
+        isDark ? "bg-slate-900 text-white" : "bg-gray-50 text-slate-900"
+      }`}
+    >
+      {/* Header */}
       <div className="px-4 mt-4">
         <SharedHeader />
       </div>
-  
-       {/* Main login form content */}
-      <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 w-full">   
-         <div className={`max-w-md w-full space-y-8 ${isDark ? 'bg-slate-800' : 'bg-white'} p-10 rounded-xl shadow-lg`}>
-                {/* Logo and instructions */}
-              <div className="flex flex-col items-center space-y-2">
-                  <img src="/educator-icon.png" alt="Educator" className="w-16 h-16" />
-                <h2 className="text-3xl font-extrabold text-center">Teacher Login</h2>
-                <p className="text-xs text-center">
-                  Sign in to manage your classes and view student performance.
-                </p>
-              </div>
-                 {/* Error alert */}
-            {error && <Alert type="error" message={error} />}
-            {/* Login form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-4">
+
+      {/* Main */}
+      <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 w-full">
+        <div
+          className={`max-w-md w-full space-y-8 ${
+            isDark ? "bg-slate-800" : "bg-white"
+          } p-10 rounded-xl shadow-lg`}
+        >
+          {/* Logo + Title */}
+          <div className="flex flex-col items-center space-y-2">
+            <img src="/educator-icon.png" alt={t("altEducator")} className="w-16 h-16" />
+            <h2 className="text-3xl font-extrabold text-center">{t("title")}</h2>
+            <p className="text-xs text-center">{t("subtitle")}</p>
+          </div>
+
+          {/* Error */}
+          {error && <Alert type="error" message={error} />}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-4">
               <FormInput
                 id="id"
                 name="id"
-                label="ID"
-                placeholder="Enter your ID"
+                label={t("fieldIdLabel")}
+                placeholder={t("fieldIdPlaceholder")}
                 value={form.id}
                 onChange={handleChange}
+                autoComplete="username"
               />
               <FormInput
                 id="password"
                 name="password"
                 type="password"
-                label="Password"
-                placeholder="Enter your password"
+                label={t("fieldPasswordLabel")}
+                placeholder={t("fieldPasswordPlaceholder")}
                 value={form.password}
                 onChange={handleChange}
+                autoComplete="current-password"
               />
-              </div>
-                 {/* Forgot password link */}
-              <div className="text-sm mb-2">
-                <Link to="/forgot-password?role=teacher" className="text-blue-500 hover:underline">
-                  Forgot your password?
-                </Link>
-              </div>
-               {/* Submit button */}
-              <Button type="submit" isLoading={isLoading} fullWidth variant="primary">
-                Sign in
-              </Button>
-            </form>
-                {/* Registration link */}
-            <p className="mt-4 text-sm text-center">
-              Don't have an account?{" "}
-              <Link to="/register?role=teacher" className="text-blue-500 hover:underline">
-                Register now
+            </div>
+
+            {/* Forgot */}
+            <div className="text-sm mb-2">
+              <Link
+                to="/forgot-password?role=teacher"
+                className="text-blue-500 hover:underline"
+              >
+                {t("forgot")}
               </Link>
-            </p>
-          
+            </div>
+
+            {/* Submit */}
+            <Button type="submit" isLoading={isLoading} fullWidth variant="primary">
+              {t("btnSignIn")}
+            </Button>
+          </form>
+
+          {/* Register */}
+          <p className="mt-4 text-sm text-center">
+            {t("noAccount")}{" "}
+            <Link to="/register?role=teacher" className="text-blue-500 hover:underline">
+              {t("registerNow")}
+            </Link>
+          </p>
         </div>
       </main>
 
-    {/* Footer section */}
+      {/* Footer */}
       <div className="px-4 pb-4">
         <Footer />
       </div>
     </div>
   );
 };
+
 /**
- * Login
- * 
- * Wraps the login content with the ThemeProvider to provide theme context.
+ * Wrapper with ThemeProvider
  */
-const Login = () => {
-  return (
-    <ThemeProvider>
-      <LoginContent />
-    </ThemeProvider>
-  );
-};
+const Login = () => (
+  <ThemeProvider>
+    <LoginContent />
+  </ThemeProvider>
+);
 
 export default Login;

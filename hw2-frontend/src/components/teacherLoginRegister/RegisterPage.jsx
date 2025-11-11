@@ -1,6 +1,6 @@
 // pages/RegisterPage.jsx 
 import React, { useState, useContext } from "react";
-import { Link, useNavigate ,useLocation} from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ThemeContext } from '../../DarkLightMood/ThemeContext';
 import ThemeToggle from '../../DarkLightMood/ThemeToggle';
 import FormInput from '../FormInput';
@@ -10,54 +10,59 @@ import Footer from "../../layout/Footer";
 import SharedHeader from "../../layoutForEducatorsAndStudents/SharedHeader";
 import { ThemeProvider } from "../../DarkLightMood/ThemeContext";
 import { UserProvider } from "../../context/UserContext";
-// This component implements a two-step registration page for students and teachers,
+
+import { useI18n } from "../../utils/i18n";
+import { LanguageContext } from "../../context/LanguageContext";
+
 const RegisterPage = () => {
   const { theme } = useContext(ThemeContext);
-   // Get current theme (dark/light) from context
   const isDark = theme === 'dark';
   const location = useLocation();
   const navigate = useNavigate();
-  // Determine user role from URL query string (default: student)
-   const searchParams = new URLSearchParams(location.search);
+  const searchParams = new URLSearchParams(location.search);
   const role = searchParams.get("role") || "student";
-   // Form state for user input fields
+
+  // i18n
+  const { t, dir, lang: langAttr, ready } = useI18n("register");
+  const { lang } = useContext(LanguageContext) || { lang: "he" };
+
   const [form, setForm] = useState({
     username: '',
     id: '',
     email: '',
     password: ''
   });
-  // State for profile picture (Base64), skip flag, loading, error, and step
+
   const [profilePicBase64, setProfilePicBase64] = useState("");
   const [skipProfilePic, setSkipProfilePic] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [step, setStep] = useState(1); // 1 = basic info, 2 = profile pic
 
+  if (!ready) return null; // למנוע FOUC קצר
 
- // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    setError(""); // Clear error when user starts typing
+    setError("");
   };
-   // Handle profile picture file selection
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 5000000) { // 5MB limit
-        setError("Image is too large. Please upload an image under 5MB");
+      if (file.size > 5000000) { // 5MB
+        setError(t("errImageLarge"));
         return;
       }
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePicBase64(reader.result);
-        setSkipProfilePic(false); // Disable skip if image uploaded
+        setSkipProfilePic(false);
       };
       reader.readAsDataURL(file);
     }
   };
-   // Handle skip profile picture
+
   const handleSkipProfilePic = () => {
     setSkipProfilePic(true);
     setProfilePicBase64("");
@@ -65,91 +70,83 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
-    
-    // Internal function for email validation
+    setError("");
+
     const isValidEmail = (email) => /^[^\s@]+@gmail\.com$/.test(email);
-      // Step 1: Validate basic info
+
     if (step === 1) {
-      // Validate all fields
       if (!form.username || !form.id || !form.email || !form.password) {
-        setError("Please fill in all required fields.");
+        setError(t("errFillAll"));
         return;
       }
       if (!isValidEmail(form.email)) {
-        setError("Please enter a valid Gmail address (@gmail.com).");
+        setError(t("errGmailOnly"));
         return;
       }
       if (form.password.length < 6) {
-        setError("Password must be at least 6 characters long.");
+        setError(t("errPasswordLen"));
         return;
       }
       if (!/^\d{9}$/.test(form.id)) {
-        setError("ID must be exactly 9 digits.");
+        setError(t("errIdDigits"));
         return;
       }
-      
-      // Move to next step
-      setStep(2);// Move to profile picture step
+      setStep(2);
       return;
     }
-    
-    // Step 2: Require profile picture or skip
+
     if (!profilePicBase64 && !skipProfilePic) {
-      setError("Please select a profile picture or choose to skip");
+      setError(t("errNeedPicOrSkip"));
       return;
     }
-    
+
     setIsLoading(true);
     setError("");
-    
+
     try {
-       // Use default placeholder if skipping profile picture
-      const profilePicToSend = skipProfilePic ? 
-        "default_empty_profile_pic" : 
-        profilePicBase64;
-      // Send registration request 
+      const profilePicToSend = skipProfilePic ? "default_empty_profile_pic" : profilePicBase64;
+
       const response = await fetch(
-        role === "teacher"
-          ? "/api/teachers/register"
-          : "/api/students/register",
+        role === "teacher" ? "/api/teachers/register" : "/api/students/register",
         {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          ...form, 
-          profilePic: profilePicToSend,
-          useDefaultProfilePic: skipProfilePic 
-        }),
-      });
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...form,
+            profilePic: profilePicToSend,
+            useDefaultProfilePic: skipProfilePic
+          }),
+        }
+      );
 
       if (response.ok) {
-         // Registration successful, redirect to login page
-        const savedStudent = await response.json();
+        await response.json(); // savedStudent (לא משנים לוגיקה)
         setError("");
         const loginPage = role === "teacher" ? "/login" : "/student-login";
         setTimeout(() => navigate(loginPage), 2500);
       } else {
-        // Show error message from server
         const errorData = await response.json();
-        setError(errorData.message || "Registration failed");
+        setError(errorData.message || t("errRegisterFail"));
       }
-    } catch (error) {
-      console.error("❌ Registration error:", error);
-      setError("Registration error. Please try again later.");
+    } catch (err) {
+      console.error("❌ Registration error:", err);
+      setError(t("errRegisterGeneric"));
     } finally {
       setIsLoading(false);
     }
   };
-   // Go back to previous step (basic info)
+
   const goBack = () => {
     setStep(1);
-    setError(""); // Clear any errors when going back
+    setError("");
   };
 
   return (
-  <div className={`min-h-screen w-screen flex flex-col ${isDark ? 'bg-slate-900 text-white' : 'bg-gray-50 text-slate-900'}`}>
-    
+    <div
+      dir={dir}
+      lang={langAttr}
+      className={`min-h-screen w-screen flex flex-col ${isDark ? 'bg-slate-900 text-white' : 'bg-gray-50 text-slate-900'}`}
+    >
       {/* Header */}
       <div className="px-4 mt-4">
         <SharedHeader />
@@ -158,21 +155,21 @@ const RegisterPage = () => {
       <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 w-full">
         <div className={`max-w-md w-full space-y-8 ${isDark ? 'bg-slate-800' : 'bg-white'} p-10 rounded-xl shadow-lg`}>
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold">Create your account</h2>
+            <h2 className="mt-6 text-center text-3xl font-extrabold">{t("title")}</h2>
             <p className="mt-2 text-center text-sm">
-              Already have an account?{' '}
-              <Link 
-                to={role === "teacher" ? "/login" : "/student-login"} 
+              {t("haveAccount")}{" "}
+              <Link
+                to={role === "teacher" ? "/login" : "/student-login"}
                 className="font-medium text-blue-500 hover:text-blue-600"
               >
-                Sign in
+                {t("signIn")}
               </Link>
-
             </p>
           </div>
-             {/* Error Alert */}
+
           {error && <Alert type="error" message={error} />}
-            {/* Stepper Progress Indicator */}
+
+          {/* Stepper */}
           <div className="flex justify-center">
             <div className="w-full">
               <div className="flex items-center w-full mb-6">
@@ -188,9 +185,9 @@ const RegisterPage = () => {
                 </div>
                 <div className={`flex-1 border-t-2 ${step >= 3 ? 'border-blue-500' : 'border-gray-300'}`}></div>
               </div>
-              
+
               <h3 className="text-center font-medium text-xl mb-6">
-                {step === 1 ? 'Basic Information' : 'Profile Picture'}
+                {step === 1 ? t("step1Title") : t("step2Title")}
               </h3>
 
               <form className="space-y-6" onSubmit={handleSubmit}>
@@ -198,13 +195,13 @@ const RegisterPage = () => {
                   <div className="space-y-4">
                     <div>
                       <label htmlFor="username" className="block text-sm font-medium mb-1">
-                        Username
+                        {t("fUsername")}
                       </label>
                       <input
                         id="username"
                         name="username"
                         type="text"
-                        placeholder="Enter username"
+                        placeholder={t("pUsername")}
                         value={form.username}
                         onChange={handleChange}
                         required
@@ -215,16 +212,16 @@ const RegisterPage = () => {
                         }`}
                       />
                     </div>
-                    
+
                     <div>
                       <label htmlFor="id" className="block text-sm font-medium mb-1">
-                        ID
+                        {t("fId")}
                       </label>
                       <input
                         id="id"
                         name="id"
                         type="text"
-                        placeholder="Enter your 9-digit ID"
+                        placeholder={t("pId")}
                         value={form.id}
                         onChange={handleChange}
                         maxLength="9"
@@ -237,16 +234,16 @@ const RegisterPage = () => {
                         }`}
                       />
                     </div>
-                    
+
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium mb-1">
-                        Email
+                        {t("fEmail")}
                       </label>
                       <input
                         id="email"
                         name="email"
                         type="email"
-                        placeholder="Enter your email address"
+                        placeholder={t("pEmail")}
                         value={form.email}
                         onChange={handleChange}
                         required
@@ -257,16 +254,16 @@ const RegisterPage = () => {
                         }`}
                       />
                     </div>
-                    
+
                     <div>
                       <label htmlFor="password" className="block text-sm font-medium mb-1">
-                        Password
+                        {t("fPassword")}
                       </label>
                       <input
                         id="password"
                         name="password"
                         type="password"
-                        placeholder="Create a password (min 6 characters, include letters)"
+                        placeholder={t("pPassword")}
                         value={form.password}
                         onChange={handleChange}
                         minLength="6"
@@ -278,14 +275,12 @@ const RegisterPage = () => {
                         }`}
                       />
                     </div>
-                    
                   </div>
                 ) : (
-                   // Step 2: Profile Picture Upload/Skip
                   <div className="space-y-6">
                     <div className="flex flex-col items-center justify-center">
-                      <label className="block text-sm font-medium mb-4">Profile Picture</label>
-                          {/* If skipped, show placeholder and change option */}
+                      <label className="block text-sm font-medium mb-4">{t("profilePic")}</label>
+
                       {skipProfilePic ? (
                         <div className="mb-4 relative">
                           <div className={`w-40 h-40 rounded-full border-4 ${isDark ? 'border-slate-600 bg-slate-700' : 'border-gray-300 bg-gray-200'} flex items-center justify-center overflow-hidden`}>
@@ -303,21 +298,22 @@ const RegisterPage = () => {
                             onClick={() => setSkipProfilePic(false)}
                             className="mt-2 text-sm text-blue-500 hover:text-blue-700"
                           >
-                            Change
+                            {t("btnChange")}
                           </button>
                         </div>
                       ) : profilePicBase64 ? (
-                         // If picture uploaded, show preview and remove option
                         <div className="mb-4 relative">
                           <img
                             src={profilePicBase64}
-                            alt="Profile preview"
+                            alt={t("altProfilePreview")}
                             className="w-40 h-40 object-cover rounded-full border-4 border-blue-500"
                           />
                           <button
                             type="button"
                             onClick={() => setProfilePicBase64("")}
                             className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 shadow-lg"
+                            aria-label={t("btnRemovePic")}
+                            title={t("btnRemovePic")}
                           >
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -325,17 +321,16 @@ const RegisterPage = () => {
                           </button>
                         </div>
                       ) : (
-                            // No picture yet: show upload area
                         <div className={`mb-4 w-40 h-40 flex items-center justify-center rounded-full border-4 border-dashed ${isDark ? 'border-slate-600' : 'border-gray-300'}`}>
                           <svg xmlns="http://www.w3.org/2000/svg" className={`h-20 w-20 ${isDark ? 'text-slate-500' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                         </div>
                       )}
-                       
+
                       <div className="flex flex-col sm:flex-row gap-3 items-center">
                         <label className={`cursor-pointer px-4 py-2 rounded-md ${isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white transition`}>
-                          <span>Select image</span>
+                          <span>{t("btnSelectImage")}</span>
                           <input
                             type="file"
                             className="hidden"
@@ -343,19 +338,19 @@ const RegisterPage = () => {
                             onChange={handleImageChange}
                           />
                         </label>
-                        
+
                         <button
                           type="button"
                           onClick={handleSkipProfilePic}
                           className={`px-4 py-2 rounded-md ${isDark ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-300 hover:bg-gray-400'} transition`}
                         >
-                          Skip for now
+                          {t("btnSkip")}
                         </button>
                       </div>
-                      
+
                       {skipProfilePic && (
                         <p className={`mt-3 text-sm text-center ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
-                          A default blank profile picture will be used. You can add your photo later.
+                          {t("skipNote")}
                         </p>
                       )}
                     </div>
@@ -364,26 +359,21 @@ const RegisterPage = () => {
 
                 <div className="flex items-center justify-between pt-4">
                   {step > 1 ? (
-                    <Button
-                      type="button"
-                      onClick={goBack}
-                      variant="secondary"
-                    >
-                      Back
+                    <Button type="button" onClick={goBack} variant="secondary">
+                      {t("btnBack")}
                     </Button>
                   ) : (
                     <div></div>
                   )}
-                  
+
                   <Button
                     type="submit"
                     isLoading={isLoading}
                     variant="primary"
                     className={`${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     disabled={isLoading}
-                    >
-                  
-                    {step === 1 ? 'Continue' : 'Register'}
+                  >
+                    {step === 1 ? t("btnContinue") : t("btnRegister")}
                   </Button>
                 </div>
               </form>
@@ -391,6 +381,7 @@ const RegisterPage = () => {
           </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );

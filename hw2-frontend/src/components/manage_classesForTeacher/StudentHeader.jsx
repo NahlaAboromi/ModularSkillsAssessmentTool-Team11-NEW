@@ -1,21 +1,32 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { LanguageContext } from '../../context/LanguageContext';
+import { useI18n } from '../../utils/i18n';
 
 /**
  * StudentHeader
- * Displays the student's profile picture, name, ID, and the number of completed simulations.
- * Used as a header section in student report cards or similar views.
+ * Displays student's profile image, name, ID, and completed simulations count.
  */
-const StudentHeader = ({ 
-  profilePic, 
-  onImageError, 
-  username, 
-  studentId, 
-  simulationCount, 
-  isDark 
+const StudentHeader = ({
+  profilePic,
+  onImageError,
+  username,
+  studentId,
+  simulationCount,
+  isDark
 }) => {
+  const { lang } = useContext(LanguageContext) || { lang: 'he' };
+  const { t, dir, ready } = useI18n('studentHeader');
+  if (!ready) return null;
+
+  const name = username || t('unknown');
+  const simsText =
+    simulationCount === 1
+      ? t('simulationsOne')
+      : (t('simulationsMany') || '').replace('{n}', String(simulationCount));
+
   return (
-    <div className="flex items-center gap-4 mb-4">
-      {/* Student profile image, with fallback on error */}
+    <div className="flex items-center gap-4 mb-4" dir={dir} lang={lang}>
+      {/* Student profile image */}
       <img
         src={profilePic}
         onError={onImageError}
@@ -24,19 +35,18 @@ const StudentHeader = ({
           isDark ? 'border-slate-500' : 'border-gray-300'
         }`}
       />
+
       <div>
-        {/* Student's name or 'Unknown Student' if missing */}
-        <p className="text-base font-semibold">
-          {username || 'Unknown Student'}
-        </p>
-        {/* Student ID, styled according to theme */}
+        {/* Student's name */}
+        <p className="text-base font-semibold">{name}</p>
+
+        {/* Student ID */}
         <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
-          Student ID: {studentId}
+          {t('studentId')} {studentId}
         </p>
-        {/* Number of completed simulations, with pluralization */}
-        <p className="text-sm">
-          📊 <strong>{simulationCount}</strong> Simulation{simulationCount > 1 ? 's' : ''} Completed
-        </p>
+
+        {/* Completed simulations */}
+        <p className="text-sm">{simsText}</p>
       </div>
     </div>
   );

@@ -8,14 +8,24 @@ import StudentAnswerCard from './StudentAnswerCard';
 import { UserContext } from '../../context/UserContext';
 import AIChat from '../../AI/AIChat';
 
+// ✅ i18n
+import { LanguageContext } from '../../context/LanguageContext';
+import { useI18n } from '../../utils/i18n';
+
 const ClassDetailsContent = () => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
-const { classCode: encoded } = useParams();
-const classCode = decodeURIComponent(encoded || '');
+
+  const { classCode: encoded } = useParams();
+  const classCode = decodeURIComponent(encoded || '');
+
   const [classInfo, setClassInfo] = useState(null);
   const [classInsight, setClassInsight] = useState('');
   const { user } = useContext(UserContext);
+
+  // ---- language / rtl ----
+  const { lang } = useContext(LanguageContext) || { lang: 'he' };
+  const { t, dir, ready } = useI18n('classDetails');
 
   // ===== DEBUG: mount =====
   console.groupCollapsed('[ClassDetails] mount');
@@ -35,7 +45,6 @@ const classCode = decodeURIComponent(encoded || '');
         const t1 = performance.now();
         console.log('response.ok:', res.ok, 'status:', res.status, 'statusText:', res.statusText, `(${(t1 - t0).toFixed(1)}ms)`);
 
-        // נרשום גם את כותרות התשובה
         console.log('response headers:', Array.from(res.headers.entries()));
 
         const data = await res.json().catch(e => {
@@ -84,13 +93,13 @@ const classCode = decodeURIComponent(encoded || '');
         setClassInsight(data.insight);
         console.log('✅ insight set. length:', (data.insight || '').length);
       } else {
-        const msg = `⚠️ ${data?.message || 'Unknown error'}`;
+        const msg = `⚠️ ${data?.message || ''}`.trim() || t('aiServerError');
         setClassInsight(msg);
         console.warn('setClassInsight with warning:', msg);
       }
     } catch (error) {
       console.error('❌ Error getting AI class insight:', error);
-      setClassInsight('❌ Server error while requesting class insight.');
+      setClassInsight(t('aiServerError'));
     } finally {
       console.groupEnd();
     }
@@ -106,8 +115,15 @@ const classCode = decodeURIComponent(encoded || '');
   console.log('classInsight length:', (classInsight || '').length);
   console.groupEnd();
 
+  // ⛳️ כדי למנוע הבהוב — לא מרנדרים עד שהמילון מוכן
+  if (!ready) return null;
+
   return (
-    <div className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}>
+    <div
+      dir={dir}
+      lang={lang}
+      className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
+    >
       <div className="px-4 mt-4">
         <TeacherHeader />
       </div>
@@ -115,10 +131,11 @@ const classCode = decodeURIComponent(encoded || '');
       <main className="flex-1 w-full px-4 py-6">
         <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 rounded mb-6`}>
           <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <span role="img" aria-label="book">📘</span> Class Details
+            <span role="img" aria-label="book">📘</span> {t('title')}
           </h1>
           <p className="text-lg">
-            Class Code: <span className="bg-gray-100 dark:bg-slate-600 px-3 py-1 rounded font-mono">{classCode}</span>
+            {t('classCodeLabel')}{' '}
+            <span className="bg-gray-100 dark:bg-slate-600 px-3 py-1 rounded font-mono">{classCode}</span>
           </p>
         </div>
 
@@ -132,7 +149,7 @@ const classCode = decodeURIComponent(encoded || '');
 
             {classInsight && (
               <div className="mt-4 mb-6 p-4 rounded bg-yellow-100 text-yellow-900 shadow">
-                <h3 className="text-lg font-semibold mb-2">🧠 AI Insight for the Class:</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('aiInsightTitle')}</h3>
                 <p>{classInsight}</p>
               </div>
             )}
@@ -145,11 +162,11 @@ const classCode = decodeURIComponent(encoded || '');
                 );
               })
             ) : (
-              <p className="text-red-500">⚠️ students is not an array</p>
+              <p className="text-red-500">{t('studentsNotArray')}</p>
             )}
           </>
         ) : (
-          <p>Loading class information...</p>
+          <p>{t('loading')}</p>
         )}
       </main>
 

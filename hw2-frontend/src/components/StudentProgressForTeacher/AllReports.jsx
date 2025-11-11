@@ -6,10 +6,20 @@ import { UserContext } from '../../context/UserContext';
 import AIChat from '../../AI/AIChat';
 import StudentCard from '../../components/StudentProgressForTeacher/StudentCard';
 
+// i18n
+import { LanguageContext } from '../../context/LanguageContext';
+import { useI18n } from '../../utils/i18n';
+
 const AllReportsContent = () => {
   const { theme } = useContext(ThemeContext);
   const { user } = useContext(UserContext);
   const isDark = theme === 'dark';
+
+  // i18n (namespace: allReports)
+  const { t, dir, lang } = useI18n('allReports');
+  const { lang: currentLang } = useContext(LanguageContext) || { lang: 'he' };
+  const isRTL = currentLang === 'he';
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchId, setSearchId] = useState('');
@@ -21,10 +31,10 @@ const AllReportsContent = () => {
         setLoading(true);
         const response = await fetch(`/api/student-progress/${user.id}`);
         const data = await response.json();
-        console.log("Fetched students data:", data);
+        console.log('Fetched students data:', data);
         setStudents(data);
       } catch (error) {
-        console.error("Failed to fetch student progress:", error);
+        console.error('Failed to fetch student progress:', error);
       } finally {
         setLoading(false);
       }
@@ -33,12 +43,18 @@ const AllReportsContent = () => {
     fetchStudents();
   }, [user]);
 
-  const filteredStudents = students.filter(student =>
-    student.id.includes(searchId.trim())
+  const filteredStudents = students.filter((student) =>
+    (student?.id || '').includes(searchId.trim())
   );
 
   return (
-    <div className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}>
+    <div
+      dir={dir}
+      lang={lang}
+      className={`flex flex-col min-h-screen w-screen ${
+        isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'
+      }`}
+    >
       <div className="px-4 mt-4">
         <TeacherHeader />
       </div>
@@ -46,19 +62,20 @@ const AllReportsContent = () => {
       <main className="flex-1 w-full px-4 py-6">
         <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 rounded`}>
           <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'} mb-1`}>
-            All Students Progress
+            {t('title')}
           </h1>
           <p className={`${isDark ? 'text-gray-300' : 'text-slate-600'} mb-4`}>
-            View progress of all students who participated in your classes
+            {t('subtitle')}
           </p>
 
-          {/* 🔹 שדה חיפוש מעוצב לאורך כל הרוחב */}
-          <div className="mb-6">
+          {/* 🔹 שדה חיפוש */}
+          <div className={`mb-6 ${isRTL ? 'text-right' : 'text-left'}`}>
             <input
               type="text"
               value={searchId}
               onChange={(e) => setSearchId(e.target.value)}
-              placeholder="Search by Student ID..."
+              placeholder={t('searchPlaceholder')}
+              aria-label={t('searchAria')}
               className={`p-3 border rounded shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 isDark
                   ? 'bg-slate-600 text-white placeholder-gray-300 border-slate-500'
@@ -70,16 +87,22 @@ const AllReportsContent = () => {
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3">Loading student data...</span>
+              <span className="ml-3">{t('loading')}</span>
             </div>
           ) : filteredStudents.length === 0 ? (
-            <div className={`rounded-lg shadow-md p-6 text-center ${isDark ? 'bg-slate-600 text-gray-300' : 'bg-white text-slate-600'}`}>
-              {searchId
-                ? 'No students match this ID.'
-                : 'It looks like no students have joined your classes yet.'}
+            <div
+              className={`rounded-lg shadow-md p-6 text-center ${
+                isDark ? 'bg-slate-600 text-gray-300' : 'bg-white text-slate-600'
+              }`}
+            >
+              {searchId ? t('noMatch') : t('empty')}
             </div>
           ) : (
-            <div className={`rounded-lg shadow-md p-6 ${isDark ? 'bg-slate-600' : 'bg-white'} grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4`}>
+            <div
+              className={`rounded-lg shadow-md p-6 ${
+                isDark ? 'bg-slate-600' : 'bg-white'
+              } grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4`}
+            >
               {filteredStudents.map((student) => (
                 <StudentCard key={student.id} student={student} />
               ))}

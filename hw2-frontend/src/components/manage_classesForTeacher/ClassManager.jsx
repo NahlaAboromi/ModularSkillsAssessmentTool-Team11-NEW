@@ -7,46 +7,38 @@ import { ThemeProvider, ThemeContext } from "../../DarkLightMood/ThemeContext";
 import { UserContext } from '../../context/UserContext';
 import AIChat from '../../AI/AIChat';
 
+// ✅ i18n
+import { LanguageContext } from '../../context/LanguageContext';
+import { useI18n } from '../../utils/i18n';
 
- //This component is responsible for displaying and managing the teacher's classes.
- 
 const ClassManagerContent = () => {
-  // Access theme from ThemeContext
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
 
-  // Access current user from UserContext
   const { user } = useContext(UserContext);
 
-  // State for classes, loading, errors, and filters
+  // ---- language / rtl ----
+  const { lang } = useContext(LanguageContext) || { lang: 'he' };
+  const { t, dir, ready } = useI18n('classManager');
+
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [classCodeFilter, setClassCodeFilter] = useState('');
 
-  /**
-   * useEffect to fetch classes when the component mounts or when the user changes.
-   * Fetches classes for the current teacher from the backend API.
-   */
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        // Check if user ID exists
         if (!user?.id) {
-          setError('No user ID found.');
+          setError('No user ID found.'); // נשאיר הודעת דיבוג באנגלית כבעבר
           setLoading(false);
           return;
         }
-
-        // Fetch classes from API
         const response = await fetch(`/api/classes/teacher/${user.id}`);
         const data = await response.json();
 
-        console.log("📦 Response from server:", data);
-
         if (response.ok) {
-          // Format the data for the UI
           const formattedData = data.map((item) => ({
             _id: item._id || '',
             classCode: item.classCode || item.id || '',
@@ -55,9 +47,6 @@ const ClassManagerContent = () => {
             createdAt: item.createdAt || item.createdDate || '',
             studentsTaken: item.students || [],
           }));
-
-          console.log("📚 Formatted classes:", formattedData);
-
           setClasses(formattedData);
           setError('');
         } else {
@@ -70,22 +59,28 @@ const ClassManagerContent = () => {
         setLoading(false);
       }
     };
-
     fetchClasses();
   }, [user]);
 
-  /**
-   * Filter classes based on search term and class code filter.
-   */
   const filteredClasses = classes.filter(classData => {
-    const matchesSearch = searchTerm === '' ||
-      classData.className.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesClassCode = classCodeFilter === '' || classData.classCode.includes(classCodeFilter);
+    const matchesSearch =
+      searchTerm === '' ||
+      (classData.className || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesClassCode =
+      classCodeFilter === '' ||
+      (classData.classCode || '').includes(classCodeFilter);
     return matchesSearch && matchesClassCode;
   });
 
+  // למניעת הבהוב לפני טעינת המילון
+  if (!ready) return null;
+
   return (
-    <div className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}>
+    <div
+      dir={dir}
+      lang={lang}
+      className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
+    >
       {/* Page Header */}
       <div className="px-4 mt-4">
         <TeacherHeader />
@@ -93,9 +88,9 @@ const ClassManagerContent = () => {
 
       <main className="flex-1 w-full px-4 py-6">
         <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 rounded`}>
-          <h1 className="text-2xl font-bold mb-1">Manage My Classes</h1>
+          <h1 className="text-2xl font-bold mb-1">{t('title')}</h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            View and manage all your classes and student progress in one place
+            {t('subtitle')}
           </p>
 
           {/* Search and Filter Section */}
@@ -105,7 +100,7 @@ const ClassManagerContent = () => {
               <div className="flex-1 relative">
                 <input
                   type="text"
-                  placeholder="Search classes by name..."
+                  placeholder={t('searchPlaceholder')}
                   className="w-full py-2 px-4 pr-10 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -130,7 +125,7 @@ const ClassManagerContent = () => {
               <div className="flex gap-4 flex-wrap md:flex-nowrap">
                 <input
                   type="text"
-                  placeholder="Class Code..."
+                  placeholder={t('codePlaceholder')}
                   className="py-2 px-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={classCodeFilter}
                   onChange={(e) => setClassCodeFilter(e.target.value)}
@@ -142,35 +137,27 @@ const ClassManagerContent = () => {
           {/* Classes List */}
           <div className="grid grid-cols-1 gap-6">
             {loading ? (
-              // Loading State
-              <div className="text-center py-10">Loading classes...</div>
+              <div className="text-center py-10">{t('loading')}</div>
             ) : error ? (
-              // Error State
               <div className="bg-red-100 dark:bg-red-500 p-5 rounded text-center">
-                <p>{error}</p>
+                <p>{t('errorBox')}<br />{error}</p>
               </div>
             ) : filteredClasses.length === 0 ? (
-              // Empty State
               <div className="bg-white dark:bg-slate-600 p-5 rounded text-center">
-                <p>No classes found.</p>
+                <p>{t('empty')}</p>
               </div>
             ) : (
-              // Render Class Cards
               filteredClasses
                 .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                .map((classData) => {
-                  console.log("🎯 Rendering ClassCard with:", classData);
-                  return (
-                       <ClassCard
-                         key={classData._id || classData.classCode}
-                         classData={classData}
-                         onDeleteSuccess={(deletedClassCode) => {
-                           setClasses(prev => prev.filter(c => c.classCode !== deletedClassCode));
-                         }}
-                       />
-                     );
-
-                })
+                .map((classData) => (
+                  <ClassCard
+                    key={classData._id || classData.classCode}
+                    classData={classData}
+                    onDeleteSuccess={(deletedClassCode) => {
+                      setClasses(prev => prev.filter(c => c.classCode !== deletedClassCode));
+                    }}
+                  />
+                ))
             )}
           </div>
 
@@ -195,11 +182,12 @@ const ClassManagerContent = () => {
                 <line x1="12" y1="8" x2="12" y2="16" />
                 <line x1="8" y1="12" x2="16" y2="12" />
               </svg>
-              <span>Create New Class</span>
+              <span>{t('createBtn')}</span>
             </Link>
           </div>
         </div>
       </main>
+
       {/* AI Chat for Teacher Assistance */}
       {user?.id && <AIChat teacherId={user.id} />}
 
@@ -211,11 +199,6 @@ const ClassManagerContent = () => {
   );
 };
 
-/**
- * ClassManager Component
- * 
- * Wraps ClassManagerContent with ThemeProvider to provide theme context.
- */
 const ClassManager = () => (
   <ThemeProvider>
     <ClassManagerContent />

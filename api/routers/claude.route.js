@@ -90,6 +90,9 @@ router.post('/generate-situation', async (req, res) => {
     console.log("Claude /generate-situation endpoint called with body:", JSON.stringify(req.body, null, 2));
      // Extract topic, maxWords, and previousSituations from the request
     const { topic, maxWords = 50, previousSituations = 0 } = req.body;
+    const lang = req.body.language || req.get('X-Teacher-Lang') || 'he';
+const languageNote = lang === 'he' ? 'Answer fully in Hebrew.' : 'Answer fully in English.';
+
       // Validate that a topic was provided
     if (!topic) {
       console.log("No topic provided in request");
@@ -117,7 +120,8 @@ router.post('/generate-situation', async (req, res) => {
           "question": "your open-ended question here"
         }
         
-        Only provide the JSON response, nothing else.`
+        Only provide the JSON response, nothing else.
+        ${languageNote}`
       }
     ];
 

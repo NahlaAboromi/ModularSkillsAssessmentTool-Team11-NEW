@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import ConfirmModal from './ConfirmModal';
+import { LanguageContext } from "../../context/LanguageContext";
+import { useI18n } from "../../utils/i18n";
+
+
 
 /**
  * ClassCard component displays a summary card for a class,
  * including statistics and actions such as view, reports, and delete.
  */
 const ClassCard = ({ classData, onDeleteSuccess }) => {
-  // State for showing the delete confirmation modal
+  const { lang } = useContext(LanguageContext) || { lang: 'he' };
+  const isRTL = lang === 'he';
+  const locale = lang === 'he' ? 'he-IL' : 'en-US';
+  const { t, ready } = useI18n('classCard');
+
   const [showConfirm, setShowConfirm] = useState(false);
-  // State for indicating if the delete operation is in progress
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Formats a date string to a readable format (e.g., June 2, 2025)
+  // Guard קטן למניעת הבהוב מפתחות
+  if (!ready) return null;
+
+  // Formats a date string to a readable localized format
   const formatDate = (dateString) => {
-    if (!dateString) return 'Unknown';
+    if (!dateString) return t('misc.unknown');
     const date = new Date(dateString);
-    if (isNaN(date)) return 'Unknown';
+    if (isNaN(date)) return t('misc.unknown');
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
+    return date.toLocaleDateString(locale, options);
   };
 
   // Returns a Tailwind background color class based on the percentage
@@ -39,27 +49,26 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
 
   // Count unique students by their studentId
   const uniqueStudentIds = new Set();
-  students.forEach(student => {
-    if (student.studentId) {
-      uniqueStudentIds.add(student.studentId);
-    }
+  students.forEach((student) => {
+    if (student.studentId) uniqueStudentIds.add(student.studentId);
   });
   const totalStudents = uniqueStudentIds.size;
 
-  // Calculate the average SEL score (out of 5), rounded to one decimal place
-  const averageScore = studentsWithScores.length > 0
-    ? (
-        studentsWithScores.reduce(
-          (sum, student) => sum + student.analysisResult.overallScore,
-          0
-        ) / studentsWithScores.length
-      ).toFixed(1)
-    : "0.0";
+  // Average SEL score (out of 5)
+  const averageScore =
+    studentsWithScores.length > 0
+      ? (
+          studentsWithScores.reduce(
+            (sum, student) => sum + student.analysisResult.overallScore,
+            0
+          ) / studentsWithScores.length
+        ).toFixed(1)
+      : '0.0';
 
-  // Convert the average score to a percentage (0-100)
+  // Convert to percentage
   const averageScorePercent = Math.round((parseFloat(averageScore) / 5) * 100);
 
-  // Count the total number of simulation attempts across all students
+  // Total attempts across all students
   const totalAttempts = students.reduce((sum, student) => {
     if (Array.isArray(student.simulations)) {
       return sum + student.simulations.length;
@@ -69,72 +78,81 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
     return sum;
   }, 0);
 
-  // Count unique students who have at least one attempt or a score
+  // Unique students with attempts or score
   const studentIdsWithAttempts = new Set();
-  students.forEach(student => {
+  students.forEach((student) => {
     const hasSimulations = Array.isArray(student.simulations) && student.simulations.length > 0;
     const hasScore = student.analysisResult && typeof student.analysisResult.overallScore === 'number';
-
     if (hasSimulations || hasScore) {
-      if (student.studentId) {
-        studentIdsWithAttempts.add(student.studentId);
-      } else if (student._id) {
-        studentIdsWithAttempts.add(student._id);
-      } else {
-        studentIdsWithAttempts.add(JSON.stringify(student));
-      }
+      if (student.studentId) studentIdsWithAttempts.add(student.studentId);
+      else if (student._id) studentIdsWithAttempts.add(student._id);
+      else studentIdsWithAttempts.add(JSON.stringify(student));
     }
   });
   const uniqueStudents = studentIdsWithAttempts.size;
 
-  // Handles deleting the class: calls the API and reloads the page if successful
+  // Delete handler
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/classes/delete/${classData.classCode}`, {
-        method: 'DELETE',
-      });
-
+      const response = await fetch(`/api/classes/delete/${classData.classCode}`, { method: 'DELETE' });
       const data = await response.json();
 
-        if (response.ok) {
-              setShowConfirm(false);
-              onDeleteSuccess(classData.classCode);
+      if (response.ok) {
+        setShowConfirm(false);
+        onDeleteSuccess(classData.classCode);
       } else {
-        alert("Error deleting class: " + data.message);
+        alert(t('toasts.deleteError') + ': ' + data.message);
       }
     } catch (err) {
       console.error(err);
-      alert("Server error");
+      alert(t('toasts.serverError'));
     } finally {
       setIsDeleting(false);
     }
   };
 
+  // טקסטים עם מספרים—בלי פלורליזציה חכמה כדי לא לשנות util:
+  const studentsBadgeText =
+    lang === 'he'
+      ? `${totalStudents} ${t('badges.students_he')}`
+      : `${totalStudents} ${t('badges.students_en')}`;
+
+  const attemptsTitle = t('stats.attemptsTitle');
+  const attemptsLine =
+    lang === 'he'
+      ? `${totalAttempts} ${t('stats.attempts_he')}`
+      : `${totalAttempts} ${t('stats.attempts_en', '')}${totalAttempts !== 1 ? 's' : ''}`;
+
+  const completedByLine =
+    lang === 'he'
+      ? `${t('stats.completedBy_he.prefix')} ${uniqueStudents} ${t('stats.completedBy_he.suffix')}`
+      : `${t('stats.completedBy_en.prefix')} ${uniqueStudents} ${t('stats.completedBy_en.suffix')}${uniqueStudents !== 1 ? 's' : ''}`;
+
   return (
-    <div className="bg-white dark:bg-slate-700 rounded shadow class-card relative">
-      {/* Header: class code, name, creation date, status */}
+    <div dir={isRTL ? 'rtl' : 'ltr'} lang={lang} className="bg-white dark:bg-slate-700 rounded shadow class-card relative">
+      {/* Header */}
       <div className="p-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
             {classData.classCode}: {classData.className}
           </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Created: {formatDate(classData.createdAt)}
+            {t('header.created')}: {formatDate(classData.createdAt)}
           </p>
         </div>
         <div className="flex gap-2">
           <span className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 text-xs font-medium py-1 px-2 rounded">
-            Active
+            {t('badges.active')}
           </span>
           <span className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 text-xs font-medium py-1 px-2 rounded">
-            {totalStudents} Students
+            {studentsBadgeText}
           </span>
         </div>
       </div>
 
       <div className="p-4">
-        {/* Show subject if exists */}
+        {/* Subject */}
         {classData.subject && (
           <div className="mb-4 flex flex-wrap gap-2">
             <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100 text-xs font-medium py-1 px-2 rounded">
@@ -143,42 +161,39 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
           </div>
         )}
 
-        {/* Show message if there are no students */}
+        {/* No students */}
         {totalStudents === 0 && (
-          <p className="text-sm text-gray-400 italic mb-4">
-            No students in this class yet
-          </p>
+          <p className="text-sm text-gray-400 italic mb-4">{t('empty.noStudents')}</p>
         )}
 
-        {/* Statistics: attempts and average score */}
+        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Attempts summary */}
           <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded">
             <h3 className="font-bold text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Simulation Attempts Summary
+              {attemptsTitle}
             </h3>
             <p className="text-xl font-bold text-gray-900 dark:text-white">
-              {totalAttempts} Attempt{totalAttempts !== 1 && 's'}
+              {attemptsLine}
             </p>
             <p className="text-sm text-gray-700 dark:text-gray-300">
-              completed by {uniqueStudents} unique student{uniqueStudents !== 1 && 's'}
+              {completedByLine}
             </p>
           </div>
 
           {/* Average SEL score */}
           <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded">
             <h3 className="font-bold text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Average SEL Score
+              {t('stats.avgSelTitle')}
             </h3>
             <div className="flex items-center justify-between mb-1">
               <div className="text-xl font-bold text-gray-900 dark:text-white">
                 {averageScore} / 5
               </div>
               <div className="text-sm text-gray-500 dark:text-gray-400">
-                SEL Average
+                {t('stats.avgSelLabel')}
               </div>
             </div>
-            {/* Progress bar for average score */}
             <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
               <div
                 className={`${getGradeColorClass(averageScorePercent)} h-3 rounded-full`}
@@ -188,17 +203,17 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
           </div>
         </div>
 
-        {/* Action buttons */}
+        {/* Actions */}
         <div className="mt-6 flex flex-wrap gap-2">
           <Link to={`/teacher/class/${encodeURIComponent(classData.classCode)}`}>
             <button className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm">
-              View Details
+              {t('actions.view')}
             </button>
           </Link>
 
           <Link to={`/teacher/class/${encodeURIComponent(classData.classCode)}/reports`}>
             <button className="bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded text-sm">
-              Student Reports
+              {t('actions.reports')}
             </button>
           </Link>
 
@@ -206,18 +221,18 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
             className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm"
             onClick={() => setShowConfirm(true)}
           >
-            Delete
+            {t('actions.delete')}
           </button>
         </div>
       </div>
 
-      {/* Confirmation modal for deletion */}
+      {/* Confirm delete */}
       <ConfirmModal
         isOpen={showConfirm}
-        title="Delete Class"
-        description="Are you sure you want to delete this class? This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
+        title={t('modal.title')}
+        description={t('modal.desc')}
+        confirmText={t('modal.confirm')}
+        cancelText={t('modal.cancel')}
         isProcessing={isDeleting}
         onCancel={() => setShowConfirm(false)}
         onConfirm={handleDelete}
