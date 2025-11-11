@@ -4,77 +4,106 @@ import { LanguageContext } from "../context/LanguageContext";
 import { ThemeContext } from "../DarkLightMood/ThemeContext";
 
 export default function LanguageSwitcher({ compact = false, disabled = false, title }) {
-    const { lang, setLang } = useContext(LanguageContext);
+  const { lang, setLang } = useContext(LanguageContext);
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
 
-  // 🎨 צבעים
-  const baseBg    = isDark ? "#1e293b" : "#f8fafc";  // רקע לא פעיל
-  const activeBg  = isDark ? "#334155" : "#e2e8f0";  // רקע פעיל
-  const baseText  = isDark ? "#f8fafc" : "#1e293b";
-  const offBorder = isDark ? "#64748b" : "#cbd5e1";
-  const onBorder  = "#3b82f6";
-
-  // מידות קשיחות לשני המצבים (מונע קפיצות)
-  const BTN_W = compact ? 40 : 48;  // px
-  const BTN_H = compact ? 30 : 36;  // px
-
-  const buttonStyle = (active) => ({
-    width: BTN_W,
-    height: BTN_H,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 8,
-    // 🧱 אותו עובי גבול בשני המצבים
-    border: `1px solid ${active ? onBorder : offBorder}`,
-    // ✅ הדגשה שלא שוברת לייאאוט
-    outline: active ? `2px solid ${onBorder}33` : "2px solid transparent",
-    outlineOffset: 2,
-    background: active ? activeBg : baseBg,
-    color: baseText,
-    cursor: "pointer",
-    fontWeight: 500,             // קבוע, לא משתנה
-    letterSpacing: 0.2,          // קלילות קבועה
-    transition: "background 0.2s ease, outline-color 0.2s ease, border-color 0.2s ease",
-    boxSizing: "border-box",     // חשוב כדי שה־outline לא ישנה מידה
-    userSelect: "none",
-  });
-
   return (
-    <div
+    <div 
       style={{
-          display: "flex",
-        gap: 8,
-        alignItems: "center",
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 0,
+        padding: '4px',
+        borderRadius: '10px',
+        background: isDark ? 'rgba(51, 65, 85, 0.5)' : 'rgba(226, 232, 240, 0.5)',
+        backdropFilter: 'blur(8px)',
+        border: `1px solid ${isDark ? 'rgba(100, 116, 139, 0.3)' : 'rgba(203, 213, 225, 0.5)'}`,
+        transition: 'all 0.3s ease',
         opacity: disabled ? 0.5 : 1,
-        pointerEvents: disabled ? "none" : "auto",
+        pointerEvents: disabled ? 'none' : 'auto',
       }}
-      aria-disabled={disabled}
       title={title}
-   >
-      {!compact && (
-        <span style={{ opacity: 0.8, fontSize: 12, color: baseText, minWidth: 48, textAlign: "center" }}>
-          {lang === "he" ? "עברית" : "English"}
-        </span>
-      )}
+    >
+      {/* Sliding background indicator */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '4px',
+          bottom: '4px',
+          left: '4px',
+          width: compact ? '36px' : '44px',
+          borderRadius: '8px',
+          background: isDark 
+            ? 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+            : 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+          boxShadow: isDark
+            ? '0 2px 8px rgba(59, 130, 246, 0.3)'
+            : '0 2px 8px rgba(59, 130, 246, 0.2)',
+          transform: lang === 'he' 
+            ? 'translateX(0)' 
+            : `translateX(${compact ? 40 : 48}px)`,
+          transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        }}
+      />
 
-            <button
-       type="button"
-       disabled={disabled}
-       onClick={() => !disabled && setLang("he")}
-       style={{ ...buttonStyle(lang === "he"), cursor: disabled ? "not-allowed" : "pointer" }}
-     >
-        IL
+      {/* Hebrew Button */}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => !disabled && setLang("he")}
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: compact ? 36 : 44,
+          height: compact ? 28 : 34,
+          borderRadius: '8px',
+          color: lang === 'he' 
+            ? '#ffffff'
+            : isDark ? 'rgba(248, 250, 252, 0.6)' : 'rgba(30, 41, 59, 0.6)',
+          fontSize: compact ? '13px' : '14px',
+          fontWeight: lang === 'he' ? 600 : 500,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          letterSpacing: '0.3px',
+          border: 'none',
+          background: 'transparent',
+          transition: 'all 0.3s ease',
+        }}
+      >
+        עב
       </button>
 
-           <button
+      {/* English Button */}
+      <button
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setLang("en")}
-        style={{ ...buttonStyle(lang === "en"), cursor: disabled ? "not-allowed" : "pointer" }}
+        style={{
+          position: 'relative',
+          zIndex: 10,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: compact ? 36 : 44,
+          height: compact ? 28 : 34,
+          borderRadius: '8px',
+          color: lang === 'en' 
+            ? '#ffffff'
+            : isDark ? 'rgba(248, 250, 252, 0.6)' : 'rgba(30, 41, 59, 0.6)',
+          fontSize: compact ? '13px' : '14px',
+          fontWeight: lang === 'en' ? 600 : 500,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          letterSpacing: '0.3px',
+          border: 'none',
+          background: 'transparent',
+          transition: 'all 0.3s ease',
+        }}
       >
-        GB
+        EN
       </button>
     </div>
   );

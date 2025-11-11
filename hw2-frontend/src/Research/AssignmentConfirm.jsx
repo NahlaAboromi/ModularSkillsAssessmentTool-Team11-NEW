@@ -8,7 +8,7 @@ import { useAnonymousStudent as useStudent } from '../context/AnonymousStudentCo
 
 // 🔹 i18n חדש (מקומי)
 import { LanguageContext } from '../context/LanguageContext';
-import { useI18n } from '../utils/i18n'; // ⬅️ במקום translateUI
+import { useI18n } from '../utils/i18n';
 
 function AssignmentConfirmContent() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ function AssignmentConfirmContent() {
 
   const { lang } = useContext(LanguageContext);
   const isRTL = lang === 'he';
-  const { t } = useI18n('assignmentConfirm'); // ✅ שימוש בתרגום מקומי
+  const { t } = useI18n('assignmentConfirm');
 
   const locationAsg = useLocation().state?.assignment;
   const { student, setStudent } =
@@ -78,6 +78,7 @@ function AssignmentConfirmContent() {
 
   return (
     <div
+      key={lang}
       dir={isRTL ? 'rtl' : 'ltr'}
       lang={lang}
       className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
@@ -200,10 +201,5 @@ function AssignmentConfirmContent() {
 }
 
 export default function AssignmentConfirm() {
-  const outer = useContext(ThemeContext);
-  return (
-    <ThemeContext.Provider value={outer}>
-      <AssignmentConfirmContent />
-    </ThemeContext.Provider>
-  );
+  return <AssignmentConfirmContent />;
 }
