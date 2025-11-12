@@ -28,7 +28,12 @@ function readLS(key, fallback = null) {
   try { return JSON.parse(localStorage.getItem(key) || 'null') ?? fallback; }
   catch { return fallback; }
 }
-
+function getUILang(fallback = 'he') {
+  try {
+    const ls = localStorage.getItem('lang');
+    return (ls === 'he' || ls === 'en') ? ls : fallback;
+  } catch { return fallback; }
+}
 // בוחר וריאנט לפי שפה מתוך אובייקט assignment ששמור בלוקאל
 function pickScenarioFromAssignment(asg, lang) {
   if (!asg) return null;
@@ -66,6 +71,29 @@ function pickScenarioByLang(scn, lang) {
   }
   return scn;
 }
+// ===== DEBUG HELPERS =====
+const DBG = (...args) => console.log('[Simulation]', ...args);
+
+
+function dumpScenario(label, scn) {
+  try {
+    console.log(
+      `[${label}]`,
+      {
+        _lang: scn?._lang,
+        scenarioId: scn?.scenarioId,
+        title: scn?.title,
+        textSnippet: (scn?.text || '').slice(0, 60),
+        reflectionCount: Array.isArray(scn?.reflection) ? scn.reflection.length : 0,
+        hasMap: !!(scn?.scenarios && Object.keys(scn.scenarios || {}).length),
+        mapKeys: scn?.scenarios ? Object.keys(scn.scenarios) : [],
+      }
+    );
+  } catch (e) {
+    console.warn('[dumpScenario] failed:', e);
+  }
+}
+// ==========================
 
 function SimulationContent() {
   const navigate = useNavigate();
@@ -74,7 +102,19 @@ function SimulationContent() {
   const isDark = theme === 'dark';
   const { student } = useStudent?.() || { student: null };
   const navState = useLocation().state;
-
+useEffect(() => {
+  // ✅ ביטול נעילת שפה אם המשתמש חזר לדף שבו לא אמורה להיות נעילה
+  try {
+    const lock = localStorage.getItem("langLock");
+    if (lock === "1") {
+      localStorage.removeItem("langLock");
+      window.dispatchEvent(new Event("lang-lock-change"));
+      console.log("Language lock removed on this page");
+    }
+  } catch (e) {
+    console.warn("Failed to clear langLock:", e);
+  }
+}, []);
   // ✅ i18n
   const { t, dir, lang } = useI18n('simulation');
 
@@ -113,37 +153,71 @@ function SimulationContent() {
     startTrial(student.anonId);
   }, [student?.anonId]);
 
-  // ✅ על שינוי שפה – מחליף וריאנט מתוך localStorage.assignment (ללא fetch)
-// ✅ כשהשפה משתנה: קודם בודקים אם ל-trial.scenario יש מפה פנימית של תרחישים,
-// אם כן - מחליפים משם. אחרת מנסים מ-localStorage.assignment. אין fetch כאן.
+// 🔁 החלפת וריאנט תרחיש בעת שינוי שפה – ללא לופ
 useEffect(() => {
-  if (!trial) return;
-
-  // 1) החלפה מתוך המפה הפנימית אם קיימת
-  const repicked = pickScenarioByLang(trial.scenario, lang);
-  const changed =
-    !trial.scenario ||
-    repicked?.title !== trial.scenario?.title ||
-    repicked?.text !== trial.scenario?.text;
-
-  if (repicked && changed) {
-    setTrial(prev => (prev ? { ...prev, scenario: repicked } : prev));
+  if (!trial) {
+    DBG('[lang-effect] no trial yet → return');
     return;
   }
 
-  // 2) fallback ל־localStorage.assignment
-  const lsAsg = readLS('assignment', null);
-  if (lsAsg) {
-    const variant = pickScenarioFromAssignment(lsAsg, lang);
-    if (variant) {
-      setTrial(prev => (prev ? { ...prev, scenario: { ...variant, scenarios: lsAsg.scenarios } } : prev));
-    }
-  }
-}, [lang]); // eslint-disable-line react-hooks/exhaustive-deps
-// eslint-disable-line react-hooks/exhaustive-deps
-// eslint-disable-line react-hooks/exhaustive-deps
+  const uiLang = (lang === 'he' || lang === 'en') ? lang : getUILang('he');
+  const code = uiLang === 'he' ? 'he' : 'en';
+  DBG('[lang-effect] triggered with', { langProp: lang, uiLang, code });
 
-  // 🔹 אתחול טיימר תצוגה
+  // 1) מועמד מתוך assignment בלוקאל (אם יש מפה)
+  const asg = readLS('assignment', null);
+  DBG('[lang-effect] LS assignment present?', !!asg, { keys: asg ? Object.keys(asg || {}) : [] });
+
+  let candidate = null;
+  if (asg?.scenarios?.[code]) {
+    const v = pickScenarioFromAssignment(asg, uiLang);
+    if (v) {
+      candidate = { ...v, scenarios: asg.scenarios };
+      dumpScenario('CANDIDATE-from-LS', candidate);
+    } else {
+      DBG('[lang-effect] pickScenarioFromAssignment returned null for', uiLang);
+    }
+  } else {
+    DBG('[lang-effect] LS has no scenarios for', code, { scenariosKeys: asg?.scenarios ? Object.keys(asg.scenarios) : [] });
+  }
+
+  // 2) אחרת – ממפת התרחיש שכבר ב־state
+  if (!candidate) {
+    candidate = pickScenarioByLang(trial.scenario, uiLang);
+    dumpScenario('CANDIDATE-from-trialMap', candidate);
+  }
+
+  if (!candidate) {
+    DBG('[lang-effect] no candidate → return');
+    return;
+  }
+
+  const cur = trial.scenario || {};
+  dumpScenario('CURRENT', cur);
+
+  // --- השוואת תוכן ---
+  const sameTitle = cur.title === candidate.title;
+  const sameText  = cur.text  === candidate.text;
+  const sameRefl  =
+    Array.isArray(cur.reflection) && Array.isArray(candidate.reflection) &&
+    cur.reflection.join('||') === candidate.reflection.join('||');
+
+  DBG('[lang-effect] compare', { sameTitle, sameText, sameRefl, curLang: cur._lang, uiLang });
+
+  // ✅ תנאי עצירה יחיד: גם השפה זהה וגם התוכן זהה → אין מה לעדכן
+  if (cur._lang === uiLang && sameTitle && sameText && sameRefl) {
+    DBG('[lang-effect] _lang AND content identical → no update');
+    return;
+  }
+
+  // אחרת—לעדכן (גם אם _lang כבר זהה אבל התוכן שונה)
+  DBG('[lang-effect] setTrial → apply candidate with _lang', uiLang);
+  setTrial(prev =>
+    prev ? { ...prev, scenario: { ...candidate, _lang: uiLang } } : prev
+  );
+}, [lang, trial?.scenario?.scenarios]);
+
+
   useEffect(() => {
     const isoNow = new Date().toISOString();
     setViewStartAt(isoNow);
@@ -156,6 +230,7 @@ useEffect(() => {
     async function init() {
       try {
         setLoading(true);
+        
         setErr('');
 
         // 1) ניווט עם state מוכן
@@ -165,10 +240,11 @@ useEffect(() => {
             groupType: navState.groupType,
             scenarioId: navState.scenarioId || paramScenarioId,
  scenario: {
-   ...pickScenarioByLang(navState.scenario, lang),
-   
-   scenarios: navState.scenario?.scenarios,     // ✅ שמירה על המפה
- },            startedAt: navState.startedAt,
+  ...pickScenarioByLang(navState.scenario, lang),
+ scenarios: navState.scenario?.scenarios || navState?.scenarios || {},
+  _lang: (lang === 'he' || lang === 'en') ? lang : 'he',
+ },
+          startedAt: navState.startedAt,
           };
           if (!cancelled) {
             setTrial(tTrial);
@@ -187,7 +263,9 @@ useEffect(() => {
               group: lsAsg.group,
               groupType: lsAsg.groupType || lsAsg.assignedGroupType || 'control',
               scenarioId: lsAsg.scenarioId,
- scenario: { ...variant, scenarios: lsAsg.scenarios },
+ scenario: {   ...variant,
+  scenarios: lsAsg.scenarios || {},
+  _lang: (lang === 'he' || lang === 'en') ? lang : 'he', },
                startedAt: readLS('simStartAtISO', null) || null,
             };
             if (!cancelled) {
@@ -214,7 +292,8 @@ const picked = pickScenarioByLang(data.scenario, lang);
             scenarioId: data.scenarioId,
              scenario: {
    ...picked,
-   scenarios: data.scenario?.scenarios || picked.scenarios, // ✅ שמירה על המפה
+   scenarios: data.scenario?.scenarios || picked.scenarios,
+   _lang: (lang === 'he' || lang === 'en') ? lang : 'he',
 },
             startedAt: data.startedAt,
           };

@@ -14,7 +14,15 @@ function AssignmentConfirmContent() {
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
-
+  useEffect(() => {
+    try {
+      const lock = localStorage.getItem("langLock");
+      if (lock === "1") {
+        localStorage.removeItem("langLock");
+        window.dispatchEvent(new Event("lang-lock-change"));
+      }
+    } catch {}
+  }, []);
   const { lang } = useContext(LanguageContext);
   const isRTL = lang === 'he';
   const { t } = useI18n('assignmentConfirm');

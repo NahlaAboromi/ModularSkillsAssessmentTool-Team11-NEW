@@ -1,20 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useNotifications } from '../context/NotificationsContext';
 import { useLocation } from 'react-router-dom';
+import { LanguageContext } from '../context/LanguageContext';
+import { useI18n } from '../utils/i18n'; // ✅ מילון לוקאלי
 
 const RecentActivity = () => {
   const { notifications, fetchNotifications } = useNotifications();
   const location = useLocation();
 
+  const { t, dir, lang } = useI18n('recentActivity'); // ⬅️ מילון מהיר
+  const { lang: ctxLang } = useContext(LanguageContext) || { lang: 'he' };
+
   useEffect(() => {
     fetchNotifications();
   }, []);
 
-
   const sortedNotifications = [...notifications].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
-
 
   const recentNotifications = sortedNotifications.slice(0, 3);
 
@@ -42,15 +45,15 @@ const RecentActivity = () => {
 
   if (!notifications.length) {
     return (
-      <div className="text-center text-gray-500 dark:text-gray-300">
-        No activities found.
+      <div dir={dir} lang={lang} className="text-center text-gray-500 dark:text-gray-300">
+        {t('noActivities')}
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-slate-600 dark:text-white p-6 rounded shadow-md">
-      <h2 className="text-xl font-bold mb-4">Recent Activities</h2>
+    <div dir={dir} lang={lang} className="bg-white dark:bg-slate-600 dark:text-white p-6 rounded shadow-md">
+      <h2 className="text-xl font-bold mb-4">{t('title')}</h2>
       <ul className="space-y-4">
         {recentNotifications.map((activity, index) => (
           <li
@@ -65,7 +68,9 @@ const RecentActivity = () => {
             <div>
               <div className="font-medium">{activity.title}</div>
               <div className="text-xs text-gray-500 dark:text-gray-300">
-                {activity.createdAt ? new Date(activity.createdAt).toLocaleString() : 'No date'}
+                {activity.createdAt
+                  ? new Date(activity.createdAt).toLocaleString(ctxLang === 'he' ? 'he-IL' : 'en-US')
+                  : t('noDate')}
               </div>
             </div>
           </li>

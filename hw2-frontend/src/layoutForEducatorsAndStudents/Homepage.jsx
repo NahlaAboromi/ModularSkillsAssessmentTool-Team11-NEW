@@ -1,5 +1,4 @@
-import React, { useContext } from "react";
-import { ThemeContext } from "../DarkLightMood/ThemeContext";
+import React, { useContext, useEffect } from "react";import { ThemeContext } from "../DarkLightMood/ThemeContext";
 import HomeHeader from "./HomeHeader";
 import Footer from "../layout/Footer";
 import { Link } from "react-router-dom";
@@ -11,6 +10,19 @@ const HomepageContent = () => {
   const isDark = theme === "dark";
   const { lang } = useContext(LanguageContext);
   const isRTL = lang === "he";
+useEffect(() => {
+  // ✅ ביטול נעילת שפה אם המשתמש חזר לדף שבו לא אמורה להיות נעילה
+  try {
+    const lock = localStorage.getItem("langLock");
+    if (lock === "1") {
+      localStorage.removeItem("langLock");
+      window.dispatchEvent(new Event("lang-lock-change"));
+      console.log("Language lock removed on this page");
+    }
+  } catch (e) {
+    console.warn("Failed to clear langLock:", e);
+  }
+}, []);
 
   // ⬅️ לוקחים מילון לוקאלי ומהיר
   const { t } = useI18n("homepage");

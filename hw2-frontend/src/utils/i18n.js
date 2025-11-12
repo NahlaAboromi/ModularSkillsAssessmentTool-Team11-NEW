@@ -165,7 +165,11 @@ case 'createClass':
     ? await import('../i18n/studentOverview.he.json')
     : await import('../i18n/studentOverview.en.json');
   break;
-
+case 'aiChat':
+  mod = lang === 'he'
+    ? await import('../i18n/aiChat.he.json')
+    : await import('../i18n/aiChat.en.json');
+  break;
   case 'classCard':
   mod = lang === 'he'
     ? await import('../i18n/classCard.he.json')
@@ -176,7 +180,11 @@ case 'studentReports':
     ? await import('../i18n/studentReports.he.json')
     : await import('../i18n/studentReports.en.json');
   break;
-
+      case 'recentActivity':
+        mod = lang === 'he'
+          ? await import('../i18n/recentActivity.he.json')
+          : await import('../i18n/recentActivity.en.json');
+        break;
 case 'confirmModal':
   mod = lang === 'he'
     ? await import('../i18n/confirmModal.he.json')

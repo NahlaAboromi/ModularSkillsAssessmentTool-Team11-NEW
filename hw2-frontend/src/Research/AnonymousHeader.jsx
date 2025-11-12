@@ -1,3 +1,4 @@
+//C:\Users\n0502\OneDrive\שולחן העבודה\final_project\hw2-frontend\src\Research\AnonymousHeader.jsx
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ThemeContext } from '../DarkLightMood/ThemeContext';

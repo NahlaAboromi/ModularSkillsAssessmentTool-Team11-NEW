@@ -261,7 +261,10 @@ const TeacherHeader = () => {
             style={isRTL ? { left: 0, right: 'auto' } : undefined}
           >
             <div className={`px-4 py-3 ${theme === 'dark' ? 'bg-slate-800 border-slate-600 text-white' : 'bg-slate-100 border-gray-200 text-gray-800'} border-b flex justify-between items-center`}>
-              <h3 className="font-bold text-sm">{t('notifications', 'Notifications')} ({notificationCount})</h3>
+             <h3 className="font-bold text-sm" dir={isRTL ? 'rtl' : 'ltr'}>
+  {t('notifications', 'Notifications')} <span dir="ltr">({notificationCount})</span>
+</h3>
+
               <button
                 onClick={markAllAsRead}
                 className={`text-xs ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'} font-medium`}

@@ -15,6 +15,19 @@ export default function SocraticReflectionEnd() {
   const { student } = useStudent?.() || { student: null };
   const anonId = student?.anonId || null;
   const navigate = useNavigate();
+useEffect(() => {
+  // ✅ ביטול נעילת שפה אם המשתמש חזר לדף שבו לא אמורה להיות נעילה
+  try {
+    const lock = localStorage.getItem("langLock");
+    if (lock === "1") {
+      localStorage.removeItem("langLock");
+      window.dispatchEvent(new Event("lang-lock-change"));
+      console.log("Language lock removed on this page");
+    }
+  } catch (e) {
+    console.warn("Failed to clear langLock:", e);
+  }
+}, []);
 
   // ---- i18n ----
   const { t, dir, lang: langAttr, ready } = useI18n('socraticReflectionFeedback');

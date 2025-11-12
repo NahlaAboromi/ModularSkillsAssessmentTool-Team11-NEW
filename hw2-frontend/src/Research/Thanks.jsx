@@ -15,11 +15,26 @@ function ThanksInner() {
   const navigate = useNavigate();
   const location = useLocation();
   const { student } = useStudent?.() || { student: null };
+useEffect(() => {
+  // ✅ ביטול נעילת שפה אם המשתמש חזר לדף שבו לא אמורה להיות נעילה
+  try {
+    const lock = localStorage.getItem("langLock");
+    if (lock === "1") {
+      localStorage.removeItem("langLock");
+      window.dispatchEvent(new Event("lang-lock-change"));
+      console.log("Language lock removed on this page");
+    }
+  } catch (e) {
+    console.warn("Failed to clear langLock:", e);
+  }
+}, []);
 
   // ✅ שפה/כיוון מ־useI18n (לא עושים return לפני שכל ה-hooks הוגדרו)
   const { t, dir, lang: langAttr, ready } = useI18n('thanks');
   const isRTL = dir === 'rtl';
 
+ const cardDir  = langAttr === 'he' ? 'rtl' : dir;
+  const cardRTL  = cardDir === 'rtl';
   const anonId = location.state?.anonId || student?.anonId || '—';
   const initialGroup = (location.state?.group || '').toString().toUpperCase();
   const initialType =
@@ -178,42 +193,45 @@ function ThanksInner() {
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Appreciation Card */}
-                <div
-                  className={`rounded-xl border-2 shadow-md transition-all duration-300 hover:shadow-lg ${
-                    isDark 
-                      ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600' 
-                      : 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
-                  }`}
-                >
-                  <div className="p-6 md:p-7">
-                    <div
-                      className={`flex items-center gap-3 mb-4 ${
-                        isRTL ? 'flex-row-reverse text-right' : 'flex-row text-left'
-                      }`}
-                    >
-                      {isRTL ? (
-                        <>
-                          <span className="text-3xl">🙏</span>
-                          <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
-                        </>
-                      ) : (
-                        <>
-                          <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
-                          <span className="text-3xl">🙏</span>
-                        </>
-                      )}
-                    </div>
+<div
+  className={`rounded-xl border-2 shadow-md transition-all duration-300 hover:shadow-lg ${
+    isDark 
+      ? 'bg-gradient-to-br from-slate-700 to-slate-800 border-slate-600' 
+      : 'bg-gradient-to-br from-white to-slate-50 border-slate-200'
+  }`}
+  dir={cardDir}
+  style={{ direction: cardDir, textAlign: cardRTL ? 'right' : 'left' }}
+>
+  <div className="p-6 md:p-7">
 
-                    <ul className={`space-y-3 ${isRTL ? 'text-right pr-6 md:pr-7' : 'text-left pl-6 md:pl-7'}`} role="list">
-                      {aboutList.map((b, i) => (
-                        <li key={i} className={`flex items-start gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
-                          <span className={`mt-2 flex-shrink-0 w-1.5 h-1.5 rounded-full ${isDark ? 'bg-blue-400' : 'bg-blue-600'}`} />
-                          <span className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
-                            {b}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+
+
+<div
+  className={`flex items-center gap-3 mb-4 ${
+    cardRTL ? 'flex-row-reverse text-right' : 'flex-row text-left'
+  }`}
+>
+  <h2 className="text-2xl font-bold">{t('aboutTitle')}</h2>
+  <span className="text-3xl">🙏</span>
+</div>
+
+
+
+<ul
+  className={`space-y-3 list-none ${cardRTL ? 'text-right pr-0' : 'text-left pl-6 md:pl-7'}`}
+  role="list"
+>
+
+  {aboutList.map((b, i) => (
+    <li key={i} className={`flex items-start gap-3 ${cardRTL ? 'flex-row-reverse' : ''}`}>
+      <span className={`mt-2 flex-shrink-0 w-1.5 h-1.5 rounded-full ${isDark ? 'bg-blue-400' : 'bg-blue-600'}`} />
+      <span className={`text-sm md:text-base leading-relaxed ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+        {b}
+      </span>
+    </li>
+  ))}
+</ul>
+
                   </div>
                 </div>
               </div>

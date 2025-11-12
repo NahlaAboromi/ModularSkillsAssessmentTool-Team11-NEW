@@ -19,7 +19,7 @@ const Button = ({
   const isDark = theme === 'dark';
 
   // ✅ טקסט טעינה לפי שפה (או לפי prop אם הועבר)
-  const loadingText = loadingLabel ?? (lang === 'he' ? '...טוען' : '...Loading');
+  const loadingText = loadingLabel ?? (lang === 'he' ? '. טוען' : '...Loading');
 
   const getVariantStyles = () => {
     switch (variant) {

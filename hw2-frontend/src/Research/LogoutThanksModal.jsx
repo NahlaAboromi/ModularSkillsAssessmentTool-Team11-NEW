@@ -16,6 +16,19 @@ export default function LogoutThanksModal({
   const { lang } = useContext(LanguageContext);
   const isHe = lang === 'he';
   const { t, dir } = useI18n('logoutThanksModal');
+useEffect(() => {
+  // ✅ ביטול נעילת שפה אם המשתמש חזר לדף שבו לא אמורה להיות נעילה
+  try {
+    const lock = localStorage.getItem("langLock");
+    if (lock === "1") {
+      localStorage.removeItem("langLock");
+      window.dispatchEvent(new Event("lang-lock-change"));
+      console.log("Language lock removed on this page");
+    }
+  } catch (e) {
+    console.warn("Failed to clear langLock:", e);
+  }
+}, []);
 
   const dialogRef = useRef(null);
 
@@ -58,10 +71,10 @@ export default function LogoutThanksModal({
       <div
         ref={dialogRef}
         onClick={stop}
-        className="relative bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl shadow-xl p-6 w-[min(520px,90vw)] border border-slate-200 dark:border-slate-700"
+ className={`relative bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 rounded-2xl shadow-xl p-6 w-[min(520px,90vw)] border border-slate-200 dark:border-slate-700 ${dir === 'rtl' ? 'text-right' : 'text-left'}`}
       >
-        <h2 className={`text-xl font-bold mb-2 ${isHe ? 'text-right' : 'text-left'}`}>{t('title')}</h2>
-        <p className={`text-sm opacity-80 mb-4 ${isHe ? 'text-right' : 'text-left'}`}>{t('desc')}</p>
+         <h2 className="text-xl font-bold mb-2">{t('title')}</h2>
+       <p className="text-sm opacity-80 mb-4">{t('desc')}</p>
 
         {/* בלוק הנתונים — לא מתהפך */}
         <div className="rounded-lg border dark:border-slate-600 p-4 mb-4 text-sm">
@@ -82,7 +95,7 @@ export default function LogoutThanksModal({
         </div>
 
         {/* כפתור בצד ההגיוני */}
-        <div className={`flex ${isHe ? 'justify-start' : 'justify-end'}`}>
+       <div className={`flex ${dir === 'rtl' ? 'justify-start' : 'justify-end'}`}>
           <button
             data-primary
             onClick={onConfirm ?? onClose}
