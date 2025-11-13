@@ -71,61 +71,61 @@ useEffect(() => {
 
   return (
     <div
-      className={`flex flex-col min-h-screen w-full ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
+      className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
       dir={dir}
       lang={langAttr}
     >
       {/* HEADER */}
-      <div className="px-3 sm:px-4 mt-3 sm:mt-4">
+      <div className="px-4 mt-4">
         <AnonymousHeader />
       </div>
 
       {/* BODY */}
-      <main className="flex-1 w-full px-3 sm:px-4 md:px-5 lg:px-6 py-4 sm:py-6">
-        <section className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-4 sm:p-6 md:p-7 rounded-lg`}>
-          <div className={`rounded-lg shadow-md p-4 sm:p-6 md:p-8 ${isDark ? 'bg-slate-600' : 'bg-white'} max-w-6xl mx-auto`}>
+      <main className="flex-1 w-full px-3 md:px-5 lg:px-6 py-6">
+        <section className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 md:p-7 rounded`}>
+          <div className={`rounded-lg shadow-md p-6 md:p-8 ${isDark ? 'bg-slate-600' : 'bg-white'} max-w-6xl mx-auto`}>
             {/* Thank You header inside the card */}
-            <div className="mb-4 sm:mb-6 text-center">
-              <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-emerald-500 mb-3 sm:mb-4 mx-auto">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mb-6 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500 mb-4 mx-auto">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h2 className={`clear-both text-2xl sm:text-3xl md:text-4xl font-bold mb-2 px-2 ${isDark ? 'text-white' : 'text-slate-800'}`}>
+              <h2 className={`clear-both text-3xl md:text-4xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-800'}`}>
                 {t('thanksTitle')}
               </h2>
-              <p className={`text-sm sm:text-base px-2 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              <p className={`${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                 {t('thanksSub')}
               </p>
             </div>
 
             {/* Content Area */}
-            <div className="px-1 sm:px-2 md:px-4 py-3 sm:py-4">
+            <div className="px-2 md:px-4 py-4">
               {loading && (
-                <div className="flex flex-col items-center justify-center py-12 sm:py-16" role="status" aria-live="polite">
+                <div className="flex flex-col items-center justify-center py-16" role="status" aria-live="polite">
                   <div className="relative">
-                    <div className={`w-12 h-12 sm:w-16 sm:h-16 border-4 rounded-full animate-spin ${isDark ? 'border-slate-600 border-t-emerald-400' : 'border-slate-200 border-t-emerald-600'}`} />
-                    <div className={`absolute inset-0 w-12 h-12 sm:w-16 sm:h-16 border-4 rounded-full animate-ping opacity-20 ${isDark ? 'border-emerald-400' : 'border-emerald-600'}`} />
+                    <div className={`w-16 h-16 border-4 rounded-full animate-spin ${isDark ? 'border-slate-600 border-t-emerald-400' : 'border-slate-200 border-t-emerald-600'}`} />
+                    <div className={`absolute inset-0 w-16 h-16 border-4 rounded-full animate-ping opacity-20 ${isDark ? 'border-emerald-400' : 'border-emerald-600'}`} />
                   </div>
-                  <p className={`mt-4 sm:mt-6 text-sm sm:text-base font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                  <p className={`mt-6 text-base font-medium ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                     {t('loading')}
                   </p>
                 </div>
               )}
 
               {err && (
-                <div className={`rounded-xl p-4 sm:p-6 text-center ${isDark ? 'bg-red-900/30 border-2 border-red-800' : 'bg-red-50 border-2 border-red-200'}`}>
-                  <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-red-500 mb-3 sm:mb-4">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`rounded-xl p-6 text-center ${isDark ? 'bg-red-900/30 border-2 border-red-800' : 'bg-red-50 border-2 border-red-200'}`}>
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500 mb-4">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </div>
-                  <div className={`text-base sm:text-lg font-semibold mb-3 sm:mb-4 px-2 ${isDark ? 'text-red-300' : 'text-red-700'}`}>
+                  <div className={`text-lg font-semibold mb-4 ${isDark ? 'text-red-300' : 'text-red-700'}`}>
                     {err}
                   </div>
                   <button
                     onClick={() => navigate('/study/home')}
-                    className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
                     {t('back')}
                   </button>
@@ -133,16 +133,16 @@ useEffect(() => {
               )}
 
               {!loading && !err && (
-                <div className="space-y-5 sm:space-y-8">
+                <div className="space-y-8">
                   {/* Summary Section */}
-                  <div className={`rounded-xl p-4 sm:p-6 md:p-8 ${isDark ? 'bg-slate-900/50 border border-slate-600' : 'bg-slate-50 border border-slate-200'}`}>
-                    <div className={`flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 ${dir === 'rtl' ? 'flex-row-reverse justify-end text-right' : ''}`}>
-                      <div className={`w-1 h-6 sm:h-8 rounded-full ${isDark ? 'bg-emerald-400' : 'bg-emerald-600'}`} />
-                      <h3 className={`text-xl sm:text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>
+                  <div className={`rounded-xl p-6 md:p-8 ${isDark ? 'bg-slate-900/50 border border-slate-600' : 'bg-slate-50 border border-slate-200'}`}>
+                    <div className={`flex items-center gap-3 mb-4 ${dir === 'rtl' ? 'flex-row-reverse justify-end text-right' : ''}`}>
+                      <div className={`w-1 h-8 rounded-full ${isDark ? 'bg-emerald-400' : 'bg-emerald-600'}`} />
+                      <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>
                         {t('summaryTitle')}
                       </h3>
                     </div>
-                    <p className={`text-sm sm:text-base md:text-lg leading-relaxed whitespace-pre-wrap ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+                    <p className={`text-base md:text-lg leading-relaxed whitespace-pre-wrap ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                       {summary || t('noSummary')}
                     </p>
                   </div>
@@ -155,7 +155,7 @@ useEffect(() => {
                           state: { phase: 'post', from: 'final-summary', anonId }
                         })
                       }
-                      className={`w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg text-white transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:-translate-y-0.5 ${
+                      className={`w-full md:w-auto px-8 py-4 rounded-xl font-bold text-lg text-white transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:-translate-y-0.5 ${
                         isDark
                           ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400'
                           : 'bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-700 hover:to-emerald-600'
@@ -172,7 +172,7 @@ useEffect(() => {
       </main>
 
       {/* FOOTER */}
-      <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+      <div className="px-4 pb-4">
         <Footer />
       </div>
     </div>
