@@ -62,7 +62,7 @@ export default function SocraticCoach({
     async function loadT() {
       if (lang === 'he') {
         try {
-          const SOURCE = T; // משתמשים בערכים העדכניים כמקור
+          const SOURCE = T;
           const keys = Object.keys(SOURCE);
           const vals = Object.values(SOURCE);
           const tr = await translateUI({
@@ -77,12 +77,10 @@ export default function SocraticCoach({
           }
         } catch {
           if (!cancelled) {
-            // אם התרגום נכשל, נשאיר את האנגלית (לא זורקים)
             setT((prev) => prev);
           }
         }
       } else {
-        // חזרה לאנגלית אם שפת UI איננה עברית
         setT({
           title: "Hi! I'm your Socratic Coach ✋",
           missingAnonId: 'Missing anonId',
@@ -134,11 +132,11 @@ export default function SocraticCoach({
 
   const TypingDots = ({ align = 'left' }) => (
     <div className={align === 'left' ? 'text-left' : 'text-right'}>
-      <span className={`inline-flex items-center gap-1 px-4 py-3 rounded-2xl shadow-sm
+      <span className={`inline-flex items-center gap-1 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl shadow-sm
         ${isDark ? 'bg-slate-700' : 'bg-gradient-to-r from-slate-100 to-slate-50'}`}>
-        <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '0ms' }} />
-        <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '150ms' }} />
-        <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '300ms' }} />
+        <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '0ms' }} />
+        <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '150ms' }} />
+        <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isDark ? 'bg-slate-300' : 'bg-slate-400'} animate-bounce`} style={{ animationDelay: '300ms' }} />
       </span>
     </div>
   );
@@ -231,7 +229,7 @@ export default function SocraticCoach({
     try {
       setError('');
       setFinished(true);
-      setFinishing(true); // spinner
+      setFinishing(true);
 
       if (!anonId) throw new Error(t('missingAnonId'));
 
@@ -255,39 +253,40 @@ export default function SocraticCoach({
     }
   }
 
-  // כותרת: אם זה הדיפולט – נתרגם; אם לא, נשאיר כ־prop
   const shownTitle = title === DEFAULT_TITLE ? t('title') : title;
 
   return (
     <div
-      className={`rounded-3xl p-6 md:p-7 shadow-lg border
+      className={`rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-lg border
         ${isDark
           ? 'border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 text-slate-100'
           : 'border-slate-200 bg-gradient-to-br from-white to-slate-50 text-slate-800'}`}
       dir={dir}
     >
-      <div className={`flex items-center gap-3 mb-5 ${dir === 'rtl' ? 'flex-row-reverse justify-end' : ''}`}>
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
+      {/* Header */}
+      <div className={`flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 ${dir === 'rtl' ? 'flex-row-reverse justify-end' : ''}`}>
+        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg sm:text-xl shadow-md shrink-0">
           ✋
         </div>
-        <h3 className={`text-xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>
+        <h3 className={`text-base sm:text-lg md:text-xl font-bold ${isDark ? 'text-slate-100' : 'text-slate-800'} leading-tight`}>
           {shownTitle.replace(' ✋', '')}
         </h3>
       </div>
 
+      {/* Error */}
       {error && (
-        <div className="mb-4 text-sm rounded-xl border border-red-200 bg-gradient-to-r from-red-50 to-red-100 px-4 py-3 text-red-800 shadow-sm" aria-live="polite">
+        <div className="mb-3 sm:mb-4 text-xs sm:text-sm rounded-xl border border-red-200 bg-gradient-to-r from-red-50 to-red-100 px-3 sm:px-4 py-2 sm:py-3 text-red-800 shadow-sm" aria-live="polite">
           <div className={`flex items-start gap-2 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-            <span className="text-lg">⚠️</span>
-            <span>{error}</span>
+            <span className="text-base sm:text-lg shrink-0">⚠️</span>
+            <span className="leading-relaxed">{error}</span>
           </div>
         </div>
       )}
 
-      {/* chat area */}
+      {/* Chat Area - רספונסיבי */}
       <div
         ref={listRef}
-        className={`h-80 overflow-y-auto space-y-3 mb-4 rounded-2xl p-4 shadow-inner border
+        className={`h-64 sm:h-72 md:h-80 overflow-y-auto space-y-2 sm:space-y-3 mb-3 sm:mb-4 rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-inner border
           ${isDark
             ? 'border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900 text-slate-100'
             : 'border-slate-200 bg-gradient-to-b from-white to-slate-50/50 text-slate-800'}`}
@@ -297,9 +296,9 @@ export default function SocraticCoach({
           const isUser = m.role === 'user';
           return (
             <div key={i} className={isUser ? 'text-right' : 'text-left'}>
-              <div className={`inline-flex flex-col max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
+              <div className={`inline-flex flex-col max-w-[90%] sm:max-w-[85%] ${isUser ? 'items-end' : 'items-start'}`}>
                 <span
-                  className={`inline-block px-4 py-3 rounded-2xl leading-relaxed whitespace-pre-wrap break-words shadow-sm transition-all hover:shadow-md ${
+                  className={`inline-block px-3 sm:px-4 py-2 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words shadow-sm transition-all hover:shadow-md ${
                     isUser
                       ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
                       : (isDark
@@ -309,7 +308,7 @@ export default function SocraticCoach({
                 >
                   {m.text}
                 </span>
-                <span className={`mt-1.5 text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                <span className={`mt-1 sm:mt-1.5 text-[10px] sm:text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                   {fmtTime(m.ts)}
                 </span>
               </div>
@@ -317,14 +316,13 @@ export default function SocraticCoach({
           );
         })}
 
-        {/* typing dots only during chat loading (not while finishing) */}
         {chatLoading && !finishing && <TypingDots align="left" />}
       </div>
 
-      {/* input row */}
-      <div className={`flex gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+      {/* Input Row - רספונסיבי */}
+      <div className={`flex flex-col sm:flex-row gap-2 sm:gap-3 ${dir === 'rtl' ? 'sm:flex-row-reverse' : ''}`}>
         <input
-          className={`flex-1 rounded-xl px-4 py-3 transition-all focus:outline-none
+          className={`flex-1 rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base transition-all focus:outline-none
             ${isDark
               ? 'bg-slate-800 text-slate-100 placeholder-slate-400 border-2 border-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-900/40'
               : 'bg-white text-slate-800 placeholder-slate-400 border-2 border-slate-200 focus:border-blue-400 focus:ring-4 focus:ring-blue-100'}
@@ -340,42 +338,45 @@ export default function SocraticCoach({
             }
           }}
         />
-        <button
-          onClick={send}
-          disabled={!canSend}
-          className="px-5 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all transform hover:scale-105 active:scale-95"
-        >
-          {t('send')}
-        </button>
+        
+        <div className={`flex gap-2 sm:gap-3 ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
+          <button
+            onClick={send}
+            disabled={!canSend}
+            className="flex-1 sm:flex-none px-4 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base text-white font-semibold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all transform active:scale-95 sm:hover:scale-105"
+          >
+            {t('send')}
+          </button>
 
-        {/* Finish button with spinner */}
-        <button
-          onClick={finish}
-          disabled={finished || finishing}
-          aria-busy={finishing ? 'true' : 'false'}
-          className={`min-w-32 px-5 py-3 rounded-xl text-white font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all inline-flex items-center justify-center gap-2 ${finishing ? 'cursor-wait opacity-90' : 'transform hover:scale-105 active:scale-95'}`}
-        >
-          {finishing ? (
-            <>
-              <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a 8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
-              </svg>
-              <span>{t('processing')}</span>
-            </>
-          ) : (
-            t('finish')
-          )}
-        </button>
+          <button
+            onClick={finish}
+            disabled={finished || finishing}
+            aria-busy={finishing ? 'true' : 'false'}
+            className={`flex-1 sm:flex-none sm:min-w-[8rem] px-4 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base text-white font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all inline-flex items-center justify-center gap-2 ${finishing ? 'cursor-wait opacity-90' : 'transform active:scale-95 sm:hover:scale-105'}`}
+          >
+            {finishing ? (
+              <>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a 8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" />
+                </svg>
+                <span>{t('processing')}</span>
+              </>
+            ) : (
+              t('finish')
+            )}
+          </button>
+        </div>
       </div>
 
+      {/* Hint */}
       {!finished && (
-        <div className={`mt-4 flex items-start gap-2 text-xs rounded-xl px-4 py-3 border
+        <div className={`mt-3 sm:mt-4 flex items-start gap-2 text-[11px] sm:text-xs rounded-lg sm:rounded-xl px-3 sm:px-4 py-2 sm:py-3 border
           ${isDark
             ? 'text-slate-300 bg-slate-800 border-slate-700'
             : 'text-slate-600 bg-blue-50 border-blue-100'}`}>
-          <span className="text-sm">💡</span>
-          <p>{t('hintBeforeFinish')}</p>
+          <span className="text-xs sm:text-sm shrink-0">💡</span>
+          <p className="leading-relaxed">{t('hintBeforeFinish')}</p>
         </div>
       )}
     </div>

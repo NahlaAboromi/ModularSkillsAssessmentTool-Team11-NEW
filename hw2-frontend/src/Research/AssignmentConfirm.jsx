@@ -77,7 +77,7 @@ function AssignmentConfirmContent() {
 
   const Num = ({ n, accent = 'emerald' }) => (
     <div
-      className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold
+      className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-sm sm:text-base
       ${isDark ? `bg-${accent}-700 text-white` : `bg-${accent}-600 text-white`}`}
     >
       {n}
@@ -98,10 +98,10 @@ function AssignmentConfirmContent() {
 
       {/* BODY */}
       <main className="flex-1 w-full px-2 md:px-4 lg:px-6 py-6">
-        <section className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 md:p-7 rounded`}>
+        <section className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-4 sm:p-6 md:p-7 rounded`}>
           {/* card */}
           <div
-            className={`rounded-lg shadow-md p-6 md:p-8 ${
+            className={`rounded-lg shadow-md p-4 sm:p-6 md:p-8 ${
               isDark ? 'bg-slate-600 border border-slate-500 text-white' : 'bg-white border border-slate-200 text-slate-800'
             } max-w-7xl mx-auto`}
           >
@@ -109,13 +109,13 @@ function AssignmentConfirmContent() {
 
             {!assignment ? (
               <>
-                <h2 className="text-2xl md:text-3xl font-bold mt-3 mb-2">{t('noAssignmentTitle')}</h2>
-                <p className={`${isDark ? 'text-gray-300' : 'text-slate-600'} mb-6`}>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mt-3 mb-2">{t('noAssignmentTitle')}</h2>
+                <p className={`${isDark ? 'text-gray-300' : 'text-slate-600'} mb-6 text-sm sm:text-base`}>
                   {t('noAssignmentBody')}
                 </p>
                 <button
                   onClick={() => navigate(-1)}
-                  className={`px-6 py-3 rounded-xl font-semibold border text-sm
+                  className={`w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold border text-sm
                     ${isDark
                       ? 'border-slate-400 text-white bg-slate-700 hover:shadow'
                       : 'border-slate-300 text-slate-700 bg-white hover:shadow'}`}
@@ -125,26 +125,26 @@ function AssignmentConfirmContent() {
               </>
             ) : (
               <>
-                <h2 className="text-3xl font-bold mt-3 mb-3">{t('summaryTitle')}</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold mt-3 mb-3">{t('summaryTitle')}</h2>
 
                 <div
-                  className={`rounded-xl border p-6 mb-8 text-sm md:text-base
+                  className={`rounded-xl border p-4 sm:p-6 mb-6 sm:mb-8 text-sm sm:text-base
                     ${
                       assignment.groupType === 'control'
                         ? (isDark ? 'bg-slate-900/20 border-slate-600' : 'bg-slate-50 border-slate-200')
                         : (isDark ? 'bg-emerald-900/20 border-emerald-600' : 'bg-emerald-50 border-emerald-200')
                     }`}
                 >
-                  <div className="text-xl font-bold mb-4">{t('journeyTitle')}</div>
+                  <div className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">{t('journeyTitle')}</div>
 
                   {assignment.groupType !== 'control' ? (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {[1, 2, 3, 4, 5, 6].map((n) => (
-                        <div className="flex gap-3" key={n}>
+                        <div className="flex gap-2 sm:gap-3" key={n}>
                           <Num n={n} accent="emerald" />
-                          <div>
-                            <div className="font-semibold mb-1">{t(`step${n}_title_exp`)}</div>
-                            <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold mb-1 text-sm sm:text-base">{t(`step${n}_title_exp`)}</div>
+                            <div className={`text-xs sm:text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                               {t(`step${n}_body_exp`)}
                             </div>
                           </div>
@@ -152,13 +152,13 @@ function AssignmentConfirmContent() {
                       ))}
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3 sm:space-y-4">
                       {[1, 2, 3, 4].map((n) => (
-                        <div className="flex gap-3" key={n}>
+                        <div className="flex gap-2 sm:gap-3" key={n}>
                           <Num n={n} accent="slate" />
-                          <div>
-                            <div className="font-semibold mb-1">{t(`step${n}_title_ctrl`)}</div>
-                            <div className={isDark ? 'text-slate-300' : 'text-slate-600'}>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold mb-1 text-sm sm:text-base">{t(`step${n}_title_ctrl`)}</div>
+                            <div className={`text-xs sm:text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                               {t(`step${n}_body_ctrl`)}
                             </div>
                           </div>
@@ -167,7 +167,7 @@ function AssignmentConfirmContent() {
                     </div>
                   )}
 
-                  <div className={`mt-5 pt-4 border-t text-sm ${isDark ? 'border-slate-600 text-slate-300' : 'border-slate-300 text-slate-600'}`}>
+                  <div className={`mt-4 sm:mt-5 pt-3 sm:pt-4 border-t text-xs sm:text-sm ${isDark ? 'border-slate-600 text-slate-300' : 'border-slate-300 text-slate-600'}`}>
                     <b>{t('importantLead')}</b> {t('importantBody')}
                   </div>
                 </div>
@@ -175,7 +175,7 @@ function AssignmentConfirmContent() {
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
                     onClick={() => navigate(-1)}
-                    className={`w-full sm:w-auto px-6 py-2 rounded-xl font-semibold border text-sm
+                    className={`w-full sm:w-auto px-5 sm:px-6 py-2 sm:py-2.5 rounded-xl font-semibold border text-sm
                       ${isDark ? 'border-slate-400 text-white bg-slate-700 hover:shadow'
                                : 'border-slate-300 text-slate-700 bg-white hover:shadow'}`}
                   >
@@ -189,7 +189,7 @@ function AssignmentConfirmContent() {
                       try { localStorage.setItem('assignment', JSON.stringify(enriched)); } catch {}
                       navigate('/validated-questionnaire', { state: { phase: 'pre', fromAssignment: true } });
                     }}
-                    className="w-full sm:w-auto px-6 py-2 rounded-xl font-semibold text-white bg-emerald-600 hover:shadow text-sm"
+                    className="w-full sm:w-auto px-5 sm:px-6 py-2 sm:py-2.5 rounded-xl font-semibold text-white bg-emerald-600 hover:shadow text-sm"
                   >
                     {t('confirmContinue')}
                   </button>

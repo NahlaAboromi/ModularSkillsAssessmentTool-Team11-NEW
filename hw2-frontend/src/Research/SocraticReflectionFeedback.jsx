@@ -15,19 +15,20 @@ export default function SocraticReflectionEnd() {
   const { student } = useStudent?.() || { student: null };
   const anonId = student?.anonId || null;
   const navigate = useNavigate();
-useEffect(() => {
-  // ✅ ביטול נעילת שפה אם המשתמש חזר לדף שבו לא אמורה להיות נעילה
-  try {
-    const lock = localStorage.getItem("langLock");
-    if (lock === "1") {
-      localStorage.removeItem("langLock");
-      window.dispatchEvent(new Event("lang-lock-change"));
-      console.log("Language lock removed on this page");
+
+  useEffect(() => {
+    // ✅ ביטול נעילת שפה אם המשתמש חזר לדף שבו לא אמורה להיות נעילה
+    try {
+      const lock = localStorage.getItem("langLock");
+      if (lock === "1") {
+        localStorage.removeItem("langLock");
+        window.dispatchEvent(new Event("lang-lock-change"));
+        console.log("Language lock removed on this page");
+      }
+    } catch (e) {
+      console.warn("Failed to clear langLock:", e);
     }
-  } catch (e) {
-    console.warn("Failed to clear langLock:", e);
-  }
-}, []);
+  }, []);
 
   // ---- i18n ----
   const { t, dir, lang: langAttr, ready } = useI18n('socraticReflectionFeedback');
@@ -77,7 +78,7 @@ useEffect(() => {
   if (!ready) return null;
 
   // helper קצר להזחה לוגית לפי כיוון
-  const offsetClass = dir === 'rtl' ? 'pr-11' : 'pl-11';
+  const offsetClass = dir === 'rtl' ? 'pr-9 sm:pr-11' : 'pl-9 sm:pl-11';
 
   return (
     <div
@@ -95,18 +96,18 @@ useEffect(() => {
       {/* BODY */}
       <main className="flex-1 w-full px-3 md:px-5 lg:px-6 py-6">
         <section
-          className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 md:p-7 rounded`}
+          className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-4 sm:p-6 md:p-7 rounded`}
         >
           <div
-            className={`rounded-lg shadow-md p-6 md:p-8 ${
+            className={`rounded-lg shadow-md p-4 sm:p-6 md:p-8 ${
               isDark ? 'bg-slate-600' : 'bg-white'
             } max-w-6xl mx-auto`}
           >
             {/* Card header */}
-            <div className="mb-6 text-center">
-              <div className="inline-block mb-4">
+            <div className="mb-5 sm:mb-6 text-center">
+              <div className="inline-block mb-3 sm:mb-4">
                 <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center text-3xl ${
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-2xl sm:text-3xl ${
                     isDark ? 'bg-emerald-900/50' : 'bg-emerald-100'
                   }`}
                 >
@@ -114,24 +115,24 @@ useEffect(() => {
                 </div>
               </div>
               <h1
-                className={`text-2xl md:text-3xl font-bold ${
+                className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                   isDark ? 'text-white' : 'text-slate-800'
                 }`}
               >
                 {t('cardTitle')}
               </h1>
-              <p className={`${isDark ? 'text-emerald-200' : 'text-emerald-800'} mt-2`}>
+              <p className={`${isDark ? 'text-emerald-200' : 'text-emerald-800'} mt-2 text-sm sm:text-base`}>
                 {t('cardSub')}
               </p>
             </div>
 
             {/* Questions */}
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               {/* Question 1 */}
               <div className="space-y-3">
-                <div className="flex items-start gap-3 justify-between">
+                <div className="flex items-start gap-2 sm:gap-3">
                   <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                    className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       isDark
                         ? 'bg-emerald-900/50 text-emerald-300'
                         : 'bg-emerald-100 text-emerald-700'
@@ -140,7 +141,7 @@ useEffect(() => {
                     1
                   </div>
                   <label
-                    className={`flex-1 font-semibold text-lg pt-1 ${
+                    className={`flex-1 font-semibold text-base sm:text-lg pt-1 ${
                       isDark ? 'text-white' : 'text-slate-800'
                     }`}
                   >
@@ -153,7 +154,7 @@ useEffect(() => {
                     value={answers.insight}
                     onChange={handleChange}
                     rows="4"
-                    className={`w-full rounded-lg border px-4 py-3 text-base transition-all focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
+                    className={`w-full rounded-lg border px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base transition-all focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 ${
                       isDark
                         ? 'bg-slate-700 border-slate-500 text-white placeholder-slate-400'
                         : 'bg-slate-50 border-slate-300 text-slate-800 placeholder-slate-400'
@@ -174,9 +175,9 @@ useEffect(() => {
 
               {/* Question 2 */}
               <div className="space-y-3">
-                <div className="flex items-start gap-3 justify-between">
+                <div className="flex items-start gap-2 sm:gap-3">
                   <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                    className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       isDark
                         ? 'bg-teal-900/50 text-teal-300'
                         : 'bg-teal-100 text-teal-700'
@@ -185,7 +186,7 @@ useEffect(() => {
                     2
                   </div>
                   <label
-                    className={`flex-1 font-semibold text-lg pt-1 ${
+                    className={`flex-1 font-semibold text-base sm:text-lg pt-1 ${
                       isDark ? 'text-white' : 'text-slate-800'
                     }`}
                   >
@@ -198,7 +199,7 @@ useEffect(() => {
                     value={answers.usefulness}
                     onChange={handleChange}
                     rows="4"
-                    className={`w-full rounded-lg border px-4 py-3 text-base transition-all focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${
+                    className={`w-full rounded-lg border px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base transition-all focus:ring-2 focus:ring-teal-500 focus:border-teal-500 ${
                       isDark
                         ? 'bg-slate-700 border-slate-500 text-white placeholder-slate-400'
                         : 'bg-slate-50 border-slate-300 text-slate-800 placeholder-slate-400'
@@ -222,7 +223,7 @@ useEffect(() => {
                     !answers.insight.trim() ||
                     !answers.usefulness.trim()
                   }
-                  className={`px-8 py-3 rounded-lg font-semibold shadow-md transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`w-full sm:w-auto min-w-[200px] px-6 sm:px-8 py-2.5 sm:py-3 rounded-lg font-semibold shadow-md transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base ${
                     isDark
                       ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
                       : 'bg-emerald-500 hover:bg-emerald-600 text-white'
@@ -232,20 +233,20 @@ useEffect(() => {
                 </button>
 
                 {(!answers.insight.trim() || !answers.usefulness.trim()) && (
-                  <p className={`text-sm mt-3 ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>
+                  <p className={`text-xs sm:text-sm mt-3 ${isDark ? 'text-slate-300' : 'text-slate-500'}`}>
                     {t('mustAnswer')}
                   </p>
                 )}
 
                 {err && (
-                  <p className="text-sm mt-3 text-red-400">
+                  <p className="text-xs sm:text-sm mt-3 text-red-400">
                     {err}
                   </p>
                 )}
               </div>
 
               {/* Bottom note */}
-              <p className={`text-center text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+              <p className={`text-center text-xs sm:text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                 {t('thanksNote')}
               </p>
             </div>

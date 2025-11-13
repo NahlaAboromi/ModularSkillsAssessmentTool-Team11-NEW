@@ -1,4 +1,4 @@
-// src/components/LanguageSwitcher.jsx
+// C:\Users\n0502\OneDrive\שולחן העבודה\final_project\hw2-frontend\src\components\LanguageSwitcher.jsx
 import React, { useContext } from "react";
 import { LanguageContext } from "../context/LanguageContext";
 import { ThemeContext } from "../DarkLightMood/ThemeContext";
@@ -11,6 +11,7 @@ export default function LanguageSwitcher({ compact = false, disabled = false, ti
   return (
     <div 
       style={{
+        direction: 'ltr', 
         position: 'relative',
         display: 'inline-flex',
         alignItems: 'center',

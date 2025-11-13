@@ -1,3 +1,4 @@
+// src/Research/assessment/ScaleButtons.jsx
 import React, { useContext } from 'react';
 import { ThemeContext } from '../../DarkLightMood/ThemeContext';
 
@@ -14,14 +15,14 @@ export default function ScaleButtons({ options, selected, onSelect }) {
   const isDark = theme === 'dark';
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-3">
       {options.map((opt) => {
         const pal = paletteByValue[opt.value] || paletteByValue[4];
         const isSelected = selected === opt.value;
 
-        // קלף (card) – סגנון לפי מצב ותצוגה
+        // כרטיס – קטן יותר ורספונסיבי
         const cardBase =
-          'group relative p-7 rounded-2xl border-2 transition-all duration-200 focus:outline-none ' +
+          'group relative rounded-xl border-2 transition-all duration-200 focus:outline-none px-3 py-3 sm:px-4 sm:py-4 ' +
           (isDark
             ? 'focus-visible:ring-2 focus-visible:ring-violet-400/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
             : 'focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white');
@@ -29,19 +30,19 @@ export default function ScaleButtons({ options, selected, onSelect }) {
         const cardCls = isSelected
           ? (
               isDark
-                ? `bg-slate-800/70 border-slate-500 ring-2 ring-white/30 shadow-xl scale-[1.02]`
-                : `${pal.bg} ${pal.border} shadow-xl scale-[1.02]`
+                ? 'bg-slate-800/80 border-slate-500 shadow-lg scale-[1.02]'
+                : `${pal.bg} ${pal.border} shadow-lg scale-[1.02]`
             )
           : (
               isDark
-                ? `border-slate-700 bg-slate-900/60 hover:bg-slate-800/70 hover:border-slate-500 shadow-sm`
-                : `border-slate-200 bg-white ${pal.hover} hover:shadow-lg`
+                ? 'border-slate-700 bg-slate-900/70 hover:bg-slate-800/80 hover:border-slate-500 shadow-sm'
+                : `border-slate-200 bg-white ${pal.hover} hover:shadow-md`
             );
 
         const labelCls = isDark ? 'text-slate-100' : 'text-slate-700';
         const kbdCls = isDark
-          ? 'text-xs bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-600'
-          : 'text-xs bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-300';
+          ? 'text-[10px] sm:text-xs bg-slate-800 text-slate-200 px-2 py-1 rounded-lg border border-slate-600'
+          : 'text-[10px] sm:text-xs bg-slate-100 px-2 py-1 rounded-lg border border-slate-300';
 
         return (
           <button
@@ -50,23 +51,29 @@ export default function ScaleButtons({ options, selected, onSelect }) {
             onClick={() => onSelect(opt.value)}
             aria-pressed={isSelected}
             title={`${opt.label} (${opt.value})`}
-            className={`${cardBase} ${cardCls} hover:scale-105 active:scale-95`}
+            className={`${cardBase} ${cardCls} hover:scale-[1.02] active:scale-95`}
           >
-            {/* עיגול הצבע (גרדיאנט) */}
+            {/* עיגול הצבע – קטן יותר במובייל */}
             <div
-              className={`w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br ${pal.color} 
-                          flex items-center justify-center text-white font-bold text-2xl shadow-lg`}
+              className={`
+                w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-2 sm:mb-3
+                rounded-xl bg-gradient-to-br ${pal.color}
+                flex items-center justify-center
+                text-white font-bold text-lg sm:text-2xl shadow-md
+              `}
             >
               {opt.value}
             </div>
 
             {/* תווית */}
-            <div className={`text-sm font-bold mb-3 ${labelCls}`}>
+            <div className={`text-xs sm:text-sm font-bold mb-2 sm:mb-3 text-center ${labelCls}`}>
               {opt.label}
             </div>
 
             {/* hotkey */}
-            <kbd className={kbdCls}>{opt.value}</kbd>
+            <div className="flex justify-center">
+              <kbd className={kbdCls}>{opt.value}</kbd>
+            </div>
           </button>
         );
       })}

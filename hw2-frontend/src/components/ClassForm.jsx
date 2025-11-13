@@ -186,30 +186,45 @@ const language = lang === 'he' ? 'he' : 'en';
         body: JSON.stringify({
           teacherId: user.id,
           type: 'success',
+          // אנגלית – לטבלת Notification הרגילה
           title: `Class ${formData.classCode} created successfully`,
+          // עברית – לטבלת HebrewNotification
+          titleHe: `הכיתה ${formData.classCode} נוצרה בהצלחה`,
           content: `A situational question about "${selectedTopic}" is ready for students.`,
           time: new Date().toLocaleString(),
           read: false,
         }),
       });
 
+
       await fetchNotifications();
       showSuccessToast(t('toasts.classCreated'));
       resetForm();
     } catch (error) {
       console.error('❌ Error creating class:', error);
-
+const rawMessage = error.message || '';
+const isCodeExists = rawMessage.includes('Class Code already exists');
+const titleEn = isCodeExists
+     ? 'Failed to create class: Class code already exists. Please choose a different code.'
+     : `Failed to create class: ${rawMessage}`;
+const titleHe = isCodeExists
+    ? 'יצירת הכיתה נכשלה: קוד הכיתה כבר קיים. נא לבחור קוד אחר.'
+    : `יצירת הכיתה נכשלה: ${rawMessage}`;
       await fetch('/api/notifications/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           teacherId: user.id,
           type: 'warning',
-          title: `Failed to create class: ${error.message}`,
+          // אנגלית – לטבלת Notification
+          title: titleEn,
+          // עברית – לטבלת HebrewNotification
+          titleHe: titleHe,
           time: new Date().toLocaleString(),
           read: false,
         }),
       });
+
 
       await fetchNotifications();
       showErrorToast(`${t('toasts.error')}: ${error.message}`);

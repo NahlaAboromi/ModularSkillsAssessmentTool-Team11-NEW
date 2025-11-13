@@ -5,8 +5,9 @@ import { useI18n } from '../utils/i18n';
 
 const StudentAnswerCard = ({ answer, isDark }) => {
   const { answerText, analysisResult, submittedAt } = answer || {};
-  const { lang: ctxLang } = useContext(LanguageContext); // נשאר בשביל locale לתאריך בלבד
+  const { lang: ctxLang } = useContext(LanguageContext);
   const { t, dir, lang, ready } = useI18n('studentAnswerCard');
+  
   if (!analysisResult || !ready) return null;
 
   // ========= NORMALIZATION =========
@@ -60,18 +61,24 @@ const StudentAnswerCard = ({ answer, isDark }) => {
   };
 
   return (
-    <main className="flex-1 w-full px-4 py-6">
-      <div dir={dir} lang={lang} className="bg-slate-100 text-black dark:bg-slate-800 dark:text-white p-6 rounded">
-        <div className="bg-white dark:bg-slate-600 p-4 rounded shadow mb-6">
-          <div className="flex justify-between items-center gap-3">
+    <main className="flex-1 w-full px-3 sm:px-4 md:px-6 py-4 sm:py-6">
+      <div 
+        dir={dir} 
+        lang={lang} 
+        className="bg-slate-100 text-black dark:bg-slate-800 dark:text-white p-3 sm:p-4 md:p-6 rounded-lg"
+      >
+        <div className="bg-white dark:bg-slate-600 p-3 sm:p-4 md:p-5 rounded-lg shadow-md mb-4 sm:mb-6">
+          
+          {/* Header: Score + Date */}
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-500">
             <div
-              className={`px-3 py-1.5 rounded-full ${getScoreBadgeColor(AR.overallScore)} ${getScoreColor(AR.overallScore)} font-bold text-sm`}
+              className={`px-3 py-1.5 rounded-full ${getScoreBadgeColor(AR.overallScore)} ${getScoreColor(AR.overallScore)} font-bold text-xs sm:text-sm w-fit`}
             >
               {t('overallScore')}: {AR.overallScore}
             </div>
 
             {submittedAt && (
-              <p className="text-sm mt-1 shrink-0">
+              <p className="text-xs sm:text-sm">
                 <span role="img" aria-label="time">⏱️</span>{' '}
                 {t('submitted')}: {formatDate(submittedAt)}
               </p>
@@ -79,24 +86,25 @@ const StudentAnswerCard = ({ answer, isDark }) => {
           </div>
 
           {/* Main content */}
-          <div className="p-4">
-            {/* Answer */}
-            <div className="mb-5">
-              <h4 className="font-bold mb-2 flex items-center gap-2">
+          <div className="space-y-4 sm:space-y-5">
+            
+            {/* Answer Section */}
+            <div>
+              <h4 className="font-bold text-sm sm:text-base mb-2 flex items-center gap-2">
                 <span role="img" aria-label="pencil">✍️</span> {t('answer')}:
               </h4>
-              <div className="p-6 rounded-md bg-slate-100 text-black dark:bg-slate-800 dark:text-white">
-                <p className="whitespace-pre-line">{answerText}</p>
+              <div className="p-3 sm:p-4 md:p-6 rounded-md bg-slate-100 text-black dark:bg-slate-800 dark:text-white">
+                <p className="whitespace-pre-line text-sm sm:text-base leading-relaxed">{answerText}</p>
               </div>
             </div>
 
-            {/* CASEL categories */}
-            <div className="mb-5">
-              <h4 className="font-bold mb-3 flex items-center gap-2">
+            {/* CASEL Categories */}
+            <div>
+              <h4 className="font-bold text-sm sm:text-base mb-3 flex items-center gap-2">
                 <span role="img" aria-label="analysis">📊</span> {t('caselAnalysis')}:
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                 {Object.entries(CAT)
                   .filter(([_, v]) => v)
                   .map(([key, val]) => {
@@ -105,24 +113,28 @@ const StudentAnswerCard = ({ answer, isDark }) => {
                     return (
                       <div
                         key={key}
-                        className={`p-3 rounded-md bg-slate-100 text-black dark:bg-slate-800 dark:text-white ${dir === 'rtl' ? 'border-r-4' : 'border-l-4'} ${getScoreBadgeColor(score)}`}
+                        className={`p-3 sm:p-4 rounded-md bg-slate-100 text-black dark:bg-slate-800 dark:text-white ${dir === 'rtl' ? 'border-r-4' : 'border-l-4'} ${getScoreBadgeColor(score)}`}
                       >
-                        <div className="flex items-center gap-2 mb-1">
-                          <span role="img" aria-label={key}>{categoryIcons[key]}</span>
-                          <h5 className="font-bold">{t(key)}</h5>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span role="img" aria-label={key} className="text-base sm:text-lg">
+                            {categoryIcons[key]}
+                          </span>
+                          <h5 className="font-bold text-xs sm:text-sm">{t(key)}</h5>
                         </div>
 
                         <div className="flex items-center gap-2 mb-2">
-                          <div className={`text-lg font-bold ${getScoreColor(score)}`}>{score}</div>
-                          <div className="w-full bg-gray-200 dark:bg-slate-600 rounded-full h-2">
+                          <div className={`text-base sm:text-lg font-bold ${getScoreColor(score)} min-w-[2rem]`}>
+                            {score}
+                          </div>
+                          <div className="flex-1 bg-gray-200 dark:bg-slate-600 rounded-full h-2">
                             <div
-                              className={`h-2 rounded-full ${barColor(score)}`}
+                              className={`h-2 rounded-full ${barColor(score)} transition-all`}
                               style={{ width: `${Math.max(0, Math.min(100, (score / 5) * 100))}%` }}
                             />
                           </div>
                         </div>
 
-                        <p className="text-sm">{feedback}</p>
+                        <p className="text-xs sm:text-sm leading-relaxed">{feedback}</p>
                       </div>
                     );
                   })}
@@ -130,41 +142,41 @@ const StudentAnswerCard = ({ answer, isDark }) => {
             </div>
 
             {/* Strengths & Areas for Improvement */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-              <div className="p-3 rounded-md bg-green-200 text-black dark:bg-green-800 dark:text-white">
-                <h4 className="font-bold mb-2 flex items-center gap-2 text-green-800 dark:text-green-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+              <div className="p-3 sm:p-4 rounded-md bg-green-200 text-black dark:bg-green-800 dark:text-white">
+                <h4 className="font-bold text-sm sm:text-base mb-2 flex items-center gap-2 text-green-800 dark:text-green-200">
                   <span role="img" aria-label="strength">💪</span> {t('strengths')}:
                 </h4>
-                <ul className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}>
+                <ul className={`list-disc ${dir === 'rtl' ? 'list-inside text-right pr-2' : 'list-inside text-left pl-2'} space-y-1`}>
                   {AR.observedStrengths.map((s, i) => (
-                    <li key={i} className="text-sm">{s}</li>
+                    <li key={i} className="text-xs sm:text-sm leading-relaxed break-words">{s}</li>
                   ))}
                 </ul>
               </div>
 
-              <div className="p-3 rounded-md bg-yellow-200 text-black dark:bg-yellow-800 dark:text-white">
-                <h4 className="font-bold mb-2 flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
+              <div className="p-3 sm:p-4 rounded-md bg-yellow-200 text-black dark:bg-yellow-800 dark:text-white">
+                <h4 className="font-bold text-sm sm:text-base mb-2 flex items-center gap-2 text-yellow-800 dark:text-yellow-200">
                   <span role="img" aria-label="improvement">🔍</span> {t('areasForImprovement')}:
                 </h4>
-                <ul className={`list-disc list-inside ${dir === 'rtl' ? 'text-right' : 'text-left'} space-y-1 break-words leading-relaxed`}>
+                <ul className={`list-disc ${dir === 'rtl' ? 'list-inside text-right pr-2' : 'list-inside text-left pl-2'} space-y-1`}>
                   {AR.areasForImprovement.map((a, i) => (
-                    <li key={i} className="text-sm">{a}</li>
+                    <li key={i} className="text-xs sm:text-sm leading-relaxed break-words">{a}</li>
                   ))}
                 </ul>
               </div>
             </div>
 
             {/* Suggested Intervention */}
-            <div className="p-3 rounded-md bg-blue-200 text-black dark:bg-blue-800 dark:text-white">
-              <h4 className="font-bold mb-2 flex items-center gap-2 text-blue-800 dark:text-blue-200">
+            <div className="p-3 sm:p-4 rounded-md bg-blue-200 text-black dark:bg-blue-800 dark:text-white">
+              <h4 className="font-bold text-sm sm:text-base mb-2 flex items-center gap-2 text-blue-800 dark:text-blue-200">
                 <span role="img" aria-label="lightbulb">💡</span> {t('suggestedIntervention')}:
               </h4>
-              <p className="text-sm">{AR.suggestedIntervention}</p>
+              <p className="text-xs sm:text-sm leading-relaxed">{AR.suggestedIntervention}</p>
             </div>
 
             {/* Depth Level */}
             {AR.estimatedDepthLevel && (
-              <div className={`${dir === 'rtl' ? 'text-left' : 'text-right'} text-sm mt-2`}>
+              <div className={`${dir === 'rtl' ? 'text-left' : 'text-right'} text-xs sm:text-sm`}>
                 <span className="opacity-75">{t('depthLevel')}:</span>{' '}
                 <span className="font-semibold">{AR.estimatedDepthLevel}</span>
               </div>

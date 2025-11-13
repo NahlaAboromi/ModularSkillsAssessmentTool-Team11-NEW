@@ -89,12 +89,18 @@ const TeacherHeader = () => {
   };
 
   return (
-    <header
-      dir={dir}
-      lang={lang}
-      className={`p-4 ${theme === 'dark' ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-800'} flex justify-between items-center rounded shadow-md`}
-    >
-      <nav className="flex items-center gap-6">
+<header
+  dir={dir}
+  lang={lang}
+  className={`p-3 sm:p-4 ${
+    theme === 'dark' ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-800'
+  } rounded shadow-md
+    flex flex-col gap-3
+    sm:flex-row sm:items-center sm:justify-between`}
+>
+
+      <nav className="flex flex-wrap items-center gap-3 sm:gap-6 text-sm sm:text-base justify-center sm:justify-start">
+
         {/* Home */}
         <Link to="/teacher/Teacher" className="font-bold hover:text-blue-300 transition-colors flex items-center gap-2">
           {/* Dashboard icon */}
@@ -150,9 +156,9 @@ const TeacherHeader = () => {
           <span>{t('createClass', 'Create Class')}</span>
         </Link>
       </nav>
+{/* Right section: theme toggle, language switcher, notifications, profile, logout */}
+<div className="flex flex-wrap items-center gap-3 sm:gap-6 justify-center sm:justify-end">
 
-      {/* Right section: theme toggle, language switcher, notifications, profile, logout */}
-      <div className="flex items-center gap-6">
         {/* Theme Toggle */}
         <ThemeToggle />
 

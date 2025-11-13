@@ -57,10 +57,16 @@ const SharedHeader = () => {
     <header
       dir={isRTL ? 'rtl' : 'ltr'}
       lang={lang}
-      className={`w-full flex justify-between items-center px-6 py-3 shadow-sm transition-all
+      className={`
+        w-full
+        px-4 sm:px-6 py-3
+        shadow-sm transition-all
         ${isDark ? 'bg-slate-700 text-white' : 'bg-white text-slate-800 border-b border-gray-200'}
+        flex flex-col gap-3
+        sm:flex-row sm:items-center sm:justify-between
       `}
     >
+
       {/* Left side (brand + badge) */}
       <div className="flex items-center gap-3">
         <Link to="/" className="text-2xl font-bold flex items-center gap-2">
@@ -75,12 +81,21 @@ const SharedHeader = () => {
       </div>
 
       {/* Right side (buttons) */}
-      <div className={`flex items-center gap-6 text-sm font-semibold ${isRTL ? 'flex-row-reverse' : ''}`}>
+      <div
+        className={`
+          flex flex-wrap items-center
+          gap-3 sm:gap-6 text-sm font-semibold
+          ${isRTL
+            ? 'flex-row-reverse justify-center sm:justify-start'
+            : 'justify-center sm:justify-end'}
+        `}
+      >
         <ThemeToggle />
         <LanguageSwitcher />
         <FeaturesModal label={T.features} />
         <AboutModal label={T.about} />
-     </div>
+      </div>
+
     </header>
   );
 };

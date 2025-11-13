@@ -69,9 +69,17 @@ const StudentHeader = () => {
   };
 
   return (
-    <header className={"p-4 $ dark:bg-slate-700 dark:text-white' bg-slate-200 text-slate-800 flex justify-between items-center rounded shadow-md"}>
+  <header
+    className={`p-3 sm:p-4 ${
+      theme === 'dark' ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-800'
+    } rounded shadow-md
+      flex flex-col gap-3
+      sm:flex-row sm:items-center sm:justify-between`}
+  >
+
       {/* Navigation links */}
-      <nav className="flex items-center gap-6">
+      <nav className="flex flex-wrap items-center gap-3 sm:gap-6 text-sm sm:text-base justify-center sm:justify-start">
+
         {/* Home link */}
         <Link to="/StudentHome" className="font-bold hover:text-blue-300 transition-colors flex items-center gap-2">
           {/* Dashboard icon */}
@@ -114,7 +122,8 @@ const StudentHeader = () => {
         
       </nav>
 
-      <div className="flex items-center gap-6">
+           <div className="flex flex-wrap items-center gap-3 sm:gap-6 justify-center sm:justify-end">
+
         {/* Theme Toggle Button */}
         <ThemeToggle />
 

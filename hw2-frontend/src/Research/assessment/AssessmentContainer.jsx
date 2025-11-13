@@ -84,7 +84,7 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   const [endTime, setEnd] = useState(null);
 
   // phase flags
-const isQuestionPhase = !showIntro && !isComplete && !alreadyDone && !showFinishModal; 
+  const isQuestionPhase = !showIntro && !isComplete && !alreadyDone && !showFinishModal; 
   const total = QUESTIONS.length;
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
   const progress = useMemo(() => (answeredCount / Math.max(1, total)) * 100, [answeredCount, total]);
@@ -272,10 +272,10 @@ const isQuestionPhase = !showIntro && !isComplete && !alreadyDone && !showFinish
       setEnd(Date.now());
       justCompletedAtRef.current = Date.now();
       try { document.activeElement?.blur?.(); } catch {}
-    advanceTmoRef.current = window.setTimeout(() => {
-      setShowFinishModal(true);
-      // נשאיר את הנעילה פעילה עד שהמשתמש ילחץ במודל
-   }, delay);
+      advanceTmoRef.current = window.setTimeout(() => {
+        setShowFinishModal(true);
+        // נשאיר את הנעילה פעילה עד שהמשתמש ילחץ במודל
+      }, delay);
     }
   };
 
@@ -395,43 +395,45 @@ const isQuestionPhase = !showIntro && !isComplete && !alreadyDone && !showFinish
       try { resultsFocusTrapRef.current?.focus?.(); } catch {}
     }
   }, [isComplete, alreadyDone]);
-// --- חוסם קלט (מקלדת/עכבר/גלילה/מגע) כשחלון הסיום פתוח ---
-useEffect(() => {
-  if (!showFinishModal) return;
-  const stop = (e) => {
-    // לא לחסום קליקים בתוך המודל
-    if (e.type === 'click' || e.type === 'mousedown' || e.type === 'mouseup' || e.type === 'touchstart' || e.type === 'touchmove') {
-      const inside = (e.target && typeof e.target.closest === 'function')
-        ? e.target.closest('#finishModalRoot')
-        : null;
-      if (inside) return; // לא חוסמים בתוך המודל
-    }
-    e.preventDefault();
-    e.stopPropagation();
-  };  const opts = { capture: true, passive: false };
-  window.addEventListener('keydown', stop, opts);
-  window.addEventListener('keyup', stop, opts);
-  window.addEventListener('keypress', stop, opts);
-  window.addEventListener('click', stop, opts);
-  window.addEventListener('mousedown', stop, opts);
-  window.addEventListener('mouseup', stop, opts);
-  window.addEventListener('wheel', stop, opts);
-  window.addEventListener('touchstart', stop, opts);
-  window.addEventListener('touchmove', stop, opts);
-  window.addEventListener('contextmenu', stop, opts);
-  return () => {
-    window.removeEventListener('keydown', stop, opts);
-    window.removeEventListener('keyup', stop, opts);
-    window.removeEventListener('keypress', stop, opts);
-    window.removeEventListener('click', stop, opts);
-    window.removeEventListener('mousedown', stop, opts);
-    window.removeEventListener('mouseup', stop, opts);
-    window.removeEventListener('wheel', stop, opts);
-    window.removeEventListener('touchstart', stop, opts);
-    window.removeEventListener('touchmove', stop, opts);
-    window.removeEventListener('contextmenu', stop, opts);
-  };
-}, [showFinishModal]);
+
+  // --- חוסם קלט (מקלדת/עכבר/גלילה/מגע) כשחלון הסיום פתוח ---
+  useEffect(() => {
+    if (!showFinishModal) return;
+    const stop = (e) => {
+      // לא לחסום קליקים בתוך המודל
+      if (e.type === 'click' || e.type === 'mousedown' || e.type === 'mouseup' || e.type === 'touchstart' || e.type === 'touchmove') {
+        const inside = (e.target && typeof e.target.closest === 'function')
+          ? e.target.closest('#finishModalRoot')
+          : null;
+        if (inside) return; // לא חוסמים בתוך המודל
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    const opts = { capture: true, passive: false };
+    window.addEventListener('keydown', stop, opts);
+    window.addEventListener('keyup', stop, opts);
+    window.addEventListener('keypress', stop, opts);
+    window.addEventListener('click', stop, opts);
+    window.addEventListener('mousedown', stop, opts);
+    window.addEventListener('mouseup', stop, opts);
+    window.addEventListener('wheel', stop, opts);
+    window.addEventListener('touchstart', stop, opts);
+    window.addEventListener('touchmove', stop, opts);
+    window.addEventListener('contextmenu', stop, opts);
+    return () => {
+      window.removeEventListener('keydown', stop, opts);
+      window.removeEventListener('keyup', stop, opts);
+      window.removeEventListener('keypress', stop, opts);
+      window.removeEventListener('click', stop, opts);
+      window.removeEventListener('mousedown', stop, opts);
+      window.removeEventListener('mouseup', stop, opts);
+      window.removeEventListener('wheel', stop, opts);
+      window.removeEventListener('touchstart', stop, opts);
+      window.removeEventListener('touchmove', stop, opts);
+      window.removeEventListener('contextmenu', stop, opts);
+    };
+  }, [showFinishModal]);
 
   // ----------------------------
   // Render guard based on status
@@ -596,18 +598,12 @@ useEffect(() => {
   // Intro screen
   if (showIntro) {
     return (
-      <div className={`min-h-screen p-8 ${isDark ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-800'}`} dir={dir}>
-        <div className="max-w-3xl mx-auto">
-          <div className={`rounded-lg shadow-md p-6 ${isDark ? 'bg-slate-600' : 'bg-white'}`}>
-            <QuestionnaireIntro
-              CATEGORIES={CAT}
-              quickMode={quickMode}
-              setQuickMode={setQuickMode}
-              onStart={() => setShowIntro(false)}
-            />
-          </div>
-        </div>
-      </div>
+      <QuestionnaireIntro
+        CATEGORIES={CAT}
+        quickMode={quickMode}
+        setQuickMode={setQuickMode}
+        onStart={() => setShowIntro(false)}
+      />
     );
   }
 
@@ -654,59 +650,55 @@ useEffect(() => {
 
   // Main questionnaire view
   return (
-    <div className="min-h-screen bg-transparent px-4 md:px-8 lg:px-12 py-6" dir={dir}>
-    {/* Finish Modal */}
+    <div className="min-h-screen bg-transparent px-3 md:px-6 py-4" dir={dir}>
+      {/* Finish Modal */}
       {showFinishModal && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
           aria-modal="true"
           role="dialog"
         >
           {/* שכבת כיסוי */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
           {/* תוכן החלון */}
-            <div id="finishModalRoot"
-       className={`relative z-[101] w-full max-w-lg rounded-2xl p-6 border shadow-2xl
+          <div id="finishModalRoot"
+               className={`relative z-[101] w-full max-w-md rounded-xl sm:rounded-2xl p-4 sm:p-6 border shadow-2xl
                            ${isDark ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'}`}>
-            <div className="flex items-center justify-center mb-4">
-              <div className={`w-14 h-14 rounded-full flex items-center justify-center
+            <div className="flex items-center justify-center mb-3">
+              <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center
                                ${isDark ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-100 text-emerald-700'}`}>
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-center mb-2">
-              {t('finishModal.title') /* למשל: "סיימת את השאלון!" */}
+            <h3 className="text-xl sm:text-2xl font-bold text-center mb-2">
+              {t('finishModal.title')}
             </h3>
-            <p className={`text-center mb-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+            <p className={`text-sm sm:text-base text-center mb-4 sm:mb-6 ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
               {(t('finishModal.body', { count: total }) || t('finishModal.body'))
                 .replace(/\{\{\s*count\s*\}\}/g, String(total))}
             </p>
-            <div className="flex justify-center gap-3">
+            <div className="flex justify-center gap-2 sm:gap-3">
               <button
                 onClick={() => {
-                  // סגירת המודל והצגת התוצאות (החסימות יוסרו באפקט)
                   setShowFinishModal(false);
                   setIsComplete(true);
-                  // שחרור נעילה אם נותרה
                   inputLockRef.current = false;
                 }}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] transition"
               >
-                {t('finishModal.cta') /* למשל: "צפייה בתוצאות" */}
+                {t('finishModal.cta')}
               </button>
             </div>
           </div>
         </div>
       )}
-      {/* polite hint */}
 
-
-      <div className="w-full max-w-[96vw] mx-auto">
+      <div className="w-full max-w-4xl mx-auto">
         {/* optional: show save error if exists */}
         {saveErr && (
-          <div className={`mb-3 rounded-lg px-4 py-2 border text-sm
+          <div className={`mb-2 rounded-lg px-3 py-2 border text-xs sm:text-sm
                            ${isDark ? 'bg-red-900/30 border-red-700 text-red-200'
                                     : 'bg-red-50 border-red-300 text-red-800'}`}>
             {t('saveFailed') || 'Save failed'}: {saveErr}
@@ -723,15 +715,23 @@ useEffect(() => {
         />
 
         <div
-          className={`rounded-xl shadow-md p-8 md:p-10 mb-6 border
+          className={`rounded-lg md:rounded-xl shadow-md p-4 sm:p-6 md:p-8 mb-4 border
           ${isDark ? 'bg-slate-600 border-slate-500 text-white' : 'bg-white border-slate-200 text-slate-800'}`}
         >
           <QuestionCard question={q} CATEGORIES={CAT} />
           <ScaleButtons options={options} selected={answers[current]} onSelect={handleAnswer} />
         </div>
 
-        <div className={`flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-        
+        <div
+          className={`
+            mt-2
+            flex flex-col sm:flex-row
+            sm:justify-between sm:items-center
+            gap-2 sm:gap-3
+            ${isRTL ? 'sm:flex-row-reverse' : ''}
+          `}
+        >
+          {/* כפתור קודם */}
           <button
             onClick={() => {
               if (inputLockRef.current) { nudge(); return; }
@@ -744,18 +744,24 @@ useEffect(() => {
               }, TRANSITION_LOCK_MS);
             }}
             disabled={current === 0}
-            className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium hover:shadow disabled:opacity-40
+            className={`flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg text-sm sm:text-base font-medium hover:shadow disabled:opacity-40
               ${isDark ? 'bg-slate-700 border border-slate-500 text-white' : 'bg-white border border-slate-300 text-slate-700'}`}
           >
             {t('previous')}
           </button>
-{showHint && (
-  <div className="mt-6 w-full text-center" role="status" aria-live="polite">
-    <span className="text-orange-600 dark:text-orange-400 text-sm font-medium">
-      {t('tooFast')}
-    </span>
-  </div>
-)}
+
+          {/* הודעת "מהיר מדי" – שורה נפרדת, לא absolute */}
+          {showHint && (
+            <div
+              className="w-full text-center text-xs sm:text-sm text-orange-600 dark:text-orange-400"
+              role="status"
+              aria-live="polite"
+            >
+              {t('tooFast')}
+            </div>
+          )}
+
+          {/* כפתור הבא */}
           {canNext && current < QUESTIONS.length - 1 && (
             <button
               onClick={() => {
@@ -768,12 +774,13 @@ useEffect(() => {
                   inputLockRef.current = false;
                 }, TRANSITION_LOCK_MS);
               }}
-              className="flex items-center gap-2 px-6 py-3 rounded-lg bg-slate-800 text-white font-semibold hover:shadow"
+              className="flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg bg-slate-800 text-white text-sm sm:text-base font-semibold hover:shadow"
             >
               {t('next')}
             </button>
           )}
         </div>
+
       </div>
     </div>
   );

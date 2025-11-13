@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Class = require('../models/ClassSchema');
 const Notification = require('../models/NotificationSchema'); // ✅ מוסיפים ייבוא Notification
+const HebrewNotification = require('../models/HebrewNotification'); // ⭐ חדש
+
 const { analyzeStudentResponse } = require('../services/studentAnalysisService');
 
 //  Create a new class
@@ -106,6 +108,7 @@ router.post('/submit-answer', async (req, res) => {
     console.log('✅ class saved');
 
     // NOTIFICATION
+    // NOTIFICATION - EN (קיים כמו שהיה)
     const newNotification = new Notification({
       teacherId: classDoc.createdBy,
       type: 'exam',
@@ -114,11 +117,24 @@ router.post('/submit-answer', async (req, res) => {
       read: false
     });
     await newNotification.save();
-    console.log('✅ teacher notification saved');
+    console.log('✅ teacher notification saved (EN)');
+
+    // ⭐ NOTIFICATION - HE (חדש)
+    const heTitle = `הסטודנט/ית ${studentId} הגיש/ה תשובה בכיתה ${classCode}`;
+    const newHebrewNotification = new HebrewNotification({
+      notificationId: newNotification._id,   // קישור אחד-על-אחד לאנגלית
+      teacherId: classDoc.createdBy,
+      type: 'exam',
+      title: heTitle,
+      read: false
+    });
+    await newHebrewNotification.save();
+    console.log('✅ teacher notification saved (HE)');
 
     console.log('OK 200. elapsed(ms)=', Date.now() - t0);
     console.groupEnd();
     res.status(200).json({ message: 'Answer submitted successfully and notification saved' });
+
   } catch (error) {
     console.error('❌ [submit-answer] ERROR:', error?.message, '\nstack:', error?.stack);
     console.log('elapsed(ms)=', Date.now() - t0);
@@ -227,6 +243,7 @@ router.delete('/delete/:classCode', async (req, res) => {
     }
 
     // Create a notification before deletion
+    // EN notification (קיים)
     const newNotification = new Notification({
       teacherId: classDoc.createdBy,
       type: 'warning',
@@ -235,11 +252,25 @@ router.delete('/delete/:classCode', async (req, res) => {
       read: false
     });
     await newNotification.save();
+    console.log('✅ delete notification saved (EN)');
+
+    // ⭐ HE notification (חדש)
+    const heTitle = `הכיתה "${classDoc.className}" נמחקה.`;
+    const newHebrewNotification = new HebrewNotification({
+      notificationId: newNotification._id,
+      teacherId: classDoc.createdBy,
+      type: 'warning',
+      title: heTitle,
+      read: false
+    });
+    await newHebrewNotification.save();
+    console.log('✅ delete notification saved (HE)');
 
     //  Delete the class
     await Class.deleteOne({ classCode });
 
     res.status(200).json({ message: 'Class deleted and notification saved' });
+
   } catch (error) {
     console.error('❌ Error deleting class:', error);
     res.status(500).json({ message: 'Server error' });

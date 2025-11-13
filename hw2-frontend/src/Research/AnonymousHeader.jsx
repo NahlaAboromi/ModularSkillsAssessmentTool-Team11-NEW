@@ -115,12 +115,18 @@ const StudentHeader = () => {
 
   return (
     <>
-      <header
-        dir={dir}                // ← נקי ומדויק
-        lang={isRTL ? 'he' : 'en'}
-        className={`p-4 ${isDark ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-800'}
-                    flex justify-between items-center rounded shadow-md`}
-      >
+<header
+  dir={dir}
+  lang={isRTL ? 'he' : 'en'}
+  className={`${
+    isDark ? 'bg-slate-700 text-white' : 'bg-slate-200 text-slate-800'
+  }
+    p-3 sm:p-4
+    flex flex-col gap-3
+    sm:flex-row sm:items-center sm:justify-between
+    rounded shadow-md`}
+>
+
         {/* Left side: tiny title only (no nav links) */}
         <div className="flex items-center gap-3">
           <span className="font-bold text-base">{t('headerTitle')}</span>
@@ -132,7 +138,7 @@ const StudentHeader = () => {
         </div>
 
         {/* Right side: theme, language, timer, profile, logout */}
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 justify-start sm:justify-end">
           <ThemeToggle />
           <LanguageSwitcher
             disabled={isLangLocked}

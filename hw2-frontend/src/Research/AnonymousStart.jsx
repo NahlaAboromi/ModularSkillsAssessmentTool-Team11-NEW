@@ -7,14 +7,14 @@ import Footer from "../layout/Footer";
 import Button from "../components/Button";
 import Alert from "../components/Alert";
 import { LanguageContext } from "../context/LanguageContext";
-import { useI18n } from "../utils/i18n"; // ✅ תרגום מקומי מהיר
+import { useI18n } from "../utils/i18n";
 
 const AnonymousStartContent = () => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === "dark";
   const { lang } = useContext(LanguageContext);
   const isRTL = lang === "he";
-  const { t } = useI18n("anonymousStart"); // ✅ טוען מילון JSON מקומי
+  const { t } = useI18n("anonymousStart");
   const navigate = useNavigate();
   const { setStudent, startSessionTimer, loadQuestionnaire } = useStudent();
 
@@ -164,7 +164,7 @@ const AnonymousStartContent = () => {
   };
 
   const baseFieldClass =
-    "mt-1 block w-full rounded-md border p-3 bg-white dark:bg-gray-700 dark:text-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent";
+    "mt-1 block w-full rounded-md border p-2 md:p-3 text-sm md:text-base bg-white dark:bg-gray-700 dark:text-white transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent";
   const errorBorder = "border-red-500";
   const normalBorder = "border-gray-300 dark:border-gray-600";
 
@@ -177,45 +177,48 @@ const AnonymousStartContent = () => {
         isDark ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-800"
       }`}
     >
-      {/* Header */}
-      <div className="px-4 mt-4">
+      {/* Header - מינימלי */}
+      <div className="px-2 md:px-4 py-1 md:py-2">
         <SharedHeader />
       </div>
 
-      {/* Main */}
-      <main className="flex-1 w-full px-4 py-6">
-        <div className={`${isDark ? "bg-slate-700" : "bg-slate-200"} p-6 rounded`}>
-          {/* כותרת */}
-          <div className="mb-6 text-center">
+      {/* Main - גמיש ומותאם */}
+      <main className="flex-1 w-full px-2 md:px-4 py-1 md:py-3 overflow-auto">
+        <div className={`${isDark ? "bg-slate-700" : "bg-slate-200"} p-2 md:p-4 rounded max-w-4xl mx-auto`}>
+          
+          {/* כותרת - קומפקטית יותר */}
+          <div className="mb-2 md:mb-3 text-center">
             <h1
-              className={`text-4xl font-extrabold bg-gradient-to-r ${
+              className={`text-xl md:text-3xl font-extrabold bg-gradient-to-r ${
                 isDark ? "from-blue-400 to-purple-400" : "from-blue-600 to-purple-600"
-              } bg-clip-text text-transparent mb-2`}
+              } bg-clip-text text-transparent mb-0.5 md:mb-1`}
             >
               {t("brandTitle")}
             </h1>
             <p
-              className={`text-lg ${
+              className={`text-xs md:text-base ${
                 isDark ? "text-gray-300" : "text-slate-600"
-              } flex items-center justify-center gap-2`}
+              } flex items-center justify-center gap-1 md:gap-2`}
             >
-              <span>💡</span>
+              <span className="text-sm md:text-base">💡</span>
               <span>{t("brandSubtitle")}</span>
-              <span>🎓</span>
+              <span className="text-sm md:text-base">🎓</span>
             </p>
           </div>
 
           {/* כרטיס */}
-          <div className={`rounded-lg shadow-md p-8 ${isDark ? "bg-slate-600" : "bg-white"}`}>
-            <div className="mb-6 text-center">
-              <div className="text-5xl mb-3">🤖💡</div>
-              <h2 className={`text-3xl font-bold ${isDark ? "text-white" : "text-slate-800"} mb-2`}>
+          <div className={`rounded-lg shadow-md p-3 md:p-5 ${isDark ? "bg-slate-600" : "bg-white"}`}>
+            
+            {/* כותרת פנימית - עוד יותר קומפקטית */}
+            <div className="mb-2 md:mb-3 text-center">
+              <div className="text-2xl md:text-3xl mb-1">🤖💡</div>
+              <h2 className={`text-lg md:text-xl font-bold ${isDark ? "text-white" : "text-slate-800"} mb-0.5 md:mb-1`}>
                 {t("welcomeTitle")}
               </h2>
-              <p className={`text-lg ${isDark ? "text-gray-300" : "text-slate-600"}`}>
+              <p className={`text-xs md:text-sm ${isDark ? "text-gray-300" : "text-slate-600"} leading-tight`}>
                 {t("welcomeDesc")}
                 <br />
-                <span className="text-sm italic opacity-80 flex items-center justify-center gap-1 mt-2">
+                <span className="text-xs italic opacity-80 flex items-center justify-center gap-1 mt-0.5">
                   <span>🔒</span>
                   <span>{t("welcomeNote")}</span>
                 </span>
@@ -229,165 +232,168 @@ const AnonymousStartContent = () => {
               <Alert type="warning" message={friendlyMissingMessage} />
             )}
 
-            {/* טופס */}
-            <form className="space-y-6 mt-6" onSubmit={handleSubmit} noValidate>
-              {/* Field of Study */}
-              <div className="group">
-                <label htmlFor="fieldOfStudy" className="block text-sm font-semibold mb-2 flex gap-2">
-                  <span>📚</span> <span>{t("fieldOfStudy")}</span> <span className="text-red-500">*</span>
-                </label>
-                <select
-                  ref={refs.fieldOfStudy}
-                  id="fieldOfStudy"
-                  name="fieldOfStudy"
-                  value={form.fieldOfStudy}
-                  onChange={handleChange}
-                  className={`${baseFieldClass} ${
-                    fieldErrors.fieldOfStudy ? errorBorder : normalBorder
-                  }`}
-                >
-                  <option value="" disabled>
-                    {t("selectField")}
-                  </option>
-                  <option value="Software Engineering">{t("fs_SW")}</option>
-                  <option value="Computer Science">{t("fs_CS")}</option>
-                  <option value="Information Systems">{t("fs_IS")}</option>
-                  <option value="Psychology">{t("fs_PSY")}</option>
-                  <option value="Education">{t("fs_EDU")}</option>
-                  <option value="Business Management">{t("fs_BIZ")}</option>
-                  <option value="Industrial Engineering">{t("fs_IE")}</option>
-                  <option value="Biology">{t("fs_BIO")}</option>
-                  <option value="Nursing">{t("fs_NUR")}</option>
-                  <option value="Law">{t("fs_LAW")}</option>
-                  <option value="other">{t("fs_OTHER")}</option>
-                </select>
-                {form.fieldOfStudy === "other" && (
-                  <input
-                    ref={refs.customFieldOfStudy}
-                    type="text"
-                    name="customFieldOfStudy"
-                    placeholder={t("otherFieldPh")}
-                    value={form.customFieldOfStudy}
+            {/* טופס - grid של 2 עמודות במובייל */}
+            <form className="mt-2 md:mt-3" onSubmit={handleSubmit} noValidate>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3">
+                
+                {/* Field of Study */}
+                <div className="md:col-span-2">
+                  <label htmlFor="fieldOfStudy" className="block text-xs md:text-sm font-semibold mb-1 flex gap-1 items-center">
+                    <span>📚</span> <span>{t("fieldOfStudy")}</span> <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    ref={refs.fieldOfStudy}
+                    id="fieldOfStudy"
+                    name="fieldOfStudy"
+                    value={form.fieldOfStudy}
                     onChange={handleChange}
-                    className={`${baseFieldClass} mt-3 ${
-                      fieldErrors.customFieldOfStudy ? errorBorder : normalBorder
+                    className={`${baseFieldClass} ${
+                      fieldErrors.fieldOfStudy ? errorBorder : normalBorder
                     }`}
-                  />
-                )}
-              </div>
-
-              {/* Semester */}
-              <div className="group">
-                <label htmlFor="semester" className="block text-sm font-semibold mb-2 flex gap-2">
-                  <span>📅</span> <span>{t("currentSemester")}</span> <span className="text-red-500">*</span>
-                </label>
-                <select
-                  ref={refs.semester}
-                  id="semester"
-                  name="semester"
-                  value={form.semester}
-                  onChange={handleChange}
-                  className={`${baseFieldClass} ${
-                    fieldErrors.semester ? errorBorder : normalBorder
-                  }`}
-                >
-                  <option value="" disabled>
-                    {t("selectSemester")}
-                  </option>
-                  {SEMESTER_VALUES_EN.map((value, i) => (
-                    <option key={value} value={value}>
-                      {t(`s_${i + 1}`)}
+                  >
+                    <option value="" disabled>
+                      {t("selectField")}
                     </option>
-                  ))}
-                </select>
-              </div>
+                    <option value="Software Engineering">{t("fs_SW")}</option>
+                    <option value="Computer Science">{t("fs_CS")}</option>
+                    <option value="Information Systems">{t("fs_IS")}</option>
+                    <option value="Psychology">{t("fs_PSY")}</option>
+                    <option value="Education">{t("fs_EDU")}</option>
+                    <option value="Business Management">{t("fs_BIZ")}</option>
+                    <option value="Industrial Engineering">{t("fs_IE")}</option>
+                    <option value="Biology">{t("fs_BIO")}</option>
+                    <option value="Nursing">{t("fs_NUR")}</option>
+                    <option value="Law">{t("fs_LAW")}</option>
+                    <option value="other">{t("fs_OTHER")}</option>
+                  </select>
+                  {form.fieldOfStudy === "other" && (
+                    <input
+                      ref={refs.customFieldOfStudy}
+                      type="text"
+                      name="customFieldOfStudy"
+                      placeholder={t("otherFieldPh")}
+                      value={form.customFieldOfStudy}
+                      onChange={handleChange}
+                      className={`${baseFieldClass} mt-2 ${
+                        fieldErrors.customFieldOfStudy ? errorBorder : normalBorder
+                      }`}
+                    />
+                  )}
+                </div>
 
-              {/* Gender */}
-              <div className="group">
-                <span className="block text-sm font-semibold mb-3 flex gap-2">
-                  <span>{t("gender")}</span> <span className="text-red-500">*</span>
-                </span>
-                <div className="flex gap-8 justify-center">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="male"
-                      checked={form.gender === "male"}
-                      onChange={handleChange}
-                    />
-                    <span>{t("male")}</span>
+                {/* Semester */}
+                <div>
+                  <label htmlFor="semester" className="block text-xs md:text-sm font-semibold mb-1 flex gap-1 items-center">
+                    <span>📅</span> <span>{t("currentSemester")}</span> <span className="text-red-500">*</span>
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="female"
-                      checked={form.gender === "female"}
-                      onChange={handleChange}
-                    />
-                    <span>{t("female")}</span>
+                  <select
+                    ref={refs.semester}
+                    id="semester"
+                    name="semester"
+                    value={form.semester}
+                    onChange={handleChange}
+                    className={`${baseFieldClass} ${
+                      fieldErrors.semester ? errorBorder : normalBorder
+                    }`}
+                  >
+                    <option value="" disabled>
+                      {t("selectSemester")}
+                    </option>
+                    {SEMESTER_VALUES_EN.map((value, i) => (
+                      <option key={value} value={value}>
+                        {t(`s_${i + 1}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Age Range */}
+                <div>
+                  <label htmlFor="ageRange" className="block text-xs md:text-sm font-semibold mb-1 flex gap-1 items-center">
+                    <span>😊</span> <span>{t("ageRange")}</span> <span className="text-red-500">*</span>
                   </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="other"
-                      checked={form.gender === "other"}
-                      onChange={handleChange}
-                    />
-                    <span>{t("other")}</span>
-                  </label>
+                  <select
+                    ref={refs.ageRange}
+                    id="ageRange"
+                    name="ageRange"
+                    value={form.ageRange}
+                    onChange={handleChange}
+                    className={`${baseFieldClass} ${
+                      fieldErrors.ageRange ? errorBorder : normalBorder
+                    }`}
+                  >
+                    <option value="" disabled>
+                      {t("selectAgeRange")}
+                    </option>
+                    <option value="18-22">{t("ar_18_22")}</option>
+                    <option value="23-26">{t("ar_23_26")}</option>
+                    <option value="27-30">{t("ar_27_30")}</option>
+                    <option value="31-35">{t("ar_31_35")}</option>
+                    <option value="36+">{t("ar_36p")}</option>
+                  </select>
+                </div>
+
+                {/* Gender - תופס רוחב מלא */}
+                <div className="md:col-span-2">
+                  <span className="block text-xs md:text-sm font-semibold mb-2 flex gap-1 items-center">
+                    <span>{t("gender")}</span> <span className="text-red-500">*</span>
+                  </span>
+                  <div className="flex gap-4 md:gap-6 justify-center flex-wrap">
+                    <label className="flex items-center gap-2 cursor-pointer text-sm md:text-base">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="male"
+                        checked={form.gender === "male"}
+                        onChange={handleChange}
+                        className="w-4 h-4"
+                      />
+                      <span>{t("male")}</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm md:text-base">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="female"
+                        checked={form.gender === "female"}
+                        onChange={handleChange}
+                        className="w-4 h-4"
+                      />
+                      <span>{t("female")}</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-sm md:text-base">
+                      <input
+                        type="radio"
+                        name="gender"
+                        value="other"
+                        checked={form.gender === "other"}
+                        onChange={handleChange}
+                        className="w-4 h-4"
+                      />
+                      <span>{t("other")}</span>
+                    </label>
+                  </div>
                 </div>
               </div>
 
-              {/* Age Range */}
-              <div className="group">
-                <label htmlFor="ageRange" className="block text-sm font-semibold mb-2 flex gap-2">
-                  <span>😊</span> <span>{t("ageRange")}</span> <span className="text-red-500">*</span>
-                </label>
-                <select
-                  ref={refs.ageRange}
-                  id="ageRange"
-                  name="ageRange"
-                  value={form.ageRange}
-                  onChange={handleChange}
-                  className={`${baseFieldClass} ${
-                    fieldErrors.ageRange ? errorBorder : normalBorder
-                  }`}
-                >
-                  <option value="" disabled>
-                    {t("selectAgeRange")}
-                  </option>
-                  <option value="18-22">{t("ar_18_22")}</option>
-                  <option value="23-26">{t("ar_23_26")}</option>
-                  <option value="27-30">{t("ar_27_30")}</option>
-                  <option value="31-35">{t("ar_31_35")}</option>
-                  <option value="36+">{t("ar_36p")}</option>
-                </select>
-                <p className="text-xs mt-2 opacity-70 flex gap-1">
-                  <span>ℹ️</span> <span>{t("ageHelp")}</span>
-                </p>
-              </div>
-
               {/* כפתור */}
-              <div className="pt-4">
+              <div className="mt-3 md:mt-4">
                 <Button type="submit" isLoading={isLoading} fullWidth variant="primary">
-                  <span className="flex items-center justify-center gap-2 text-lg">
+                  <span className="flex items-center justify-center gap-2 text-base md:text-lg">
                     <span>🚀</span> <span>{t("startCTA")}</span>
                   </span>
                 </Button>
               </div>
             </form>
 
-            {/* Privacy */}
+            {/* Privacy - קומפקטי */}
             <div
-              className={`mt-6 p-4 rounded-xl ${
+              className={`mt-2 md:mt-3 p-2 md:p-3 rounded-lg ${
                 isDark ? "bg-slate-800/50" : "bg-blue-50"
               } border ${isDark ? "border-slate-600" : "border-blue-200"}`}
             >
-              <p className="text-sm opacity-90 flex items-start gap-2">
-                <span>🔒</span>
+              <p className="text-xs opacity-90 flex items-start gap-1.5 leading-tight">
+                <span className="text-sm">🔒</span>
                 <span>
                   <strong>{t("privacyTitle")}</strong> {t("privacyText")}
                 </span>
@@ -397,8 +403,8 @@ const AnonymousStartContent = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <div className="px-4 pb-4">
+      {/* Footer - מינימלי */}
+      <div className="px-2 md:px-4 py-1 md:py-2">
         <Footer />
       </div>
     </div>

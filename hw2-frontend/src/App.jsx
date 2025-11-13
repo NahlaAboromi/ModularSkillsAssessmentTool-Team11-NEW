@@ -34,10 +34,9 @@ import AssignmentConfirm from './Research/AssignmentConfirm';
 import Simulation from './Research/Simulation';
 import FinalSummary from './Research/FinalSummary';
 import ValidatedQuestionnaire from './Research/ValidatedQuestionnairePOST';
-import Thanks from './Research/Thanks';
 import SocraticReflectionEnd from './Research/SocraticReflectionFeedback';
 import { LanguageProvider } from './context/LanguageContext';
-
+import Thanks from './Research/Thanks/Thanks';
 import AnonymousSimulationResult from './Research/AnonymousSimulationResult';
 import AssessmentContainer from './Research/assessment/AssessmentContainer';
 function App() {
