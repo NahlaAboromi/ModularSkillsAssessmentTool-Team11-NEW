@@ -129,20 +129,20 @@ const StudentReportCard = ({ studentGroup }) => {
 
   return (
     <div className="relative" dir={dir} lang={lang}>
-      {/* Export PDF Button */}
+      {/* Export PDF Button - יישאר כמו שהוא */}
       <ExportButton
         onExport={exportToPDF}
         isExporting={isExporting}
         isDark={isDark}
       />
 
-      {/* Main Content: report card to be exported */}
+      {/* Main Content: report card - רספונסיבי */}
       <div
         ref={reportRef}
         data-pdf-export
-        className={`w-full h-full p-4 rounded-md shadow-sm ${isDark ? 'bg-slate-700 text-white' : 'bg-white text-slate-800'}`}
+        className={`w-full h-full p-3 sm:p-4 rounded-md shadow-sm ${isDark ? 'bg-slate-700 text-white' : 'bg-white text-slate-800'}`}
       >
-        {/* Student Info Header */}
+        {/* Student Info Header - יישאר כמו שהוא */}
         <StudentHeader
           profilePic={getStudentProfilePic()}
           onImageError={handleImageError}
@@ -152,7 +152,7 @@ const StudentReportCard = ({ studentGroup }) => {
           isDark={isDark}
         />
 
-        {/* Charts for each simulation attempt */}
+        {/* Charts for each simulation - יישארו כמו שהם */}
         {studentGroup.map((simulation, index) => (
           <SimulationChart
             key={index}

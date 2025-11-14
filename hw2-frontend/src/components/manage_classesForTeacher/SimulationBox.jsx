@@ -23,28 +23,28 @@ const SimulationBox = ({ simulationText, situation, onGetClassInsight }) => {
   };
 
   return (
-    <div className="mb-6 p-6 rounded bg-white dark:bg-slate-700 shadow" dir={dir} lang={lang}>
-      {/* Situation */}
-      <h2 className="text-xl font-semibold mb-2">{t('situationTitle')}</h2>
-      <p className="mb-4">{situation}</p>
+    <div className="mb-4 sm:mb-6 p-4 sm:p-6 rounded bg-white dark:bg-slate-700 shadow" dir={dir} lang={lang}>
+      {/* Situation - רספונסיבי */}
+      <h2 className="text-lg sm:text-xl font-semibold mb-2">{t('situationTitle')}</h2>
+      <p className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed">{situation}</p>
 
-      {/* Question */}
-      <h2 className="text-xl font-semibold mb-2">{t('questionTitle')}</h2>
-      <p className="mb-6">{simulationText}</p>
+      {/* Question - רספונסיבי */}
+      <h2 className="text-lg sm:text-xl font-semibold mb-2">{t('questionTitle')}</h2>
+      <p className="mb-4 sm:mb-6 text-sm sm:text-base leading-relaxed">{simulationText}</p>
 
-      {/* Button */}
+      {/* Button - רספונסיבי */}
       <div className="flex gap-4 items-center justify-start">
         <button
           onClick={handleInsightClick}
           disabled={loading}
           title={t('tooltip')}
-          className={`flex items-center gap-2 px-4 py-2 rounded text-white transition 
+          className={`flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 rounded text-white transition text-sm sm:text-base w-full sm:w-auto
             ${loading ? 'bg-gray-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'}`}
         >
           {loading && (
             <span className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></span>
           )}
-          {loading ? t('buttonLoading') : t('buttonDefault')}
+          <span>{loading ? t('buttonLoading') : t('buttonDefault')}</span>
         </button>
       </div>
     </div>

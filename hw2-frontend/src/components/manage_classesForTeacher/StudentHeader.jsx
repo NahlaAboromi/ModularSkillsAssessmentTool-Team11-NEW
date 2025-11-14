@@ -25,28 +25,28 @@ const StudentHeader = ({
       : (t('simulationsMany') || '').replace('{n}', String(simulationCount));
 
   return (
-    <div className="flex items-center gap-4 mb-4" dir={dir} lang={lang}>
-      {/* Student profile image */}
+    <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4" dir={dir} lang={lang}>
+      {/* Student profile image - רספונסיבי */}
       <img
         src={profilePic}
         onError={onImageError}
         alt="Profile"
-        className={`w-12 h-12 rounded-full border-2 object-cover ${
+        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 object-cover ${
           isDark ? 'border-slate-500' : 'border-gray-300'
         }`}
       />
 
-      <div>
-        {/* Student's name */}
-        <p className="text-base font-semibold">{name}</p>
+      <div className="flex-1 min-w-0">
+        {/* Student's name - רספונסיבי */}
+        <p className="text-sm sm:text-base font-semibold truncate">{name}</p>
 
-        {/* Student ID */}
-        <p className={`text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
+        {/* Student ID - רספונסיבי */}
+        <p className={`text-xs sm:text-sm ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
           {t('studentId')} {studentId}
         </p>
 
-        {/* Completed simulations */}
-        <p className="text-sm">{simsText}</p>
+        {/* Completed simulations - רספונסיבי */}
+        <p className="text-xs sm:text-sm">{simsText}</p>
       </div>
     </div>
   );

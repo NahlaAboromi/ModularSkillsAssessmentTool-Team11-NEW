@@ -124,36 +124,43 @@ const ClassDetailsContent = () => {
       lang={lang}
       className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
     >
+      {/* Header - לא נוגעים */}
       <div className="px-4 mt-4">
         <TeacherHeader />
       </div>
 
       <main className="flex-1 w-full px-4 py-6">
-        <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 rounded mb-6`}>
-          <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        {/* Title Section - רספונסיבי */}
+        <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-4 sm:p-6 rounded mb-4 sm:mb-6`}>
+          <h1 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
             <span role="img" aria-label="book">📘</span> {t('title')}
           </h1>
-          <p className="text-lg">
-            {t('classCodeLabel')}{' '}
-            <span className="bg-gray-100 dark:bg-slate-600 px-3 py-1 rounded font-mono">{classCode}</span>
+          <p className="text-base sm:text-lg flex flex-col sm:flex-row sm:items-center gap-2">
+            <span>{t('classCodeLabel')}</span>
+            <span className="bg-gray-100 dark:bg-slate-600 px-3 py-1 rounded font-mono text-sm sm:text-base inline-block">
+              {classCode}
+            </span>
           </p>
         </div>
 
         {classInfo ? (
           <>
+            {/* SimulationBox - יישאר כמו שהוא */}
             <SimulationBox
               simulationText={classInfo.question}
               situation={classInfo.situation}
               onGetClassInsight={getClassInsightFromAI}
             />
 
+            {/* AI Insight Box - רספונסיבי */}
             {classInsight && (
-              <div className="mt-4 mb-6 p-4 rounded bg-yellow-100 text-yellow-900 shadow">
-                <h3 className="text-lg font-semibold mb-2">{t('aiInsightTitle')}</h3>
-                <p>{classInsight}</p>
+              <div className="mt-3 sm:mt-4 mb-4 sm:mb-6 p-3 sm:p-4 rounded bg-yellow-100 text-yellow-900 shadow">
+                <h3 className="text-base sm:text-lg font-semibold mb-2">{t('aiInsightTitle')}</h3>
+                <p className="text-sm sm:text-base">{classInsight}</p>
               </div>
             )}
 
+            {/* Student Cards - יישארו כמו שהם */}
             {Array.isArray(classInfo.students) ? (
               classInfo.students.map((student, idx) => {
                 console.debug('[ClassDetails] render StudentAnswerCard idx:', idx, 'studentId:', student?.studentId, 'submittedAt:', student?.submittedAt);
@@ -162,16 +169,18 @@ const ClassDetailsContent = () => {
                 );
               })
             ) : (
-              <p className="text-red-500">{t('studentsNotArray')}</p>
+              <p className="text-red-500 text-sm sm:text-base">{t('studentsNotArray')}</p>
             )}
           </>
         ) : (
-          <p>{t('loading')}</p>
+          <p className="text-sm sm:text-base">{t('loading')}</p>
         )}
       </main>
 
+      {/* AI Chat - לא נוגעים */}
       {user?.id && <AIChat teacherId={user.id} />}
 
+      {/* Footer - לא נוגעים */}
       <div className="px-4 pb-4">
         <Footer />
       </div>

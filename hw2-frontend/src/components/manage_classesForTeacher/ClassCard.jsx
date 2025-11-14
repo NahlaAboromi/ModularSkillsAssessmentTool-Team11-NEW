@@ -131,17 +131,17 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
 
   return (
     <div dir={isRTL ? 'rtl' : 'ltr'} lang={lang} className="bg-white dark:bg-slate-700 rounded shadow class-card relative">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+      {/* Header - רספונסיבי */}
+      <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-600 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+        <div className="flex-1">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
             {classData.classCode}: {classData.className}
           </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             {t('header.created')}: {formatDate(classData.createdAt)}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <span className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 text-xs font-medium py-1 px-2 rounded">
             {t('badges.active')}
           </span>
@@ -151,10 +151,10 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
         </div>
       </div>
 
-      <div className="p-4">
-        {/* Subject */}
+      <div className="p-3 sm:p-4">
+        {/* Subject - רספונסיבי */}
         {classData.subject && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mb-3 sm:mb-4 flex flex-wrap gap-2">
             <span className="bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100 text-xs font-medium py-1 px-2 rounded">
               {classData.subject}
             </span>
@@ -163,62 +163,62 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
 
         {/* No students */}
         {totalStudents === 0 && (
-          <p className="text-sm text-gray-400 italic mb-4">{t('empty.noStudents')}</p>
+          <p className="text-xs sm:text-sm text-gray-400 italic mb-3 sm:mb-4">{t('empty.noStudents')}</p>
         )}
 
-        {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Stats - רספונסיבי */}
+        <div className="grid grid-cols-1 gap-3 sm:gap-4">
           {/* Attempts summary */}
           <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded">
-            <h3 className="font-bold text-sm text-gray-500 dark:text-gray-400 mb-2">
+            <h3 className="font-bold text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2">
               {attemptsTitle}
             </h3>
-            <p className="text-xl font-bold text-gray-900 dark:text-white">
+            <p className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
               {attemptsLine}
             </p>
-            <p className="text-sm text-gray-700 dark:text-gray-300">
+            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300">
               {completedByLine}
             </p>
           </div>
 
           {/* Average SEL score */}
           <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded">
-            <h3 className="font-bold text-sm text-gray-500 dark:text-gray-400 mb-2">
+            <h3 className="font-bold text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2">
               {t('stats.avgSelTitle')}
             </h3>
             <div className="flex items-center justify-between mb-1">
-              <div className="text-xl font-bold text-gray-900 dark:text-white">
+              <div className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                 {averageScore} / 5
               </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 {t('stats.avgSelLabel')}
               </div>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-3">
+            <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 sm:h-3">
               <div
-                className={`${getGradeColorClass(averageScorePercent)} h-3 rounded-full`}
+                className={`${getGradeColorClass(averageScorePercent)} h-2 sm:h-3 rounded-full`}
                 style={{ width: `${averageScorePercent}%` }}
               ></div>
             </div>
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Link to={`/teacher/class/${encodeURIComponent(classData.classCode)}`}>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded text-sm">
+        {/* Actions - רספונסיבי */}
+        <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row flex-wrap gap-2">
+          <Link to={`/teacher/class/${encodeURIComponent(classData.classCode)}`} className="flex-1 sm:flex-none">
+            <button className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white py-2 sm:py-1 px-4 sm:px-3 rounded text-sm">
               {t('actions.view')}
             </button>
           </Link>
 
-          <Link to={`/teacher/class/${encodeURIComponent(classData.classCode)}/reports`}>
-            <button className="bg-purple-600 hover:bg-purple-700 text-white py-1 px-3 rounded text-sm">
+          <Link to={`/teacher/class/${encodeURIComponent(classData.classCode)}/reports`} className="flex-1 sm:flex-none">
+            <button className="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white py-2 sm:py-1 px-4 sm:px-3 rounded text-sm">
               {t('actions.reports')}
             </button>
           </Link>
 
           <button
-            className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm"
+            className="w-full sm:w-auto bg-red-500 hover:bg-red-600 text-white py-2 sm:py-1 px-4 sm:px-3 rounded text-sm"
             onClick={() => setShowConfirm(true)}
           >
             {t('actions.delete')}
@@ -241,4 +241,4 @@ const ClassCard = ({ classData, onDeleteSuccess }) => {
   );
 };
 
-export default ClassCard;
+export default ClassCard

@@ -10,22 +10,21 @@ const AIChat = ({ teacherId }) => {
   const { theme } = useContext(ThemeContext);
   const isDark = theme === 'dark';
 
- // שפה וכיוון (עם fallback ל-<html lang> למקרה של השהיית Context)
- const ctx = useContext(LanguageContext) || {};
- const lang = ctx.lang ?? (document.documentElement.lang === 'he' ? 'he' : 'en');
- const isRTL = lang === 'he';
- const { t, ready } = useI18n('aiChat'); // i18n לפי השפה
+  const ctx = useContext(LanguageContext) || {};
+  const lang = ctx.lang ?? (document.documentElement.lang === 'he' ? 'he' : 'en');
+  const isRTL = lang === 'he';
+  const { t, ready } = useI18n('aiChat');
 
   const chatRef = useRef(null);
-  const greetingRef = useRef(''); // נשמור כאן את ה-greeting האחרון שיצרנו
-  const [messages, setMessages] = useState([]); // ⬅️ מתחילים ריק, נייצר greeting כשצריך
+  const greetingRef = useRef('');
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const toggleChatBox = () => setShowBox(v => !v);
 
   const closeChat = () => {
     setShowBox(false);
-    setMessages([]); // ⬅️ נסגור ריק כדי שבפתיחה הבאה ניצור greeting לפי השפה הנוכחית
+    setMessages([]);
   };
 
   const scrollToBottom = () => {
@@ -36,30 +35,24 @@ const AIChat = ({ teacherId }) => {
 
   useEffect(() => { scrollToBottom(); }, [messages, loading]);
 
-  // כשפותחים את הצ'אט או כשהמילון מוכן – נייצר greeting אם עדיין אין הודעות
-// greeting תמיד תואם לשפה בעת פתיחה/החלפה, בלי למחוק היסטוריה
-useEffect(() => {
-  if (!showBox || !ready) return;
+  useEffect(() => {
+    if (!showBox || !ready) return;
 
-  const newG = t('greeting');
-  const oldG = greetingRef.current;
+    const newG = t('greeting');
+    const oldG = greetingRef.current;
 
-  setMessages(prev => {
-    if (prev.length === 0) {
-      // פתיחה ראשונה: צור הודעת ברירת מחדל בשפה הנוכחית
-      return [{ role: 'ai', content: newG }];
-    }
-    // אם ההודעה הראשונה היא ה-greeting הישן (או היתה כבר greeting), החלף רק אותה
-    if (prev[0]?.role === 'ai' && (prev[0].content === oldG || prev[0].content === newG)) {
-      return [{ role: 'ai', content: newG }, ...prev.slice(1)];
-    }
-    // אם כבר יש שיחה אמיתית — אל תשנה כלום
-    return prev;
-  });
+    setMessages(prev => {
+      if (prev.length === 0) {
+        return [{ role: 'ai', content: newG }];
+      }
+      if (prev[0]?.role === 'ai' && (prev[0].content === oldG || prev[0].content === newG)) {
+        return [{ role: 'ai', content: newG }, ...prev.slice(1)];
+      }
+      return prev;
+    });
 
-  greetingRef.current = newG;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [showBox, lang, ready, t]);
+    greetingRef.current = newG;
+  }, [showBox, lang, ready, t]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -100,12 +93,195 @@ useEffect(() => {
         .dot2{animation-delay:-0.16s;}
         .dot3{animation-delay:0;}
         @keyframes jump{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-6px);}}
+        
+        /* RESPONSIVE FIXES */
+        .ai-chat-button {
+          position: fixed;
+          bottom: 1rem;
+          background-color: #2563eb;
+          color: white;
+          padding: 0.75rem;
+          border-radius: 9999px;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          transition: background-color 0.2s;
+          z-index: 40;
+          /* MOBILE: למטה מרכז */
+          left: 50%;
+          transform: translateX(-50%);
+          right: auto;
+        }
+        
+        .ai-chat-button:hover {
+          background-color: #1d4ed8;
+        }
+        
+        /* TABLET ומעלה: צד ימין */
+        @media (min-width: 640px) {
+          .ai-chat-button {
+            right: 1.5rem;
+            left: auto;
+            transform: none;
+          }
+        }
+        
+        /* RTL support */
+        [dir="rtl"] .ai-chat-button {
+          left: auto;
+        }
+        
+        @media (min-width: 640px) {
+          [dir="rtl"] .ai-chat-button {
+            right: auto;
+            left: 1.5rem;
+          }
+        }
+        
+        .ai-chat-box {
+          position: fixed;
+          display: flex;
+          flex-direction: column;
+          border-radius: 0.5rem;
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          z-index: 50;
+          /* MOBILE: מסך מלא (עם מרווחים קטנים) */
+          bottom: 4.5rem;
+          left: 0.5rem;
+          right: 0.5rem;
+          width: auto;
+          max-height: calc(100vh - 6rem);
+        }
+        
+        /* TABLET ומעלה */
+        @media (min-width: 640px) {
+          .ai-chat-box {
+            bottom: 6rem;
+            right: 1.5rem;
+            left: auto;
+            width: 24rem;
+            max-height: 80vh;
+          }
+        }
+        
+        /* RTL support */
+        @media (min-width: 640px) {
+          [dir="rtl"] .ai-chat-box {
+            right: auto;
+            left: 1.5rem;
+          }
+        }
+        
+        /* Header responsive */
+        .ai-chat-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+        }
+        
+        .ai-chat-header h4 {
+          font-size: 1rem;
+          font-weight: 600;
+        }
+        
+        @media (min-width: 640px) {
+          .ai-chat-header h4 {
+            font-size: 1.125rem;
+          }
+        }
+        
+        /* Messages area responsive */
+        .ai-chat-messages {
+          flex: 1;
+          overflow-y: auto;
+          padding: 0.75rem;
+        }
+        
+        @media (min-width: 640px) {
+          .ai-chat-messages {
+            padding: 1rem;
+          }
+        }
+        
+        .ai-message-bubble {
+          padding: 0.5rem 0.75rem;
+          border-radius: 0.375rem;
+          font-size: 0.813rem;
+          white-space: pre-wrap;
+          word-break: break-word;
+          max-width: 90%;
+        }
+        
+        @media (min-width: 640px) {
+          .ai-message-bubble {
+            font-size: 0.875rem;
+            max-width: 85%;
+          }
+        }
+        
+        /* Input area responsive */
+        .ai-chat-input-area {
+          display: flex;
+          align-items: center;
+          padding: 0.75rem;
+          gap: 0.5rem;
+        }
+        
+        @media (min-width: 640px) {
+          .ai-chat-input-area {
+            padding: 0.75rem 1rem;
+          }
+        }
+        
+        .ai-chat-input {
+          flex: 1;
+          border: 1px solid;
+          border-radius: 0.375rem;
+          padding: 0.5rem;
+          font-size: 0.813rem;
+        }
+        
+        @media (min-width: 640px) {
+          .ai-chat-input {
+            font-size: 0.875rem;
+          }
+        }
+        
+        .ai-chat-input:focus {
+          outline: none;
+          ring: 2px;
+          ring-color: #3b82f6;
+        }
+        
+        .ai-chat-send-btn {
+          background-color: #2563eb;
+          color: white;
+          padding: 0.5rem 0.75rem;
+          border-radius: 0.375rem;
+          font-size: 0.813rem;
+          white-space: nowrap;
+          transition: background-color 0.2s;
+        }
+        
+        @media (min-width: 640px) {
+          .ai-chat-send-btn {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+          }
+        }
+        
+        .ai-chat-send-btn:hover:not(:disabled) {
+          background-color: #1d4ed8;
+        }
+        
+        .ai-chat-send-btn:disabled {
+          opacity: 0.5;
+        }
       `}</style>
 
-      {/* כפתור צף לפתיחה/סגירה */}
+      {/* כפתור צף */}
       <button
         onClick={toggleChatBox}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition"
+        className={`ai-chat-button`}
         title={t('tooltip')}
         aria-label={t('tooltip')}
       >
@@ -118,13 +294,13 @@ useEffect(() => {
           key={lang}                           
           dir={isRTL ? 'rtl' : 'ltr'}
           lang={lang}
-          className={`fixed bottom-24 right-6 w-96 max-h-[80vh] flex flex-col border rounded-lg shadow-lg z-50 ${
+          className={`ai-chat-box border ${
             isDark ? 'bg-slate-800 text-white border-slate-700' : 'bg-white text-gray-900 border-gray-300'
           }`}
         >
           {/* כותרת */}
-          <div className={`flex items-center justify-between px-4 py-2 border-b ${isDark ? 'border-slate-700' : 'border-gray-300'}`}>
-            <h4 className="text-lg font-semibold">{t('title')}</h4>
+          <div className={`ai-chat-header border-b ${isDark ? 'border-slate-700' : 'border-gray-300'}`}>
+            <h4>{t('title')}</h4>
             <button
               onClick={closeChat}
               className={`text-lg font-bold rounded-full w-8 h-8 flex items-center justify-center transition-colors ${
@@ -137,8 +313,8 @@ useEffect(() => {
             </button>
           </div>
 
-          {/* הודעות – כל הודעה בשורה מלאה */}
-          <div ref={chatRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
+          {/* הודעות */}
+          <div ref={chatRef} className="ai-chat-messages space-y-2">
             {messages.map((msg, index) => {
               const isUser = msg.role === 'user';
               return (
@@ -150,7 +326,7 @@ useEffect(() => {
                 >
                   <div
                     className={[
-                      'p-2 rounded-md text-sm whitespace-pre-wrap max-w-[85%]',
+                      'ai-message-bubble',
                       isUser
                         ? 'bg-blue-600 text-white'
                         : (isDark ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-800'),
@@ -167,7 +343,7 @@ useEffect(() => {
             {loading && (
               <div className="w-full flex justify-start" dir={isRTL ? 'rtl' : 'ltr'} lang={lang}>
                 <div className={[
-                  'p-2 rounded-md text-sm max-w-[85%] inline-flex items-center gap-1',
+                  'ai-message-bubble inline-flex items-center gap-1',
                   isDark ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-800',
                   isRTL ? 'text-right' : 'text-left'
                 ].join(' ')}>
@@ -183,14 +359,14 @@ useEffect(() => {
           </div>
 
           {/* קלט+שליחה */}
-          <div className={`flex items-center p-3 border-t ${isDark ? 'border-slate-700' : 'border-gray-300'}`}>
+          <div className={`ai-chat-input-area border-t ${isDark ? 'border-slate-700' : 'border-gray-300'}`}>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder={t('placeholder')}
-              className={`flex-1 border rounded p-2 text-sm me-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`ai-chat-input focus:outline-none ${
                 isDark ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
               } ${isRTL ? 'text-right' : 'text-left'}`}
               dir={isRTL ? 'rtl' : 'ltr'}
@@ -199,7 +375,7 @@ useEffect(() => {
             <button
               onClick={handleSend}
               disabled={loading}
-              className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 disabled:opacity-50"
+              className="ai-chat-send-btn"
             >
               {loading ? t('asking') : t('ask')}
             </button>

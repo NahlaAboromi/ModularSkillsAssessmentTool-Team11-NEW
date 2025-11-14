@@ -23,20 +23,20 @@ const SimulationChart = ({ simulation, index, isDark }) => {
   const { t, dir, ready } = useI18n('simulationChart');
   if (!ready) return null;
 
-  // tooltip
+  // tooltip - רספונסיבי
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div
-          className={`p-3 rounded-lg border shadow-none ${
+          className={`p-2 sm:p-3 rounded-lg border shadow-none ${
             isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-gray-200 text-gray-800'
           }`}
           dir={dir}
           lang={lang}
         >
-          <p className="font-medium">{label}</p>
+          <p className="font-medium text-xs sm:text-sm">{label}</p>
           {payload.map((entry, i) => (
-            <p key={i} style={{ color: entry.color }} className="text-sm">
+            <p key={i} style={{ color: entry.color }} className="text-xs">
               {entry.name}: {entry.value}/5
             </p>
           ))}
@@ -62,10 +62,10 @@ const SimulationChart = ({ simulation, index, isDark }) => {
   }));
 
   return (
-    <div className="mb-6" dir={dir} lang={lang}>
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold flex items-center gap-2">
+    <div className="mb-4 sm:mb-6" dir={dir} lang={lang}>
+      {/* Header - רספונסיבי */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-2 sm:mb-3 gap-2">
+        <h3 className="text-xs sm:text-sm font-semibold flex items-center gap-2">
           📈 { (t('header') || '').replace('{n}', String(index + 1)) }
         </h3>
         <div className="flex items-center gap-2">
@@ -81,20 +81,32 @@ const SimulationChart = ({ simulation, index, isDark }) => {
         </div>
       </div>
 
-      {/* Chart */}
-      <div className="h-36 w-full">
+      {/* Chart - רספונסיבי */}
+      <div className="h-48 sm:h-36 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={simChartData} margin={{ top: 5, right: 10, bottom: 5, left: 0 }}>
+          <BarChart 
+            data={simChartData} 
+            margin={{ 
+              top: 5, 
+              right: 5, 
+              bottom: 5, 
+              left: -5 
+            }}
+          >
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 10, fill: textColor }}
+              tick={{ fontSize: 8, fill: textColor }}
+              angle={-15}
+              textAnchor="end"
+              height={50}
               axisLine={{ stroke: textColor }}
               tickLine={{ stroke: textColor }}
             />
             <YAxis
               domain={[0, 5]}
-              tick={{ fontSize: 10, fill: textColor }}
+              tick={{ fontSize: 9, fill: textColor }}
+              width={25}
               axisLine={{ stroke: textColor }}
               tickLine={{ stroke: textColor }}
             />

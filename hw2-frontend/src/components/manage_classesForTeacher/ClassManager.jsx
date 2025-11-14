@@ -81,34 +81,35 @@ const ClassManagerContent = () => {
       lang={lang}
       className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
     >
-      {/* Page Header */}
+      {/* Page Header - לא נוגעים */}
       <div className="px-4 mt-4">
         <TeacherHeader />
       </div>
 
       <main className="flex-1 w-full px-4 py-6">
-        <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 rounded`}>
-          <h1 className="text-2xl font-bold mb-1">{t('title')}</h1>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+        <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-4 sm:p-6 rounded`}>
+          {/* Title Section - רספונסיבי */}
+          <h1 className="text-xl sm:text-2xl font-bold mb-1">{t('title')}</h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4 sm:mb-6">
             {t('subtitle')}
           </p>
 
-          {/* Search and Filter Section */}
-          <div className="bg-white dark:bg-slate-600 p-4 rounded shadow mb-6">
-            <div className="flex flex-col md:flex-row gap-4">
+          {/* Search and Filter Section - רספונסיבי */}
+          <div className="bg-white dark:bg-slate-600 p-3 sm:p-4 rounded shadow mb-4 sm:mb-6">
+            <div className="flex flex-col gap-3 sm:gap-4">
               {/* Search Input */}
-              <div className="flex-1 relative">
+              <div className="relative">
                 <input
                   type="text"
                   placeholder={t('searchPlaceholder')}
-                  className="w-full py-2 px-4 pr-10 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full py-2 px-4 pr-10 text-sm sm:text-base rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 {/* Search Icon */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 absolute right-3 top-2.5 text-gray-400"
+                  className="h-4 w-4 sm:h-5 sm:w-5 absolute right-3 top-2.5 text-gray-400"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -121,12 +122,13 @@ const ClassManagerContent = () => {
                   />
                 </svg>
               </div>
+              
               {/* Class Code Filter Input */}
-              <div className="flex gap-4 flex-wrap md:flex-nowrap">
+              <div>
                 <input
                   type="text"
                   placeholder={t('codePlaceholder')}
-                  className="py-2 px-4 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full py-2 px-4 text-sm sm:text-base rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={classCodeFilter}
                   onChange={(e) => setClassCodeFilter(e.target.value)}
                 />
@@ -134,16 +136,16 @@ const ClassManagerContent = () => {
             </div>
           </div>
 
-          {/* Classes List */}
-          <div className="grid grid-cols-1 gap-6">
+          {/* Classes List - רספונסיבי */}
+          <div className="grid grid-cols-1 gap-4 sm:gap-6">
             {loading ? (
-              <div className="text-center py-10">{t('loading')}</div>
+              <div className="text-center py-8 sm:py-10 text-sm sm:text-base">{t('loading')}</div>
             ) : error ? (
-              <div className="bg-red-100 dark:bg-red-500 p-5 rounded text-center">
+              <div className="bg-red-100 dark:bg-red-500 p-4 sm:p-5 rounded text-center text-sm sm:text-base">
                 <p>{t('errorBox')}<br />{error}</p>
               </div>
             ) : filteredClasses.length === 0 ? (
-              <div className="bg-white dark:bg-slate-600 p-5 rounded text-center">
+              <div className="bg-white dark:bg-slate-600 p-4 sm:p-5 rounded text-center text-sm sm:text-base">
                 <p>{t('empty')}</p>
               </div>
             ) : (
@@ -161,16 +163,17 @@ const ClassManagerContent = () => {
             )}
           </div>
 
-          {/* Create New Class Button */}
-          <div className="mt-6 flex justify-center">
+          {/* Create New Class Button - רספונסיבי */}
+          <div className="mt-4 sm:mt-6 flex justify-center">
             <Link
               to="/teacher/Create_New_Class"
-              className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg shadow-md flex items-center gap-2 text-lg"
+              className="bg-green-600 hover:bg-green-700 text-white py-2.5 sm:py-2 px-5 sm:px-6 rounded-lg shadow-md flex items-center gap-2 text-base sm:text-lg w-full sm:w-auto justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
+                width="18"
+                height="18"
+                className="sm:w-5 sm:h-5"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -188,10 +191,10 @@ const ClassManagerContent = () => {
         </div>
       </main>
 
-      {/* AI Chat for Teacher Assistance */}
+      {/* AI Chat for Teacher Assistance - לא נוגעים */}
       {user?.id && <AIChat teacherId={user.id} />}
 
-      {/* Page Footer */}
+      {/* Page Footer - לא נוגעים */}
       <div className="px-4 pb-4">
         <Footer />
       </div>

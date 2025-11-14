@@ -68,32 +68,35 @@ const StudentReportsContent = () => {
       lang={lang}
       className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
     >
-      {/* Header */}
+      {/* Header - לא נוגעים */}
       <div className="px-4 mt-4">
         <TeacherHeader />
       </div>
 
       {/* Main content area */}
       <main className="flex-1 w-full px-4 py-6">
-        {/* Class info and summary */}
-        <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-6 rounded mb-6`}>
-          <h1 className="text-2xl font-bold mb-4 flex items-center gap-2">
+        {/* Class info and summary - רספונסיבי */}
+        <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-200'} p-4 sm:p-6 rounded mb-4 sm:mb-6`}>
+          <h1 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 flex items-center gap-2">
             <span role="img" aria-label="chart">📊</span> {t('title')}
           </h1>
-          <p className="text-lg">
-            {t('classCode')} <span className="bg-gray-100 dark:bg-slate-600 px-3 py-1 rounded font-mono">{classCode}</span>
+          <p className="text-base sm:text-lg flex flex-col sm:flex-row sm:items-center gap-2">
+            <span>{t('classCode')}</span>
+            <span className="bg-gray-100 dark:bg-slate-600 px-3 py-1 rounded font-mono text-sm sm:text-base inline-block">
+              {classCode}
+            </span>
           </p>
           {classInfo && (
-            <div className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            <div className="mt-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
               {countLabel}
             </div>
           )}
         </div>
 
-        {/* Main reports section */}
+        {/* Main reports section - רספונסיבי */}
         {classInfo ? (
           studentGroups.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {studentGroups.map((studentGroup, index) => (
                 <StudentReportCard
                   key={`${studentGroup[0].studentId || studentGroup[0]._id}-${index}`}
@@ -102,28 +105,28 @@ const StudentReportsContent = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12">
-              <div className="text-6xl mb-4">{t('emptyIcon')}</div>
-              <p className="text-xl text-gray-500 dark:text-gray-300 mb-2">
+            <div className="text-center py-8 sm:py-12">
+              <div className="text-4xl sm:text-6xl mb-3 sm:mb-4">{t('emptyIcon')}</div>
+              <p className="text-lg sm:text-xl text-gray-500 dark:text-gray-300 mb-2 px-4">
                 {t('emptyTitle')}
               </p>
-              <p className="text-sm text-gray-400">
+              <p className="text-xs sm:text-sm text-gray-400 px-4">
                 {t('emptyHint')}
               </p>
             </div>
           )
         ) : (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-lg">{t('loadingClass')}</p>
+          <div className="text-center py-8 sm:py-12">
+            <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-3 sm:mb-4"></div>
+            <p className="text-base sm:text-lg">{t('loadingClass')}</p>
           </div>
         )}
       </main>
 
-      {/* AIChat for teacher, only if logged in */}
+      {/* AIChat for teacher - לא נוגעים */}
       {user?.id && <AIChat teacherId={user.id} />}
 
-      {/* Footer */}
+      {/* Footer - לא נוגעים */}
       <div className="px-4 pb-4">
         <Footer />
       </div>
