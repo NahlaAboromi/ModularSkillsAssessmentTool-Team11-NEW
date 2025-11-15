@@ -96,6 +96,7 @@ router.patch('/trial/finish', async (req, res) => {
 
 // 🔼 הגשת תשובה + יצירת ניתוח ושמירה ל-DB
 router.post('/submit-answer', async (req, res) => {
+  console.log('>>> TRIAL /submit-answer HIT', req.body.anonId);
   try {
     const { anonId, situation, question, answerText } = req.body;
 

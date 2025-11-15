@@ -66,6 +66,7 @@ router.get('/teacher/:teacherId', async (req, res) => {
 });
 
 router.post('/submit-answer', async (req, res) => {
+  console.log('>>> CLASSES /submit-answer HIT');
   const t0 = Date.now();
   try {
     // INPUT

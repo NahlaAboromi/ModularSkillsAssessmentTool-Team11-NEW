@@ -12,12 +12,15 @@ IMPORTANT LANGUAGE RULE:
 DATA QUALITY RULE:
 - Avoid leaving any field empty or undefined. 
 - Always provide meaningful content for every required field (e.g., use short feedback instead of an empty string, and at least one item in lists like strengths or areas for improvement).
+IMPORTANT VOICE RULE:
+- If studentName starts with "Anonymous", speak directly to the student ("you").
+- Otherwise, describe the student in third-person ("the student").
 
 
 Situation: "${situation}"
 Question: "${question}"
 Student Response: "${studentResponse}"
-
+Student Name: "${studentName}"
 Analyze across:
 1. Self-awareness
 2. Self-management

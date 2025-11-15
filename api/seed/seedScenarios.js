@@ -8,7 +8,9 @@ const DATA = [
     scenarioId: "S1",
     title: "Extra-credit without proper citation",
     text: `David is a senior and only has three more classes this semester before he graduates. He feels the pressure to uphold his 3.65 GPA, as well as just wanting to finish and get the classes out of the way.
-In one of his classes, an extra credit assignment is to read through a set of given texts from certain articles and books that have been given by the instructor throughout the semester, and then to compile personal thoughts based on the principles covered. To David, it seemed like basically doing something he already had done in the class—read the same information again. He figured the instructor just wanted to make sure the students really did read the articles, so David wrote his paper using direct quotes and verbatim phrases from the reading without correct citation. It was just extra credit, after all, so if it was not as good as his other work, it couldn't really hurt his grade.`,
+In one of his classes, an extra credit assignment is to read through a set of given texts from certain articles and books that have been given by the instructor throughout the semester, and then to compile personal thoughts based on the principles covered. To David, it seemed like basically doing something he already had done in the class—read the same information again. He figured the instructor just wanted to make sure the students really did read the articles, so David wrote his paper using direct quotes and verbatim phrases from the reading without correct citation.
+During the course, David considered asking a classmate for their thoughts about the extra-credit assignment, but decided not to because he didn’t feel comfortable starting the conversation. He also avoided approaching the instructor to clarify the expectations, worrying it might make him look uncertain.
+It was just extra credit, after all, so if it was not as good as his other work, it couldn't really hurt his grade.`,
     reflection: [
       "Is what David did wrong? Why or why not?",
       "Do you think David is right in thinking that this assignment really doesn't matter and can't really hurt his grade because it is only for extra credit?"
@@ -19,7 +21,8 @@ In one of his classes, an extra credit assignment is to read through a set of gi
   {
     scenarioId: "S3",
     title: "Dorm-mate wakes you up daily",
-    text: `You live in a dorm with someone you did not meet until move-in day. His classes begin at 8:00 a.m. each day and your classes do not typically begin until at least 10:00 a.m. When he wakes up in the morning, he turns on the light and makes a lot of noise. It wakes you up every morning.`,
+    text: `You live in a dorm with someone you did not meet until move-in day. His classes begin at 8:00 a.m. each day and your classes do not typically begin until at least 10:00 a.m. When he wakes up in the morning, he turns on the light and makes a lot of noise. It wakes you up every morning.
+You begin to notice that you feel irritated and tired throughout the day because of the lack of sleep, which affects your ability to focus in class. You also realize that you’ve been avoiding bringing up the issue with your roommate because it feels uncomfortable, even though the situation is getting worse.`,
     reflection: [
       "How will you handle this conflict?"
     ],
@@ -29,7 +32,10 @@ In one of his classes, an extra credit assignment is to read through a set of gi
   {
     scenarioId: "S10",
     title: "Salina's frustrating day and missed invite",
-    text: `Salina just had a very bad day. When she got up in the morning, she realized she needed her clean workout clothes, and they were still rolled up in a ball in her gym bag. She was angry with herself for forgetting to wash them. When her mom asked her what was wrong, she snapped, “Never mind. It’s not your problem.”Then she felt bad about snapping at her mom. When she got to first period, she was horrified when Mr. Jasper asked her to submit the first draft of her English assignment. She was sure he had said it was due tomorrow. At lunch, Donte asked her if she wanted to shoot hoops after school. She liked basketball, but she couldn’t tell if he was asking her for real or just teasing her. Although Salina thought it would be fun, she decided she didn’t want to be embarrassed if he was just kidding. She decided to play it safe by not going. That evening, Donte called Salina at home. “I waited for you on the court,”he said, sounding annoyed. “I thought you liked basketball.”Salina felt sick to her stomach because Donte really had wanted her to play and she missed her chance. She felt bummed out for the rest of the night.`,
+    text: `Salina just had a very bad day. When she got up in the morning, she realized she needed her clean workout clothes, and they were still rolled up in a ball in her gym bag. She was angry with herself for forgetting to wash them. When her mom asked her what was wrong, she snapped, “Never mind. It’s not your problem.” Even though she was frustrated with herself, Salina remembered that her mom was just trying to help, and that made her feel a bit guilty.
+Then she felt bad about snapping at her mom. When she got to first period, she was horrified when Mr. Jasper asked her to submit the first draft of her English assignment. She was sure he had said it was due tomorrow.
+At lunch, Donte asked her if she wanted to shoot hoops after school. She liked basketball, but she couldn’t tell if he was asking her for real or just teasing her. Salina noticed Donte’s excitement when he invited her, and she realized he really wanted someone to play with him, not just tease her. Although Salina thought it would be fun, she decided she didn’t want to be embarrassed if he was just kidding. She decided to play it safe by not going.
+That evening, Donte called Salina at home. “I waited for you on the court,” he said, sounding annoyed. “I thought you liked basketball.” Salina felt sick to her stomach because Donte really had wanted her to play and she missed her chance. She felt bummed out for the rest of the night.`,
     reflection: [
       "What else could Salina have said to her mom?",
       "What could Salina do next time to make sure she understands the English teacher’s expectations so that she isn’t surprised by the deadline?",
@@ -43,9 +49,10 @@ In one of his classes, an extra credit assignment is to read through a set of gi
   {
     scenarioId: "S14",
     title: "Sharing finished paper with a classmate",
-    text: `Jack and Diane are both in business class. Toward the end of the semester, the assignment is to do an analysis of a business plan. The paper is due in a couple of days and due to a family emergency, followed by being in bed all weekend with the flu, Jack hasn't had a chance to work on the paper and is very stressed out. Diane feels badly for Jack and since she has finished her analysis, she offers to loan Jack a copy of her paper so he can look it over to get a sense of how she broke down the assignment and then structured her response, figuring that should help Jack not feel so overwhelmed and make the project manageable. Jack gratefully accepts the offer. Diane sends him her analysis in an e-mail attachment.`,
+    text: `Jack and Diane are both in business class. Toward the end of the semester, the assignment is to do an analysis of a business plan. The paper is due in a couple of days and due to a family emergency, followed by being in bed all weekend with the flu, Jack hasn't had a chance to work on the paper and is very stressed out. Diane feels badly for Jack and since she has finished her analysis, she offers to loan Jack a copy of her paper so he can look it over to get a sense of how she broke down the assignment and then structured her response, figuring that should help Jack not feel so overwhelmed and make the project manageable. Jack gratefully accepts the offer. Diane sends him her analysis in an e-mail attachment. While Jack struggles with the pressure, he hesitates to express how overwhelmed he feels, even though Diane is trying to support him. Diane, in turn, considers whether she should offer more direct help or ask Jack what he truly needs, but worries about overstepping or making him uncomfortable.`,
     reflection: [
-      "At this point, is this academic dishonesty? If so, what kind (plagiarism, cheating, etc.) and why?"
+      "At this point, is this academic dishonesty? If so, what kind (plagiarism, cheating, etc.) and why?",
+      "If you were in Jack’s or Diane’s position, how would you feel, and what would you do differently to handle the situation in a fair and healthy way for both yourself and the other person?"
     ],
     selTags: ["Responsible Decision-Making","Social Awareness","Relationship Skills","Self-Management"],
     assignedGroupType: "control"

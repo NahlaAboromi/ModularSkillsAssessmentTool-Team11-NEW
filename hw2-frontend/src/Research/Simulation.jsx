@@ -124,23 +124,33 @@ function SimulationContent() {
   const [viewStartAt, setViewStartAt] = useState(null);
 
   // 🔹 טיימר
-  function useElapsedTimer(startedAt) {
-    const [elapsed, setElapsed] = React.useState(0);
-    React.useEffect(() => {
-      if (!startedAt) return;
-      const startTime = new Date(startedAt).getTime();
-      const interval = setInterval(() => {
-        const now = Date.now();
-        const diffSec = Math.max(0, Math.floor((now - startTime) / 1000));
-        setElapsed(diffSec);
-      }, 1000);
-      return () => clearInterval(interval);
-    }, [startedAt]);
-    const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
-    const ss = String(elapsed % 60).padStart(2, '0');
-    return { mm, ss };
-  }
-  const { mm, ss } = useElapsedTimer(viewStartAt);
+// 🔹 טיימר – נעצר כשsubmitting=true
+function useElapsedTimer(startedAt, isRunning = true) {
+  const [elapsed, setElapsed] = React.useState(0);
+
+  React.useEffect(() => {
+    // אם אין זמן התחלה או שהטיימר לא אמור לרוץ – לא מפעילים interval
+    if (!startedAt || !isRunning) return;
+
+    const startTime = new Date(startedAt).getTime();
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const diffSec = Math.max(0, Math.floor((now - startTime) / 1000));
+      setElapsed(diffSec);
+    }, 1000);
+
+    // ניקוי כשעוזבים דף / משנים isRunning / startedAt
+    return () => clearInterval(interval);
+  }, [startedAt, isRunning]);
+
+  const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const ss = String(elapsed % 60).padStart(2, '0');
+  return { mm, ss };
+}
+
+// ⬅️ כאן שינוי הקריאה
+const { mm, ss } = useElapsedTimer(viewStartAt, !submitting);
+
 
   useEffect(() => {
     if (!student?.anonId) return;

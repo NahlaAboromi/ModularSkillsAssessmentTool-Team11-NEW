@@ -35,24 +35,35 @@ const AIChat = ({ teacherId }) => {
 
   useEffect(() => { scrollToBottom(); }, [messages, loading]);
 
-  useEffect(() => {
-    if (!showBox || !ready) return;
+useEffect(() => {
+  if (!showBox || !ready) return;
 
-    const newG = t('greeting');
-    const oldG = greetingRef.current;
+  const greeting = t('greeting');
 
-    setMessages(prev => {
-      if (prev.length === 0) {
-        return [{ role: 'ai', content: newG }];
-      }
-      if (prev[0]?.role === 'ai' && (prev[0].content === oldG || prev[0].content === newG)) {
-        return [{ role: 'ai', content: newG }, ...prev.slice(1)];
-      }
+  setMessages(prev => {
+    // אם אין עדיין הודעות – מוסיפים ברכה ראשונית
+    if (prev.length === 0) {
+      greetingRef.current = greeting;
+      return [{ role: 'ai', content: greeting }];
+    }
+
+    // אם כבר יש הודעת ברכה זהה – לא משנים כלום (מחזירים את אותו מערך!)
+    if (prev[0]?.role === 'ai' && prev[0].content === greeting) {
       return prev;
-    });
+    }
 
-    greetingRef.current = newG;
-  }, [showBox, lang, ready, t]);
+    // אם יש הודעת ברכה קודמת ורוצים לעדכן שפה – משנים רק את ההודעה הראשונה
+    if (prev[0]?.role === 'ai') {
+      const updated = [...prev];
+      updated[0] = { ...updated[0], content: greeting };
+      greetingRef.current = greeting;
+      return updated;
+    }
+
+    return prev;
+  });
+}, [showBox, lang, ready, t]);
+
 
   const handleSend = async () => {
     if (!input.trim()) return;
