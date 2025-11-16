@@ -24,7 +24,7 @@ const ProgressOfChosenStudentContent = () => {
   const { user } = useContext(UserContext);
   const isDark = theme === 'dark';
 
-  const { t, dir, lang } = useI18n('studentDetails'); // ⬅️ namespace: studentDetails
+  const { t, dir, lang } = useI18n('studentDetails');
 
   const [studentData, setStudentData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,14 +61,14 @@ const ProgressOfChosenStudentContent = () => {
   if (loading) {
     return (
       <div dir={dir} lang={lang} className={baseClasses}>
-        <div className="px-4 mt-4"><TeacherHeader /></div>
-        <main className="flex-1 w-full px-4 py-6">
+        <div className="px-3 sm:px-4 mt-4"><TeacherHeader /></div>
+        <main className="flex-1 w-full px-3 sm:px-4 py-4 sm:py-6">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3">{t('loading')}</span>
+            <span className="ml-3 text-sm sm:text-base">{t('loading')}</span>
           </div>
         </main>
-        <div className="px-4 pb-4"><Footer /></div>
+        <div className="px-3 sm:px-4 pb-4"><Footer /></div>
       </div>
     );
   }
@@ -76,13 +76,13 @@ const ProgressOfChosenStudentContent = () => {
   if (error) {
     return (
       <div dir={dir} lang={lang} className={baseClasses}>
-        <div className="px-4 mt-4"><TeacherHeader /></div>
-        <main className="flex-1 w-full px-4 py-6">
-          <div className="p-6 text-center text-red-600">
+        <div className="px-3 sm:px-4 mt-4"><TeacherHeader /></div>
+        <main className="flex-1 w-full px-3 sm:px-4 py-4 sm:py-6">
+          <div className="p-4 sm:p-6 text-center text-red-600 text-sm sm:text-base">
             {t('errorPrefix')} {error}
           </div>
         </main>
-        <div className="px-4 pb-4"><Footer /></div>
+        <div className="px-3 sm:px-4 pb-4"><Footer /></div>
       </div>
     );
   }
@@ -93,13 +93,13 @@ const ProgressOfChosenStudentContent = () => {
 
   return (
     <div dir={dir} lang={lang} className={baseClasses}>
-      <div className="px-4 mt-4"><TeacherHeader /></div>
+      <div className="px-3 sm:px-4 mt-4"><TeacherHeader /></div>
 
-      <main className="flex-1 w-full px-4 py-6">
-        <div className="w-full flex justify-end mb-4 pr-4">
+      <main className="flex-1 w-full px-3 sm:px-4 py-4 sm:py-6">
+        <div className="w-full flex justify-end mb-3 sm:mb-4 pr-0 sm:pr-4">
           <button
             onClick={handleExportPDF}
-            className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700 transition-all"
+            className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded shadow hover:bg-blue-700 transition-all text-sm sm:text-base"
             aria-label={t('exportPdf')}
             title={t('exportPdf')}
           >
@@ -107,7 +107,7 @@ const ProgressOfChosenStudentContent = () => {
           </button>
         </div>
 
-        <div ref={exportRef} className="space-y-6">
+        <div ref={exportRef} className="space-y-4 sm:space-y-6">
           <StudentOverviewHeader
             student={{
               id: studentId,
@@ -157,7 +157,7 @@ const ProgressOfChosenStudentContent = () => {
       </main>
 
       {user?.id && <AIChat teacherId={user.id} />}
-      <div className="px-4 pb-4"><Footer /></div>
+      <div className="px-3 sm:px-4 pb-4"><Footer /></div>
     </div>
   );
 };

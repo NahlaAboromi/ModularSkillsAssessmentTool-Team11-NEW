@@ -35,35 +35,31 @@ const AIChat = ({ teacherId }) => {
 
   useEffect(() => { scrollToBottom(); }, [messages, loading]);
 
-useEffect(() => {
-  if (!showBox || !ready) return;
+  useEffect(() => {
+    if (!showBox || !ready) return;
 
-  const greeting = t('greeting');
+    const greeting = t('greeting');
 
-  setMessages(prev => {
-    // אם אין עדיין הודעות – מוסיפים ברכה ראשונית
-    if (prev.length === 0) {
-      greetingRef.current = greeting;
-      return [{ role: 'ai', content: greeting }];
-    }
+    setMessages(prev => {
+      if (prev.length === 0) {
+        greetingRef.current = greeting;
+        return [{ role: 'ai', content: greeting }];
+      }
 
-    // אם כבר יש הודעת ברכה זהה – לא משנים כלום (מחזירים את אותו מערך!)
-    if (prev[0]?.role === 'ai' && prev[0].content === greeting) {
+      if (prev[0]?.role === 'ai' && prev[0].content === greeting) {
+        return prev;
+      }
+
+      if (prev[0]?.role === 'ai') {
+        const updated = [...prev];
+        updated[0] = { ...updated[0], content: greeting };
+        greetingRef.current = greeting;
+        return updated;
+      }
+
       return prev;
-    }
-
-    // אם יש הודעת ברכה קודמת ורוצים לעדכן שפה – משנים רק את ההודעה הראשונה
-    if (prev[0]?.role === 'ai') {
-      const updated = [...prev];
-      updated[0] = { ...updated[0], content: greeting };
-      greetingRef.current = greeting;
-      return updated;
-    }
-
-    return prev;
-  });
-}, [showBox, lang, ready, t]);
-
+    });
+  }, [showBox, lang, ready, t]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -105,7 +101,7 @@ useEffect(() => {
         .dot3{animation-delay:0;}
         @keyframes jump{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-6px);}}
         
-        /* RESPONSIVE FIXES */
+        /* כפתור צף - רספונסיבי */
         .ai-chat-button {
           position: fixed;
           bottom: 1rem;
@@ -116,37 +112,37 @@ useEffect(() => {
           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
           transition: background-color 0.2s;
           z-index: 40;
-          /* MOBILE: למטה מרכז */
-          left: 50%;
-          transform: translateX(-50%);
-          right: auto;
+          border: none;
+          cursor: pointer;
         }
         
         .ai-chat-button:hover {
           background-color: #1d4ed8;
         }
         
-        /* TABLET ומעלה: צד ימין */
+        /* LTR (אנגלית) - ימין תמיד */
+        [dir="ltr"] .ai-chat-button {
+          right: 1.5rem;
+          left: auto;
+        }
+        
+        /* RTL (עברית) - MOBILE: מרכז */
+        [dir="rtl"] .ai-chat-button {
+          left: 50%;
+          transform: translateX(-50%);
+          right: auto;
+        }
+        
+        /* RTL (עברית) - TABLET ומעלה: שמאל */
         @media (min-width: 640px) {
-          .ai-chat-button {
-            right: 1.5rem;
-            left: auto;
+          [dir="rtl"] .ai-chat-button {
+            left: 1.5rem;
+            right: auto;
             transform: none;
           }
         }
         
-        /* RTL support */
-        [dir="rtl"] .ai-chat-button {
-          left: auto;
-        }
-        
-        @media (min-width: 640px) {
-          [dir="rtl"] .ai-chat-button {
-            right: auto;
-            left: 1.5rem;
-          }
-        }
-        
+        /* תיבת צ'אט - רספונסיבי */
         .ai-chat-box {
           position: fixed;
           display: flex;
@@ -154,7 +150,34 @@ useEffect(() => {
           border-radius: 0.5rem;
           box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
           z-index: 50;
-          /* MOBILE: מסך מלא (עם מרווחים קטנים) */
+        }
+        
+        /* LTR (אנגלית) - ימין תמיד */
+        [dir="ltr"] .ai-chat-box {
+          bottom: 4.5rem;
+          right: 0.5rem;
+          left: auto;
+          width: auto;
+          max-height: calc(100vh - 6rem);
+        }
+        
+        @media (min-width: 640px) {
+          [dir="ltr"] .ai-chat-box {
+            bottom: 6rem;
+            right: 1.5rem;
+            width: 24rem;
+            max-height: 80vh;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          [dir="ltr"] .ai-chat-box {
+            width: 28rem;
+          }
+        }
+        
+        /* RTL (עברית) - MOBILE: מסך מלא */
+        [dir="rtl"] .ai-chat-box {
           bottom: 4.5rem;
           left: 0.5rem;
           right: 0.5rem;
@@ -162,26 +185,23 @@ useEffect(() => {
           max-height: calc(100vh - 6rem);
         }
         
-        /* TABLET ומעלה */
+        /* RTL (עברית) - TABLET ומעלה: שמאל */
         @media (min-width: 640px) {
-          .ai-chat-box {
-            bottom: 6rem;
-            right: 1.5rem;
-            left: auto;
+          [dir="rtl"] .ai-chat-box {
+            left: 1.5rem;
+            right: auto;
             width: 24rem;
             max-height: 80vh;
           }
         }
         
-        /* RTL support */
-        @media (min-width: 640px) {
+        @media (min-width: 1024px) {
           [dir="rtl"] .ai-chat-box {
-            right: auto;
-            left: 1.5rem;
+            width: 28rem;
           }
         }
         
-        /* Header responsive */
+        /* כותרת - רספונסיבי */
         .ai-chat-header {
           display: flex;
           align-items: center;
@@ -200,7 +220,7 @@ useEffect(() => {
           }
         }
         
-        /* Messages area responsive */
+        /* אזור הודעות - רספונסיבי */
         .ai-chat-messages {
           flex: 1;
           overflow-y: auto;
@@ -213,6 +233,7 @@ useEffect(() => {
           }
         }
         
+        /* בועות הודעות - רספונסיבי */
         .ai-message-bubble {
           padding: 0.5rem 0.75rem;
           border-radius: 0.375rem;
@@ -229,7 +250,13 @@ useEffect(() => {
           }
         }
         
-        /* Input area responsive */
+        @media (min-width: 1024px) {
+          .ai-message-bubble {
+            font-size: 0.9375rem;
+          }
+        }
+        
+        /* אזור קלט - רספונסיבי */
         .ai-chat-input-area {
           display: flex;
           align-items: center;
@@ -257,6 +284,12 @@ useEffect(() => {
           }
         }
         
+        @media (min-width: 1024px) {
+          .ai-chat-input {
+            font-size: 0.9375rem;
+          }
+        }
+        
         .ai-chat-input:focus {
           outline: none;
           ring: 2px;
@@ -271,12 +304,20 @@ useEffect(() => {
           font-size: 0.813rem;
           white-space: nowrap;
           transition: background-color 0.2s;
+          border: none;
+          cursor: pointer;
         }
         
         @media (min-width: 640px) {
           .ai-chat-send-btn {
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
+          }
+        }
+        
+        @media (min-width: 1024px) {
+          .ai-chat-send-btn {
+            font-size: 0.9375rem;
           }
         }
         
@@ -292,7 +333,7 @@ useEffect(() => {
       {/* כפתור צף */}
       <button
         onClick={toggleChatBox}
-        className={`ai-chat-button`}
+        className="ai-chat-button"
         title={t('tooltip')}
         aria-label={t('tooltip')}
       >
@@ -302,7 +343,7 @@ useEffect(() => {
       {/* תיבת צ'אט */}
       {showBox && (
         <div
-          key={lang}                           
+          key={lang}
           dir={isRTL ? 'rtl' : 'ltr'}
           lang={lang}
           className={`ai-chat-box border ${
