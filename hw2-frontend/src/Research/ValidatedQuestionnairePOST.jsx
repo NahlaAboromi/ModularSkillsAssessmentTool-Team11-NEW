@@ -29,14 +29,17 @@ const phase = (location.state?.phase) || 'post';
         }
       }
 
-      // 🔀 ניווט: A/B/C → דף חוות דעת; D → דף תודה
+      // 🔀 ניווט: A/B/C → דף רפלקציה; D → שאלון חוויית משתמש (UEQ)
       try { localStorage.setItem('lastAssessmentPhase', 'post'); } catch {}
 
       if (group && group !== 'D') {
+        // קבוצות ניסוי → דף רפלקציה
         navigate('/reflection-end', { state: { anonId, group } });
       } else {
-        navigate('/thanks', { state: { anonId, group: group || 'D' } });
+        // קבוצת ביקורת D → שאלון UEQ
+        navigate('/ueq-questionnaire', { state: { anonId, group: group || 'D' } });
       }
+
     } catch {
       // fallback בטוח
       navigate('/thanks', { state: { anonId } });

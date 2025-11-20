@@ -62,7 +62,7 @@ export default function SocraticReflectionEnd() {
         throw new Error(j.error || 'save_failed');
       }
 
-      navigate('/thanks');
+navigate('/ueq-questionnaire');
     } catch (e) {
       setErr(
         e.message === 'missing_anonId'
@@ -81,13 +81,18 @@ export default function SocraticReflectionEnd() {
   const offsetClass = dir === 'rtl' ? 'pr-9 sm:pr-11' : 'pl-9 sm:pl-11';
 
   return (
-    <div
-      className={`flex flex-col min-h-screen w-screen ${
-        isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'
-      }`}
-      dir={dir}
-      lang={langAttr}
-    >
+<div
+  className={`flex flex-col min-h-screen w-screen ${
+    isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'
+  }`}
+  dir={dir}
+  lang={langAttr}
+  style={{
+    fontFamily:
+      'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  }}
+>
+
       {/* HEADER */}
       <div className="px-4 mt-4">
         <AnonymousHeader />

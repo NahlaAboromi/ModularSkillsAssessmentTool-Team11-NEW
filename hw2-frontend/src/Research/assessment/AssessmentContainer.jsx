@@ -23,7 +23,7 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   const isDark = theme === 'dark';
   const isRTL = lang === 'he';
   const { t, dir } = useI18n('assessment');
-
+const [isComplete, setIsComplete] = useState(false);
   // --- Context + Assignment ---
   const { student, setStudent, questionnaire: ctxQuestionnaire, loadQuestionnaire } = useStudent();
 
@@ -38,28 +38,43 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   const [alreadyDone, setAlreadyDone] = useState(false);
   const [doneNotice, setDoneNotice] = useState('');
 
+  // בדיקה מול השרת האם השאלון כבר הושלם *לפני* תחילת המענה
+  // אם כבר סיימנו עכשיו (isComplete) או שכבר ידוע שהוא הושלם (alreadyDone) – לא בודקים שוב
   useEffect(() => {
+    if (isComplete || alreadyDone) return;  // ⬅️ מגן על מסך התוצאות
+
     let cancelled = false;
+
     (async () => {
-      if (!student?.anonId) { setStatusChecked(true); return; }
+      if (!student?.anonId) {
+        setStatusChecked(true);
+        return;
+      }
+
       try {
         const r = await fetch(
           `/api/assessments/status?anonId=${encodeURIComponent(student.anonId)}&phase=${encodeURIComponent(phase)}`
         );
         const s = r.ok ? await r.json() : { completed: false };
         if (cancelled) return;
+
         if (s.completed) {
           setAlreadyDone(true);
           setDoneNotice(phase === 'pre' ? t('preAlready') : t('postAlready'));
         }
       } catch {
-        // allow proceeding; server enforces on save
+        // אם יש תקלה – ממשיכים, השרת יחסום בשמירה אם צריך
       } finally {
         if (!cancelled) setStatusChecked(true);
       }
     })();
-    return () => { cancelled = true; };
-  }, [student?.anonId, phase, t]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [student?.anonId, phase, lang, isComplete, alreadyDone]);
+  // שימי לב: הוספתי lang במקום t בתלויות
+
 
   // --- Questionnaire state ---
   const [loading, setLoading] = useState(!(ctxQuestionnaire?.items?.length));
@@ -76,7 +91,6 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   const [answers, setAnswers] = useState({});
   const [canNext, setCanNext] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
-  const [isComplete, setIsComplete] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
   const [quickMode, setQuickMode] = useState(false);
   const [fadeIn, setFadeIn] = useState(true);
@@ -439,12 +453,14 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   // Render guard based on status
   // ----------------------------
 
-  if (!statusChecked) {
-    return (
+if (!statusChecked) {
+  return (
       <div
-        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
         dir={dir}
+        style={{ fontFamily: lang === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
+        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
       >
+
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mb-4"></div>
           <p className="text-slate-600 dark:text-slate-300 font-medium">{t('checkingStatus')}</p>
@@ -454,16 +470,18 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   }
 
   // Already completed screen
-  if (alreadyDone) {
-    return (
+if (alreadyDone) {
+  return (
       <div
+        dir={dir}
+        style={{ fontFamily: lang === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
         className={`min-h-screen flex items-center justify-center px-4 ${
           isDark
             ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
             : 'bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50'
         }`}
-        dir={dir}
       >
+
         <div className="w-full max-w-2xl">
           <div tabIndex={-1} ref={resultsFocusTrapRef}
                style={{ position: 'fixed', opacity: 0, pointerEvents: 'none' }} />
@@ -537,7 +555,8 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
                     if (['A', 'B', 'C'].includes(group)) {
                       navigate('/reflection-end');
                     } else {
-                      navigate('/thanks');
+                     navigate('/ueq-questionnaire');
+
                     }
                   }}
                   className="group relative px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
@@ -567,12 +586,14 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
   // Normal questionnaire rendering
   // ----------------------------
 
-  if (loading) {
-    return (
+if (loading) {
+  return (
       <div
-        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
         dir={dir}
+        style={{ fontFamily: lang === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
+        className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
       >
+
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-emerald-500 border-t-transparent mb-4"></div>
           <p className="text-slate-600 dark:text-slate-300 font-medium">{t('loadingQuestionnaire')}</p>
@@ -581,9 +602,14 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
     );
   }
 
-  if (loadErr || !questionnaire || QUESTIONS.length === 0) {
-    return (
-      <div className="min-h-[40vh] grid place-items-center" dir={dir}>
+if (loadErr || !questionnaire || QUESTIONS.length === 0) {
+  return (
+      <div
+        dir={dir}
+        style={{ fontFamily: lang === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
+        className="min-h-[40vh] grid place-items-center"
+      >
+
         <div className={`rounded-xl p-6 border ${isDark ? 'bg-slate-700 border-slate-600 text-white' : 'bg-white border-slate-200 text-slate-700'}`}>
           <div className="font-bold mb-2">{t('couldntLoad')}</div>
           <div className="text-sm mb-4">{loadErr || t('noItemsFound')}</div>
@@ -617,40 +643,63 @@ export default function AssessmentContainer({ onFinish, phase: propPhase }) {
       <>
         <div tabIndex={-1} ref={resultsFocusTrapRef}
              style={{ position: 'fixed', opacity: 0, pointerEvents: 'none' }} />
-        <ResultsView
-          results={results}
-          completionTime={completionTime}
-          onRestart={() => {
-            setCurrent(0);
-            setAnswers({});
-            setIsComplete(false);
-            setShowIntro(true);
-            setStart(null);
-            setEnd(null);
-            saveOnceRef.current = false; // allow new save
-          }}
-          onFinish={async () => {
-            setStudent(s => ({ ...(s || {}), assessmentStatus: 'submitted' }));
-            if (phase === 'pre' && assignment?.scenarioId) {
-              navigate(`/simulation/${assignment.scenarioId}`, {
-                state: {
-                  group: assignment.group,
-                  groupType: assignment.groupType,
-                  scenario: assignment.scenario,
-                },
-              });
-            } else if (typeof onFinish === 'function') {
-              onFinish();
-            }
-          }}
-        />
+<ResultsView
+  results={results}
+  completionTime={completionTime}
+  onRestart={() => {
+    setCurrent(0);
+    setAnswers({});
+    setIsComplete(false);
+    setShowIntro(true);
+    setStart(null);
+    setEnd(null);
+    saveOnceRef.current = false; // allow new save
+  }}
+  onFinish={async () => {
+    setStudent(s => ({ ...(s || {}), assessmentStatus: 'submitted' }));
+
+    const group = assignment?.group?.toUpperCase?.();
+
+    // 🔹 אחרי PRE – ממשיכים לסימולציה (כמו קודם)
+    if (phase === 'pre' && assignment?.scenarioId) {
+      navigate(`/simulation/${assignment.scenarioId}`, {
+        state: {
+          group: assignment.group,
+          groupType: assignment.groupType,
+          scenario: assignment.scenario,
+        },
+      });
+
+    // 🔹 אחרי POST – מחליטים לפי קבוצה
+    } else if (phase === 'post') {
+      if (['A', 'B', 'C'].includes(group)) {
+        // קבוצות ניסוי → דף רפלקציה סופי
+        navigate('/reflection-end');
+      } else {
+        // קבוצה D (ביקורת) → שאלון חוויית משתמש
+navigate('/ueq-questionnaire');
+      }
+
+    // 🔹 כל מקרה אחר – נשתמש ב-onFinish מההורה (אם צריך)
+    } else if (typeof onFinish === 'function') {
+      onFinish();
+    }
+  }}
+/>
+
+
       </>
     );
   }
 
   // Main questionnaire view
-  return (
-    <div className="min-h-screen bg-transparent px-3 md:px-6 py-4" dir={dir}>
+return (
+    <div
+      dir={dir}
+      style={{ fontFamily: lang === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
+      className="min-h-screen bg-transparent px-3 md:px-6 py-4"
+    >
+
       {/* Finish Modal */}
       {showFinishModal && (
         <div

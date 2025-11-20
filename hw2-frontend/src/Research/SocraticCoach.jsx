@@ -255,14 +255,19 @@ export default function SocraticCoach({
 
   const shownTitle = title === DEFAULT_TITLE ? t('title') : title;
 
-  return (
-    <div
-      className={`rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-lg border
-        ${isDark
-          ? 'border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 text-slate-100'
-          : 'border-slate-200 bg-gradient-to-br from-white to-slate-50 text-slate-800'}`}
-      dir={dir}
-    >
+return (
+  <div
+    className={`rounded-2xl sm:rounded-3xl p-4 sm:p-5 md:p-6 lg:p-7 shadow-lg border
+      ${isDark
+        ? 'border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 text-slate-100'
+        : 'border-slate-200 bg-gradient-to-br from-white to-slate-50 text-slate-800'}`}
+    dir={dir}
+    style={{
+      fontFamily:
+        'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    }}
+  >
+
       {/* Header */}
       <div className={`flex items-center gap-2 sm:gap-3 mb-4 sm:mb-5 ${dir === 'rtl' ? 'flex-row-reverse justify-end' : ''}`}>
         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg sm:text-xl shadow-md shrink-0">

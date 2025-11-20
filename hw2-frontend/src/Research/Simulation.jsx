@@ -418,8 +418,17 @@ const { mm, ss } = useElapsedTimer(viewStartAt, !submitting);
 
   const isContinueDisabled = submitting || freeAnswer.trim().length === 0;
 
-  return (
-    <div className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'}`} dir={dir}>
+ return (
+  <div
+    className={`flex flex-col min-h-screen w-screen ${
+      isDark
+        ? 'bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900'
+        : 'bg-gradient-to-br from-blue-50 via-white to-indigo-50'
+    }`}
+    dir={dir}
+    style={{ fontFamily: 'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}
+  >
+
       {/* Header */}
       <div className="px-3 sm:px-4 mt-3 sm:mt-4">
         <AnonymousHeader />

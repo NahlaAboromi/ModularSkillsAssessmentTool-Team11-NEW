@@ -84,13 +84,18 @@ function AssignmentConfirmContent() {
     </div>
   );
 
-  return (
-    <div
+return (
+  <div
       key={lang}
       dir={isRTL ? 'rtl' : 'ltr'}
       lang={lang}
-      className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
-    >
+      style={{ fontFamily: lang === 'he' ? 'Heebo, Rubik, Arial, sans-serif' : 'inherit' }}
+      className={`flex flex-col min-h-screen w-screen ${
+        isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'
+      }`}
+  >
+
+
       {/* HEADER */}
       <div className="px-4 mt-4">
         <AnonymousHeader />

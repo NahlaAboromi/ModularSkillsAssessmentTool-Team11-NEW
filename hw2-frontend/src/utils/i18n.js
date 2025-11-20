@@ -56,6 +56,12 @@ case 'register':
     ? await import('../i18n/forgotPassword.he.json')
     : await import('../i18n/forgotPassword.en.json');
   break;
+case 'ueqQuestionnaire':
+  mod = lang === 'he'
+    ? await import('../i18n/ueq.s.v1.he.json')
+    : await import('../i18n/ueq.s.v1.en.json');
+  break;
+
 case 'resultsView':
   mod = lang === 'he'
     ? await import('../i18n/resultsView.he.json')

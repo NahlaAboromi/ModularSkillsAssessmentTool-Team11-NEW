@@ -1,0 +1,75 @@
+// api/seed/ueq.s.v1.he.js
+
+const OPTIONS_UEQ_HE = [
+  { value: 1, label: "1" },
+  { value: 2, label: "2" },
+  { value: 3, label: "3" },
+  { value: 4, label: "4" },
+  { value: 5, label: "5" },
+  { value: 6, label: "6" },
+  { value: 7, label: "7" }
+];
+
+// ⚠ שימי לב: כאן אני שם את הטקסטים בעברית בצורה שמורה,
+// אבל את יכולה אחר-כך לעדכן לפי התרגום הרשמי שתרצי.
+
+module.exports = [
+  // --------- Pragmatic Quality ----------
+  {
+    key: 'ueqs01',
+    category: 'Pragmatic Quality',
+    text: 'מגבילה אותי / תומכת בי',
+    order: 1,
+  },
+  {
+    key: 'ueqs02',
+    category: 'Pragmatic Quality',
+    text: 'מורכבת / קלה לשימוש',
+    order: 2,
+  },
+  {
+    key: 'ueqs03',
+    category: 'Pragmatic Quality',
+    text: 'לא יעילה / יעילה',
+    order: 3,
+  },
+  {
+    key: 'ueqs04',
+    category: 'Pragmatic Quality',
+    text: 'מבלבלת / ברורה',
+    order: 4,
+  },
+
+  // --------- Hedonic Quality ----------
+  {
+    key: 'ueqs05',
+    category: 'Hedonic Quality',
+    text: 'משעממת / מרגשת',
+    order: 5,
+  },
+  {
+    key: 'ueqs06',
+    category: 'Hedonic Quality',
+    text: 'לא מעניינת / מעניינת',
+    order: 6,
+  },
+  {
+    key: 'ueqs07',
+    category: 'Hedonic Quality',
+    text: 'שגרתית / יצירתית',
+    order: 7,
+  },
+  {
+    key: 'ueqs08',
+    category: 'Hedonic Quality',
+    text: 'רגילה / חדשנית',
+    order: 8,
+  },
+].map(q => ({
+  ...q,
+  options: OPTIONS_UEQ_HE,
+  version: 'ueq-s-v1',
+  lang: 'he',
+  phase: 'post',   // 🔹 רק בדף האחרון אחרי כל התהליך
+  active: true
+}));

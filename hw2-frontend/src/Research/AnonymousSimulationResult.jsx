@@ -94,11 +94,18 @@ useEffect(() => {
     ? !!navShowSocratic
     : isExperimental(group);
 
-  return (
-    <div
-      className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
-      dir={dir}
-    >
+return (
+  <div
+    className={`flex flex-col min-h-screen w-screen ${
+      isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'
+    }`}
+    dir={dir}
+    style={{
+      fontFamily:
+        'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    }}
+  >
+
       {/* Header */}
       <div className="px-4 mt-4">
         <AnonymousHeader />

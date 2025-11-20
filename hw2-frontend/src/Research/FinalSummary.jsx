@@ -69,12 +69,19 @@ useEffect(() => {
   // כדי למנוע הבהוב טקסטים לפני טעינת המילון
   if (!ready) return null;
 
-  return (
+return (
     <div
-      className={`flex flex-col min-h-screen w-screen ${isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'}`}
+      className={`flex flex-col min-h-screen w-screen ${
+        isDark ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-800'
+      }`}
       dir={dir}
       lang={langAttr}
+      style={{
+        fontFamily:
+          'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      }}
     >
+
       {/* HEADER */}
       <div className="px-4 mt-4">
         <AnonymousHeader />

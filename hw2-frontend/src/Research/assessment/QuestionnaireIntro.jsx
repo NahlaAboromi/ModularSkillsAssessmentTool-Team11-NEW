@@ -83,12 +83,13 @@ export default function QuestionnaireIntro({ CATEGORIES = {}, onStart }) {
     
     return 0;
   });
-
-  return (
-    <div
-      className="w-full max-w-4xl mx-auto rounded-2xl shadow-lg p-6 sm:p-8 md:p-10 lg:p-12 bg-white dark:bg-slate-800"
+return (
+  <div
       dir={isHeb ? "rtl" : "ltr"}
-    >
+      style={{ fontFamily: lang === "he" ? "Heebo, Rubik, Arial, sans-serif" : "inherit" }}
+      className="w-full max-w-4xl mx-auto rounded-2xl shadow-lg p-6 sm:p-8 md:p-10 lg:p-12 bg-white dark:bg-slate-800"
+  >
+
         
         {/* כותרת */}
         <div className="text-center mb-8 sm:mb-10">

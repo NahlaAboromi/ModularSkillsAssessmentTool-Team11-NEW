@@ -39,6 +39,8 @@ import { LanguageProvider } from './context/LanguageContext';
 import Thanks from './Research/Thanks/Thanks';
 import AnonymousSimulationResult from './Research/AnonymousSimulationResult';
 import AssessmentContainer from './Research/assessment/AssessmentContainer';
+import UeqQuestionnaire from './Research/UeqQuestionnaire';
+
 function App() {
   return (
     <LanguageProvider>
@@ -103,6 +105,14 @@ function App() {
  } />
 
 
+<Route
+  path="/ueq-questionnaire"
+  element={
+    <AnonymousStudentProvider>
+      <UeqQuestionnaire />
+    </AnonymousStudentProvider>
+  }
+/>
 
 
  <Route path="/simulation/analysis" element={

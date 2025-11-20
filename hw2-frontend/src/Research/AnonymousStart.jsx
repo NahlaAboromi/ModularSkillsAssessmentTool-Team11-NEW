@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useMemo } from "react";
+import React, { useContext, useRef, useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider, ThemeContext } from "../DarkLightMood/ThemeContext";
 import { useAnonymousStudent as useStudent } from "../context/AnonymousStudentContext";
@@ -11,6 +11,56 @@ import { useI18n } from "../utils/i18n";
 
 const AnonymousStartContent = () => {
   const { theme } = useContext(ThemeContext);
+    // 🔹 cache keys ל-UEQ-S
+  const UEQ_CACHE_KEY_HE = "ueq_questions_he_v1";
+  const UEQ_CACHE_KEY_EN = "ueq_questions_en_v1";
+
+  // 🔹 Prefetch לשאלון UEQ-S (HE+EN) כשנכנסים למסך הראשון
+  useEffect(() => {
+    const controller = new AbortController();
+
+    (async () => {
+      try {
+        // אם כבר קיים ב-localStorage – לא נביא שוב
+        const hasHe = localStorage.getItem(UEQ_CACHE_KEY_HE);
+        const hasEn = localStorage.getItem(UEQ_CACHE_KEY_EN);
+        if (hasHe && hasEn) {
+          console.log("UEQ-S cached in localStorage – skipping prefetch");
+          return;
+        }
+
+        console.log("🔄 Prefetch UEQ-S HE+EN from server...");
+
+        const [heRes, enRes] = await Promise.all([
+          fetch("/api/questionnaires/ueq?lang=he", { signal: controller.signal }),
+          fetch("/api/questionnaires/ueq?lang=en", { signal: controller.signal }),
+        ]);
+
+        if (heRes.ok) {
+          const heData = await heRes.json();
+          localStorage.setItem(UEQ_CACHE_KEY_HE, JSON.stringify(heData));
+          console.log("✅ UEQ-S HE cached");
+        } else {
+          console.warn("⚠️ UEQ-S HE fetch failed:", heRes.status);
+        }
+
+        if (enRes.ok) {
+          const enData = await enRes.json();
+          localStorage.setItem(UEQ_CACHE_KEY_EN, JSON.stringify(enData));
+          console.log("✅ UEQ-S EN cached");
+        } else {
+          console.warn("⚠️ UEQ-S EN fetch failed:", enRes.status);
+        }
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.warn("⚠️ UEQ-S prefetch error:", err);
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, []);
+
   const isDark = theme === "dark";
   const { lang } = useContext(LanguageContext);
   const isRTL = lang === "he";
@@ -170,10 +220,12 @@ const AnonymousStartContent = () => {
 
   // 🖥️ ממשק
   return (
-    <div
-      dir={isRTL ? "rtl" : "ltr"}
-      lang={lang}
-      className={`flex flex-col min-h-screen w-screen ${
+<div
+  dir={isRTL ? "rtl" : "ltr"}
+  lang={lang}
+  style={{ fontFamily: lang === "he" ? "Heebo, Rubik, Arial, sans-serif" : "inherit" }}
+  className={`flex flex-col min-h-screen w-screen ${
+
         isDark ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-800"
       }`}
     >

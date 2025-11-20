@@ -11,7 +11,11 @@ export default function ResultsView({ results, completionTime, onFinish }) {
   const spaceDir = lang === "he" ? "space-x-reverse" : "";
 
   return (
-    <div className="min-h-screen bg-transparent p-3 sm:p-4 md:p-6 lg:p-8" dir={dir}>
+<div
+  className="min-h-screen bg-transparent p-3 sm:p-4 md:p-6 lg:p-8"
+  dir={dir}
+  style={{ fontFamily: lang === "he" ? "Heebo, Rubik, Arial, sans-serif" : "inherit" }}
+>
       <div className="w-full max-w-7xl mx-auto rounded-lg shadow-md p-4 sm:p-6 md:p-8 lg:p-10 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
         
         {/* HEADER */}

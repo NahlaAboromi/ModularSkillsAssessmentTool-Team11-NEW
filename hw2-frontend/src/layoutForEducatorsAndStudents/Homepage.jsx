@@ -26,15 +26,16 @@ const HomepageContent = () => {
   }, []);
 
   const { t } = useI18n("homepage");
-
-  return (
-    <div
+return (
+  <div
       dir={isRTL ? "rtl" : "ltr"}
       lang={lang}
+      style={{ fontFamily: lang === "he" ? "Heebo, Rubik, Arial, sans-serif" : "inherit" }}
       className={`flex flex-col min-h-screen w-screen ${
         isDark ? "dark:bg-slate-900 dark:text-white" : "bg-slate-100 text-slate-900"
       }`}
-    >
+  >
+
       {/* Header */}
       <div className="px-6 pt-6">
         <HomeHeader />
@@ -50,10 +51,11 @@ const HomepageContent = () => {
               {t("heroTitle")}
             </span>
           </h1>
+<p className="text-sm sm:text-base max-w-2xl mx-auto opacity-90 px-4">
+  {t("heroSubtitle")}
+</p>
 
-          <p className="text-base sm:text-lg max-w-2xl mx-auto opacity-90 px-4">
-            {t("heroSubtitle")}
-          </p>
+
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center gap-3 sm:gap-4 mt-4 px-4">

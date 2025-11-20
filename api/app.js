@@ -71,6 +71,28 @@ try {
 } catch (e) {
   console.warn('⚠️ Scenarios seed skipped:', e.message);
 }
+  // 🔽🔽🔽 *** כאן מוסיפים את UEQ-S *** 🔽🔽🔽
+    // 🌱 UEQ-S – חוויית משתמש (EN + HE)
+    try {
+      const UeqQuestionEn = require('./models/UeqQuestion.en');
+      const UeqQuestionHe = require('./models/UeqQuestion.he');
+
+      await UeqQuestionEn.init();
+      await UeqQuestionHe.init();
+
+      const { seedUeqQuestionsEn } = require('./seed/seedUeqQuestions.en');
+      const { seedUeqQuestionsHe } = require('./seed/seedUeqQuestions.he');
+
+      const ueqEnV1 = require('./seed/ueq.s.v1.en');
+      const ueqHeV1 = require('./seed/ueq.s.v1.he');
+
+      await seedUeqQuestionsEn({ data: ueqEnV1, version: 'ueq-s-v1' });
+      await seedUeqQuestionsHe({ data: ueqHeV1, version: 'ueq-s-v1' });
+
+      console.log('✅ UEQ-S questions EN/HE seeded/verified');
+    } catch (e) {
+      console.warn('⚠️ UEQ-S seed skipped:', e.message);
+    }
 
   })
   .catch(err => console.error('❌ MongoDB error:', err));
@@ -93,8 +115,10 @@ app.use('/api', assignRouter);
 const selRouter = require('./routers/sel.route'); // כולל GET /questionnaires/casel ו-POST /assessments
 app.use('/api', selRouter);
 // ✅ נתיבי ניסוי (Trial)
-const trialRouter = require('./routers/trial.route');
+const trialRouter = require('./routers/trial.route');   
+const ueqRouter = require('./routers/ueq.route');  
 app.use('/api', trialRouter);
+ app.use('/api', ueqRouter);  
 // שאר הראוטרים כרגיל
 app.use('/api/teachers', teachersRouter);
 app.use('/api/students', studentsRouter);
