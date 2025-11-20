@@ -19,7 +19,7 @@ export const CATEGORIES_HE = {
   'מודעות עצמית':       { icon: Brain,      color:'from-purple-600 to-violet-600',  bgColor:'bg-purple-50',  textColor:'text-purple-700',  borderColor:'border-purple-200' },
   'ניהול עצמי':         { icon: Target,     color:'from-blue-600 to-cyan-600',      bgColor:'bg-blue-50',    textColor:'text-blue-700',    borderColor:'border-blue-200' },
   'מודעות חברתית':      { icon: Heart,      color:'from-rose-600 to-pink-600',      bgColor:'bg-rose-50',    textColor:'text-rose-700',    borderColor:'border-rose-200' },
-  'כישורי יחסים': { icon: Users,      color:'from-emerald-600 to-teal-600',   bgColor:'bg-emerald-50', textColor:'text-emerald-700', borderColor:'border-emerald-200' },
+  'מיומנויות בינאישיות': { icon: Users,      color:'from-emerald-600 to-teal-600',   bgColor:'bg-emerald-50', textColor:'text-emerald-700', borderColor:'border-emerald-200' },
   'קבלת החלטות אחראית': { icon: Lightbulb,  color:'from-amber-600 to-orange-600',   bgColor:'bg-amber-50',   textColor:'text-amber-700',   borderColor:'border-amber-200' },
 };
 

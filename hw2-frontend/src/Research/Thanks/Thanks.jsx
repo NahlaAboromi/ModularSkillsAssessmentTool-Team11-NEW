@@ -47,8 +47,8 @@ function ThanksInner() {
 
   const emailBody =
     langAttr === 'he'
-      ? `שלום,\n\nאני משתתפ/ת במחקר CASELy ומבקשת לקבל ניתוח מעמיק יותר של התוצאות שלי.\n\nמזהה אנונימי: ${anonId}\n\n(אפשר להוסיף כאן פרטים נוספים במידת הצורך.)\n`
-      : `Hello,\n\nI am participating in the CASELy study and would like to receive a more detailed analysis of my results.\n\nAnonymous ID: ${anonId}\n\n(You can add any additional details here.)\n`;
+      ? `שלום,\n\nאני משתתפ/ת במחקר CASELy ומבקשת לקבל ניתוח מעמיק יותר של התוצאות שלי.\n\nמזהה אנונימי: ${anonId}\n\nאשמח לקבל העמקה והבהרות לגבי החוזקות והתחומים שבהם ניתן להשתפר לפי הממצאים.\n\nתודה מראש,\n`
+      : `Hello,\n\nI am participating in the CASELy study and would like to receive a more detailed analysis of my results.\n\nAnonymous ID: ${anonId}\n\nI would appreciate a deeper explanation of my strengths and the areas where I can improve, based on the findings.\n\nThank you in advance,\n`;
 
   const mailtoHref = `mailto:${supportEmail}?subject=${encodeURIComponent(
     emailSubject

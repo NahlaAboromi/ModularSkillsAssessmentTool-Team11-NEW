@@ -142,9 +142,10 @@ return (
                 >
                   <div className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">{t('journeyTitle')}</div>
 
-                  {assignment.groupType !== 'control' ? (
-                    <div className="space-y-3 sm:space-y-4">
-                      {[1, 2, 3, 4, 5, 6].map((n) => (
+{assignment.groupType !== 'control' ? (
+  <div className="space-y-3 sm:space-y-4">
+    {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+
                         <div className="flex gap-2 sm:gap-3" key={n}>
                           <Num n={n} accent="emerald" />
                           <div className="flex-1 min-w-0">
@@ -156,9 +157,10 @@ return (
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <div className="space-y-3 sm:space-y-4">
-                      {[1, 2, 3, 4].map((n) => (
+) : (
+  <div className="space-y-3 sm:space-y-4">
+    {[1, 2, 3, 4, 5].map((n) => (
+
                         <div className="flex gap-2 sm:gap-3" key={n}>
                           <Num n={n} accent="slate" />
                           <div className="flex-1 min-w-0">

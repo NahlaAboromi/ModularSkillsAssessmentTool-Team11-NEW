@@ -85,6 +85,7 @@ const StudentHeader = () => {
   }, []);
 
   // Logout flow
+// Logout flow
 const handleLogout = async () => {
   console.log('🟦 [AnonymousHeader] handleLogout() CALLED', {
     loggingOut,
@@ -114,14 +115,48 @@ const handleLogout = async () => {
       console.error('❌ [AnonymousHeader] fetch summary failed', e);
     }
 
-    setSessionSummary(data);
-    console.log('🟩 [AnonymousHeader] sessionSummary state SET, data=', data);
+    // ✅ אל תסמכי רק על lastSeenAt מהשרת – קחי את "עכשיו" מהדפדפן
+    const now = new Date();
+    const nowISO = now.toISOString();
+    const nowLocal = now.toLocaleString('he-IL', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+
+    // נשתמש בזמן התחלה מהשרת אם יש, אחרת ניפול ל־now
+    const startISO = data?.createdAt || data?.firstSeenAt || null;
+    const startDate = startISO ? new Date(startISO) : null;
+
+    let durationSec = null;
+    if (startDate && !Number.isNaN(startDate.getTime())) {
+      // מחשבים משך לפי startDate → עכשיו
+      durationSec = Math.max(0, Math.round((now.getTime() - startDate.getTime()) / 1000));
+    } else if (typeof data?.sessionDurationSec === 'number') {
+      durationSec = Math.max(0, Math.round(data.sessionDurationSec));
+    }
+
+    const summaryPayload = {
+      ...(data || {}),
+      createdAt: startISO || nowISO,
+      createdAtLocal: data?.createdAtLocal || nowLocal,
+      lastSeenAt: nowISO,
+      lastSeenAtLocal: nowLocal,
+      sessionDurationSec: durationSec,
+    };
+
+    console.log('🟩 [AnonymousHeader] sessionSummary state SET, data=', summaryPayload);
+    setSessionSummary(summaryPayload);
   } finally {
     console.log('🟥 [AnonymousHeader] finally → setShowModal(true), setLoggingOut(false)');
     setShowModal(true);
     setLoggingOut(false);
   }
 };
+
 
   // Modal handlers
   const closeModalOnly = () => {

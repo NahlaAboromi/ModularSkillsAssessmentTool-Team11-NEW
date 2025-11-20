@@ -26,6 +26,12 @@ function UeqQuestionnaireContent() {
   const isRTL = lang === "he";
 
   const { t } = useI18n("ueqQuestionnaire");
+  // תווית "שאלות" – תומך גם בעברית וגם באנגלית
+  const rawQuestions = t("questions");
+  const questionsLabel =
+    lang === "he"
+      ? (rawQuestions && rawQuestions !== "questions" ? rawQuestions : "שאלות")
+      : (rawQuestions && rawQuestions !== "questions" ? rawQuestions : "questions");
 
   const { student } =
     typeof useStudent === "function"
@@ -208,7 +214,7 @@ function UeqQuestionnaireContent() {
     () =>
       student?.anonId ? (
         <div
-          className={`mt-2 inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full ${
+          className={`inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full ${
             isDark
               ? "bg-slate-700/80 text-slate-200 border border-slate-600"
               : "bg-slate-100 text-slate-600 border border-slate-200"
@@ -227,21 +233,20 @@ function UeqQuestionnaireContent() {
     [student?.anonId, isDark]
   );
 
-if (!statusChecked) {
-  return (
-    <div
-      key={lang}
-      dir={isRTL ? "rtl" : "ltr"}
-      lang={lang}
-      className={`flex flex-col min-h-screen w-screen ${
-        isDark ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-800"
-      }`}
-      style={{
-        fontFamily:
-          'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      }}
-    >
-
+  if (!statusChecked) {
+    return (
+      <div
+        key={lang}
+        dir={isRTL ? "rtl" : "ltr"}
+        lang={lang}
+        className={`flex flex-col min-h-screen w-screen ${
+          isDark ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-800"
+        }`}
+        style={{
+          fontFamily:
+            'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
         <div className="flex-1 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
@@ -254,21 +259,20 @@ if (!statusChecked) {
     );
   }
 
-if (alreadyDone) {
-  return (
-    <div
-      key={lang}
-      dir={isRTL ? "rtl" : "ltr"}
-      lang={lang}
-      className={`flex flex-col min-h-screen w-screen ${
-        isDark ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-800"
-      }`}
-      style={{
-        fontFamily:
-          'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      }}
-    >
-
+  if (alreadyDone) {
+    return (
+      <div
+        key={lang}
+        dir={isRTL ? "rtl" : "ltr"}
+        lang={lang}
+        className={`flex flex-col min-h-screen w-screen ${
+          isDark ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-800"
+        }`}
+        style={{
+          fontFamily:
+            'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
         <div className="px-4 mt-4">
           <AnonymousHeader />
         </div>
@@ -354,23 +358,30 @@ if (alreadyDone) {
       </div>
     );
   }
+// 🔹 estimated time fallback (1–2 דקות ל־UEQ-S)
+const rawEstimated = t("estimatedTime");
+const estimatedTimeLabel =
+  rawEstimated && rawEstimated !== "estimatedTime"
+    ? rawEstimated
+    : lang === "he"
+      ? "זמן משוער: כ-1–2 דקות"
+      : "Estimated time: about 1–2 minutes";
 
-return (
-  <div
-    key={lang}
-    dir={isRTL ? "rtl" : "ltr"}
-    lang={lang}
-    className={`flex flex-col min-h-screen w-screen ${
-      isDark
-        ? "bg-slate-800 text-white"
-        : "bg-slate-100 text-slate-800"
-    }`}
-    style={{
-      fontFamily:
-        'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    }}
-  >
-
+  return (
+    <div
+      key={lang}
+      dir={isRTL ? "rtl" : "ltr"}
+      lang={lang}
+      className={`flex flex-col min-h-screen w-screen ${
+        isDark
+          ? "bg-slate-800 text-white"
+          : "bg-slate-100 text-slate-800"
+      }`}
+      style={{
+        fontFamily:
+          'Heebo, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      }}
+    >
       {/* HEADER */}
       <div className="px-4 mt-4">
         <AnonymousHeader />
@@ -390,19 +401,62 @@ return (
                 : "bg-white border border-slate-200 text-slate-800"
             } max-w-5xl mx-auto`}
           >
-            {anonBadge}
+            {/* Header Section */}
+            <div className="mb-8 pb-6 border-b border-opacity-20" style={{
+              borderColor: isDark ? 'rgba(148, 163, 184, 0.3)' : 'rgba(71, 85, 105, 0.2)'
+            }}>
+              {/* Anonymous ID Badge */}
+              {anonBadge && (
+                <div className="mb-4">
+                  {anonBadge}
+                </div>
+              )}
 
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mt-3 mb-2">
-              {t("title") || "שאלון חוויית משתמש (UEQ-S)"}
-            </h2>
-            <p
-              className={`text-sm sm:text-base mb-6 ${
-                isDark ? "text-gray-300" : "text-slate-600"
-              }`}
-            >
-              {t("intro") ||
-                "אנא דרג/י את חווייתך עם המערכת בכל אחד מההיבטים הבאים."}
-            </p>
+              {/* Title with Icon */}
+              <div className="flex items-start gap-4 mb-4">
+                <div className={`flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center ${
+                  isDark 
+                    ? "bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-500/30" 
+                    : "bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200"
+                }`}>
+                  <svg 
+                    className={`w-6 h-6 sm:w-7 sm:h-7 ${isDark ? "text-emerald-400" : "text-emerald-600"}`}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                
+                <div className="flex-1">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                    {t("title") || "שאלון חוויית משתמש (UEQ-S)"}
+                  </h2>
+                  <p className={`text-sm sm:text-base leading-relaxed ${
+                    isDark ? "text-slate-300" : "text-slate-600"
+                  }`}>
+                    {t("intro") || "אנא דרג/י את חווייתך עם המערכת בכל אחד מההיבטים הבאים."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Info Badge */}
+              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm ${
+                isDark 
+                  ? "bg-blue-900/20 text-blue-300 border border-blue-800/50" 
+                  : "bg-blue-50 text-blue-700 border border-blue-200"
+              }`}>
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+<span className="font-medium">
+  {items.length || 0} {questionsLabel} • {estimatedTimeLabel}
+</span>
+
+
+              </div>
+            </div>
 
             {items.length === 0 && (
               <div className={`mb-4 p-4 rounded-lg text-sm ${
@@ -532,15 +586,14 @@ return (
                         </span>
                       </div>
 
-<div className="flex flex-wrap justify-center items-end gap-1 sm:gap-2 md:gap-3 px-0">
+                      <div className="flex flex-wrap justify-center items-end gap-1 sm:gap-2 md:gap-3 px-0">
                         {SCALE_VALUES.map((v) => (
-               <button
-  key={v}
-  type="button"
-  onClick={() => handleSelect(key, v)}
-  className="flex flex-col items-center gap-1 flex-[0_0_13%] xs:flex-1 min-w-[2.1rem] touch-manipulation"
->
-
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => handleSelect(key, v)}
+                            className="flex flex-col items-center gap-1 flex-[0_0_13%] xs:flex-1 min-w-[2.1rem] touch-manipulation"
+                          >
                             <div
                               className={`w-9 h-9 min-w-[2.25rem] min-h-[2.25rem] sm:w-12 sm:h-12 rounded-full border-2 transition-all duration-200 flex items-center justify-center
                                 ${

@@ -21,6 +21,8 @@
   "step5_body_exp": "Complete the same questionnaire again to measure progress.",
   "step6_title_exp": "Final Reflection & Complete",
   "step6_body_exp": "Share your experience, then you're done!",
+  "step7_title_exp": "User Experience Questionnaire (1–2 minutes)",
+  "step7_body_exp": "At the very end, you will complete a short UEQ-S questionnaire about your experience with the system.",
 
   "step1_title_ctrl": "CASEL Questionnaire (2-3 minutes)",
   "step1_body_ctrl": "A validated questionnaire to measure your social-emotional learning level.",
@@ -30,6 +32,8 @@
   "step3_body_ctrl": "You'll receive AI feedback, but no interactive dialogue.",
   "step4_title_ctrl": "Post-Questionnaire & Complete",
   "step4_body_ctrl": "Complete the same questionnaire again, then finish!",
+  "step5_title_ctrl": "User Experience Questionnaire (1–2 minutes)",
+  "step5_body_ctrl": "At the very end, you will complete a short UEQ-S questionnaire about your experience with the system.",
 
   "importantLead": "Important:",
   "importantBody": "There are no right or wrong answers — be authentic and thoughtful.",
