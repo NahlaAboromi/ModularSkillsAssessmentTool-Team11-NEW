@@ -18,25 +18,25 @@ module.exports = [
   {
     key: 'ueqs01',
     category: 'Pragmatic Quality',
-    text: 'מגבילה אותי / תומכת בי',
+    text: 'מכשילות  / תומכות',
     order: 1,
   },
   {
     key: 'ueqs02',
     category: 'Pragmatic Quality',
-    text: 'מורכבת / קלה לשימוש',
+    text: 'מסובכים / קלים',
     order: 2,
   },
   {
     key: 'ueqs03',
     category: 'Pragmatic Quality',
-    text: 'לא יעילה / יעילה',
+    text: 'לא יעיל / יעיל',
     order: 3,
   },
   {
     key: 'ueqs04',
     category: 'Pragmatic Quality',
-    text: 'מבלבלת / ברורה',
+    text: 'מבלבלים / ברורים',
     order: 4,
   },
 
@@ -44,25 +44,25 @@ module.exports = [
   {
     key: 'ueqs05',
     category: 'Hedonic Quality',
-    text: 'משעממת / מרגשת',
+    text: 'משעממים / מלהיבים',
     order: 5,
   },
   {
     key: 'ueqs06',
     category: 'Hedonic Quality',
-    text: 'לא מעניינת / מעניינת',
+    text: 'לא מעניינים / מעניינים',
     order: 6,
   },
   {
     key: 'ueqs07',
     category: 'Hedonic Quality',
-    text: 'שגרתית / יצירתית',
+    text: 'שגרתיים / פורצי דרך',
     order: 7,
   },
   {
     key: 'ueqs08',
     category: 'Hedonic Quality',
-    text: 'רגילה / חדשנית',
+    text: 'רגילים / בחזית החדשנות',
     order: 8,
   },
 ].map(q => ({
